@@ -1,4 +1,4 @@
-/* RepositoryList Styles */
+/* ProjectList Styles */
 
 .repository-list {
   padding: 2rem;
@@ -14,6 +14,38 @@
   margin-bottom: 2rem;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 1rem;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-project-btn {
+  background: var(--primary-text);
+  color: var(--primary-bg);
+  border: 2px solid var(--primary-text);
+  padding: 0.8rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.add-project-btn:hover {
+  background: transparent;
+  color: var(--primary-text);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+  transform: translateY(-2px);
 }
 
 .list-title {
@@ -178,6 +210,77 @@
   line-height: 1.6;
   margin: 0;
   opacity: 0.9;
+}
+
+.voting-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.vote-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.vote-count {
+  color: var(--primary-text);
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px var(--glow-color);
+}
+
+.vote-label {
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vote-btn {
+  background: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--secondary-text);
+  padding: 0.8rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vote-btn:hover {
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+  transform: translateY(-2px);
+}
+
+.vote-btn.voted {
+  background: var(--primary-text);
+  color: var(--primary-bg);
+  border-color: var(--primary-text);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.vote-btn.voted:hover {
+  background: transparent;
+  color: var(--primary-text);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
 }
 
 .tech-stack {
@@ -430,6 +533,15 @@
     align-items: flex-start;
   }
   
+  .header-left {
+    width: 100%;
+  }
+  
+  .add-project-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
   .list-controls {
     flex-direction: column;
     gap: 1rem;
@@ -469,6 +581,205 @@
   .repo-actions {
     flex-direction: column;
   }
+
+  .voting-section {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .vote-btn {
+    width: 100%;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: var(--secondary-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+  animation: modal-enter 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  color: var(--primary-text);
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 0;
+  text-shadow: 0 0 15px var(--glow-color);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--secondary-text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.close-btn:hover {
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  transform: rotate(90deg);
+}
+
+.add-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--primary-text);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.github-input {
+  background: var(--primary-bg);
+  border: 2px solid var(--border-color);
+  color: var(--primary-text);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.github-input:focus {
+  outline: none;
+  border-color: var(--primary-text);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.github-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.github-input::placeholder {
+  color: var(--secondary-text);
+  opacity: 0.7;
+}
+
+.form-hint {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.cancel-btn, .submit-btn {
+  padding: 0.8rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 120px;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--secondary-text);
+}
+
+.cancel-btn:hover {
+  border-color: var(--secondary-text);
+  color: var(--primary-text);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  background: var(--primary-text);
+  color: var(--primary-bg);
+  border: 2px solid var(--primary-text);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: transparent;
+  color: var(--primary-text);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Modal Animation */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @media (max-width: 480px) {
@@ -505,5 +816,28 @@
   .tech-tag {
     padding: 0.3rem 0.6rem;
     font-size: 0.75rem;
+  }
+  
+  .modal-content {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+  
+  .modal-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .cancel-btn, .submit-btn {
+    width: 100%;
+    padding: 1rem;
   }
 }

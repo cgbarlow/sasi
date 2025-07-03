@@ -11,7 +11,7 @@ import '../styles/Dashboard.css'
 const Dashboard: React.FC = () => {
   const { user, logout } = useUser()
   const { stats, agents, repositories, isSwarmActive, startSwarm, stopSwarm } = useSwarm()
-  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'repositories'>('swarm')
+  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'projects'>('swarm')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -76,10 +76,10 @@ const Dashboard: React.FC = () => {
               Agents
             </button>
             <button 
-              className={`view-btn ${selectedView === 'repositories' ? 'active' : ''}`}
-              onClick={() => setSelectedView('repositories')}
+              className={`view-btn ${selectedView === 'projects' ? 'active' : ''}`}
+              onClick={() => setSelectedView('projects')}
             >
-              Repositories
+              Projects
             </button>
             <button 
               className={`view-btn ${selectedView === 'statistics' ? 'active' : ''}`}
@@ -149,7 +149,7 @@ const Dashboard: React.FC = () => {
             </div>
           )}
           
-          {selectedView === 'repositories' && (
+          {selectedView === 'projects' && (
             <div className="content-panel">
               <RepositoryList repositories={repositories} />
             </div>

@@ -26,6 +26,8 @@ export interface Repository {
   openPullRequests: number
   lastActivity: Date
   techStack: string[]
+  votes: number
+  userVoted: boolean
 }
 
 export interface SwarmStats {
@@ -48,6 +50,8 @@ interface SwarmContextType {
   stopSwarm: () => void
   addAgent: (type: Agent['type']) => void
   removeAgent: (id: string) => void
+  voteForProject: (repositoryId: string) => void
+  addRepository: (repository: Repository) => void
 }
 
 const SwarmContext = createContext<SwarmContextType | undefined>(undefined)
@@ -113,7 +117,9 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         completedIssues: 32,
         openPullRequests: 3,
         lastActivity: new Date(),
-        techStack: ['Rust', 'Python', 'CUDA']
+        techStack: ['Rust', 'Python', 'CUDA'],
+        votes: 42,
+        userVoted: false
       },
       {
         id: 'repo_2',
@@ -125,7 +131,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         completedIssues: 51,
         openPullRequests: 5,
         lastActivity: new Date(),
-        techStack: ['Python', 'TensorFlow', 'C++']
+        techStack: ['Python', 'TensorFlow', 'C++'],        votes: 28,        userVoted: true
       },
       {
         id: 'repo_3',
@@ -137,7 +143,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         completedIssues: 67,
         openPullRequests: 7,
         lastActivity: new Date(),
-        techStack: ['Go', 'React', 'PostgreSQL']
+        techStack: ['Go', 'React', 'PostgreSQL'],        votes: 73,        userVoted: false
       }
     ]
 
@@ -267,6 +273,24 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     setAgents(current => current.filter(agent => agent.id !== id))
   }
 
+  const voteForProject = (repositoryId: string) => {
+    setRepositories(current => 
+      current.map(repo => 
+        repo.id === repositoryId 
+          ? { 
+              ...repo, 
+              votes: repo.userVoted ? repo.votes - 1 : repo.votes + 1,
+              userVoted: !repo.userVoted
+            }
+          : repo
+      )
+    )
+  }
+
+  const addRepository = (repository: Repository) => {
+    setRepositories(current => [...current, repository])
+  }
+
   const value: SwarmContextType = {
     agents,
     repositories,
@@ -275,7 +299,9 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     startSwarm,
     stopSwarm,
     addAgent,
-    removeAgent
+    removeAgent,
+    voteForProject,
+    addRepository
   }
 
   return (
