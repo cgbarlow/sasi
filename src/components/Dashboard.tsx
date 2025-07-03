@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useUser } from '../contexts/UserContext'
 import { useSwarm } from '../contexts/SwarmContext'
 import SwarmVisualization from './SwarmVisualization'
-import StatsPanel from './StatsPanel'
+import StatisticsView from './StatisticsView'
 import ControlPanel from './ControlPanel'
 import AgentList from './AgentList'
 import RepositoryList from './RepositoryList'
@@ -11,7 +11,7 @@ import '../styles/Dashboard.css'
 const Dashboard: React.FC = () => {
   const { user, logout } = useUser()
   const { stats, agents, repositories, isSwarmActive, startSwarm, stopSwarm } = useSwarm()
-  const [selectedView, setSelectedView] = useState<'swarm' | 'agents' | 'repositories'>('swarm')
+  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'repositories'>('swarm')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -81,6 +81,12 @@ const Dashboard: React.FC = () => {
             >
               Repositories
             </button>
+            <button 
+              className={`view-btn ${selectedView === 'statistics' ? 'active' : ''}`}
+              onClick={() => setSelectedView('statistics')}
+            >
+              Statistics
+            </button>
           </div>
         </div>
         
@@ -110,17 +116,28 @@ const Dashboard: React.FC = () => {
       </header>
 
       <div className="dashboard-body">
-        <aside className="sidebar">
-          <StatsPanel stats={stats} />
-          <ControlPanel />
-        </aside>
+        {selectedView !== 'statistics' && (
+          <aside className="sidebar">
+            <ControlPanel />
+          </aside>
+        )}
 
-        <main className="main-content">
+        <main className={`main-content ${selectedView === 'statistics' ? 'full-width' : ''}`}>
           {selectedView === 'swarm' && (
             <div className="visualization-container">
               <SwarmVisualization 
                 agents={agents}
                 repositories={repositories}
+                isActive={isSwarmActive}
+              />
+            </div>
+          )}
+          
+          {selectedView === 'statistics' && (
+            <div className="content-panel">
+              <StatisticsView 
+                stats={stats}
+                agents={agents}
                 isActive={isSwarmActive}
               />
             </div>

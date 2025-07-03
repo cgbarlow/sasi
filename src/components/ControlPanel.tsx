@@ -82,40 +82,6 @@ const ControlPanel: React.FC = () => {
         </div>
       </div>
 
-      <div className="control-section">
-        <div className="section-header">
-          <h4>Visualization</h4>
-        </div>
-        
-        <div className="visualization-controls">
-          <div className="control-row">
-            <label>Show Connections:</label>
-            <input type="checkbox" defaultChecked className="control-checkbox" />
-          </div>
-          
-          <div className="control-row">
-            <label>Show Agent Trails:</label>
-            <input type="checkbox" className="control-checkbox" />
-          </div>
-          
-          <div className="control-row">
-            <label>Show Repository Nodes:</label>
-            <input type="checkbox" defaultChecked className="control-checkbox" />
-          </div>
-          
-          <div className="control-row">
-            <label>Animation Speed:</label>
-            <input 
-              type="range" 
-              min="0.1" 
-              max="2" 
-              step="0.1" 
-              defaultValue="1"
-              className="control-slider"
-            />
-          </div>
-        </div>
-      </div>
 
       <div className="control-section">
         <div className="section-header">

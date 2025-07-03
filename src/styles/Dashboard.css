@@ -176,6 +176,10 @@
   overflow: hidden;
 }
 
+.main-content.full-width {
+  width: 100%;
+}
+
 .visualization-container {
   width: 100%;
   height: 100%;

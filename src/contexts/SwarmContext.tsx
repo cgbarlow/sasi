@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export interface Agent {
   id: string
+  name: string
   type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger'
   status: 'active' | 'idle' | 'processing' | 'completed'
   currentTask: string
@@ -9,6 +10,7 @@ export interface Agent {
   branch: string
   completedTasks: number
   efficiency: number
+  progress: number
   position: { x: number; y: number; z: number }
   owner: string
 }
@@ -34,6 +36,7 @@ export interface SwarmStats {
   asiProgress: number
   networkEfficiency: number
   globalContributors: number
+  processingUnits: number
 }
 
 interface SwarmContextType {
@@ -71,7 +74,8 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     tasksCompleted: 0,
     asiProgress: 0,
     networkEfficiency: 0,
-    globalContributors: 0
+    globalContributors: 0,
+    processingUnits: 0
   })
   const [isSwarmActive, setIsSwarmActive] = useState(false)
 
@@ -163,6 +167,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
 
     return Array.from({ length: count }, (_, i) => ({
       id: `agent_${i}`,
+      name: `${agentTypes[Math.floor(Math.random() * agentTypes.length)].charAt(0).toUpperCase() + agentTypes[Math.floor(Math.random() * agentTypes.length)].slice(1)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
       type: agentTypes[Math.floor(Math.random() * agentTypes.length)],
       status: Math.random() > 0.7 ? 'active' : Math.random() > 0.5 ? 'processing' : 'idle',
       currentTask: tasks[Math.floor(Math.random() * tasks.length)],
@@ -170,6 +175,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       branch: `feature/agent-${i}-${Math.random().toString(36).substr(2, 6)}`,
       completedTasks: Math.floor(Math.random() * 50),
       efficiency: Math.random() * 100,
+      progress: Math.random(),
       position: {
         x: (Math.random() - 0.5) * 100,
         y: (Math.random() - 0.5) * 100,
@@ -191,7 +197,8 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       tasksCompleted: totalTasks,
       asiProgress: Math.min(95, (totalTasks / 1000) * 100),
       networkEfficiency: avgEfficiency || 0,
-      globalContributors: Math.floor(Math.random() * 5000) + 15000
+      globalContributors: Math.floor(Math.random() * 5000) + 15000,
+      processingUnits: Math.floor(agents.length * 42.5) + Math.floor(Math.random() * 200) + 1200
     })
   }
 
@@ -214,6 +221,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
           status: newStatus,
           completedTasks,
           efficiency: Math.max(0, Math.min(100, agent.efficiency + (Math.random() - 0.5) * 10)),
+          progress: Math.max(0, Math.min(1, agent.progress + (Math.random() - 0.4) * 0.1)),
           position: {
             x: agent.position.x + (Math.random() - 0.5) * 2,
             y: agent.position.y + (Math.random() - 0.5) * 2,
@@ -235,6 +243,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
   const addAgent = (type: Agent['type']) => {
     const newAgent: Agent = {
       id: `agent_${Date.now()}`,
+      name: `${type.charAt(0).toUpperCase() + type.slice(1)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
       type,
       status: 'idle',
       currentTask: 'Initializing...',
@@ -242,6 +251,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       branch: `feature/new-agent-${Math.random().toString(36).substr(2, 6)}`,
       completedTasks: 0,
       efficiency: 50,
+      progress: 0,
       position: {
         x: (Math.random() - 0.5) * 100,
         y: (Math.random() - 0.5) * 100,
