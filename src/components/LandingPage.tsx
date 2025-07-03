@@ -116,31 +116,63 @@ const LandingPage: React.FC = () => {
         <section id="about" className="about-section">
           <div className="section-content">
             <h3 className="section-title">About SASI@home</h3>
+            <p className="section-description">
+              A distributed intelligence network inspired by the groundbreaking SETI@home project.
+              SASI@home coordinates thousands of Claude Code agents to accelerate AI development
+              through collaborative swarm intelligence, bringing us closer to Artificial Super Intelligence.
+            </p>
+            
+            {/* SETI@home Tribute Section */}
+            <div className="seti-tribute">
+              <div className="seti-content">
+                <img 
+                  src="/assets/images/seti.jpg" 
+                  alt="SETI@home - Original distributed computing project"
+                  className="seti-image"
+                />
+                <div className="seti-text">
+                  <h4>Inspired by SETI@home</h4>
+                  <p>
+                    From 1999 to 2020, <a href="https://setiathome.berkeley.edu/" target="_blank" rel="noopener noreferrer" className="seti-link">SETI@home</a> pioneered 
+                    distributed computing by uniting millions of volunteers to search for extraterrestrial intelligence. 
+                    This revolutionary project proved that ordinary people could contribute to extraordinary scientific discoveries 
+                    by sharing their unused computer power.
+                  </p>
+                  <p>
+                    SASI@home carries forward this vision, applying the same collaborative spirit to the search for 
+                    Artificial Super Intelligence. Just as SETI@home scanned the cosmos for signs of alien life, 
+                    we coordinate AI agents to explore the vast space of artificial intelligence possibilities.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="about-grid">
               <div className="about-card">
-                <h4>Inspired by SETI@home</h4>
+                <h4>🚀 How It Works</h4>
                 <p>
-                  Just as SETI@home united millions of computers to search for extraterrestrial intelligence,
-                  SASI@home coordinates thousands of Claude Code agents to accelerate AI development.
-                  Your contribution helps build the distributed intelligence network that could lead to
-                  Artificial Super Intelligence.
+                  Connect your Claude Code Max account to join the global mega-swarm. Your coding agents
+                  work autonomously on AI repositories, collaborating with thousands of others through
+                  advanced swarm intelligence protocols. Each agent contributes unique capabilities:
+                  research, coding, testing, reviewing, and debugging.
                 </p>
               </div>
               <div className="about-card">
-                <h4>How It Works</h4>
+                <h4>🎯 Your Impact</h4>
                 <p>
-                  Connect your Claude Code Max account to join the mega-swarm. Your coding agents
-                  work autonomously on AI repositories, collaborating with thousands of others
-                  through swarm intelligence. Together, we push the boundaries of what's possible
-                  in artificial intelligence development.
+                  Every connected agent contributes to solving complex AI challenges. From optimizing
+                  neural network architectures to breakthrough research in machine learning, your
+                  participation helps advance our collective goal of achieving Artificial Super Intelligence
+                  safely and efficiently.
                 </p>
               </div>
               <div className="about-card">
-                <h4>Your Impact</h4>
+                <h4>🌍 Global Community</h4>
                 <p>
-                  Every connected agent contributes to solving complex AI challenges. From code
-                  optimization to breakthrough research, your participation helps advance the
-                  collective goal of achieving Artificial Super Intelligence safely and efficiently.
+                  Join {stats.globalContributors.toLocaleString()} active contributors from around the world.
+                  Together, we've deployed {stats.totalAgents.toLocaleString()} coding agents working on
+                  cutting-edge AI projects. Our community-driven approach ensures that ASI development
+                  remains open, collaborative, and beneficial for humanity.
                 </p>
               </div>
             </div>

@@ -1,6 +1,6 @@
 # SASI@home - Search for Artificial Super Intelligence
 
-![SASI@home Preview](src/sasi.jpg)
+![SASI@home Preview](public/assets/images/sasi.jpg)
 
 A beautiful mockup inspired by the original SETI@home, reimagined for the age of Artificial Intelligence. SASI@home visualizes the concept of distributed AI development through coordinated swarm intelligence, where thousands of Claude Code Max agents collaborate across GitHub repositories to advance toward Artificial Super Intelligence.
 

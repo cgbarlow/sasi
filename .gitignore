@@ -113,12 +113,6 @@ temp/
 memory/
 claude-flow
 
-# Reference/mockup images (consider if these should be tracked)
-*.jpg
-*.png
-*.gif
-*.jpeg
-
 # Test artifacts
 test-results/
 playwright-report/
