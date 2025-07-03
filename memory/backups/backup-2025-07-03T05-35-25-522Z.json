@@ -1,0 +1,94 @@
+{
+  "timestamp": "2025-07-03T05:35:25.522Z",
+  "version": "1.0",
+  "entries": [
+    {
+      "id": "entry_mcmyc3m7_k2drugxxs",
+      "key": "sasi_architecture",
+      "value": "\"SASI@home System Architecture:\\n\\n## Core Components\\n\\n### 1. Web Frontend (React + TypeScript + WebGL)\\n- Landing page with SETI@home inspired design\\n- User authentication with Claude Code Max\\n- Real-time WebGL visualization of mega-swarm activity\\n- Dashboard showing:\\n  - Active agents count\\n  - Repository activity\\n  - Issue completion rates\\n  - ASI progress metrics\\n  - Individual user contributions\\n\\n### 2. Authentication Service\\n- OAuth integration with Claude Code Max\\n- JWT token management\\n- User session handling\\n- Permission levels (observer, contributor, coordinator)\\n\\n### 3. Swarm Orchestration Engine\\n- Agent spawning and management\\n- Task distribution algorithms\\n- Load balancing across available agents\\n- Progress tracking and reporting\\n- Failure recovery mechanisms\\n\\n### 4. GitHub Integration Service\\n- Repository monitoring\\n- Branch creation and management\\n- Issue assignment and tracking\\n- Pull request coordination\\n- GitHub Actions workflow triggers\\n\\n### 5. WebGL Visualization Engine\\n- 3D representation of swarm activity\\n- Real-time data streaming\\n- Interactive controls (rotate, zoom, filter)\\n- Visual themes inspired by SETI@home\\n- Performance optimized for large datasets\\n\\n### 6. Database Layer\\n- User profiles and authentication\\n- Agent activity logs\\n- Repository and issue status\\n- Performance metrics\\n- Historical data for analytics\\n\\n## Data Flow Architecture\\n\\n1. User authenticates → Frontend → Auth Service → Claude Code Max\\n2. Agent spawning → Orchestration Engine → Claude Code API\\n3. Task assignment → GitHub Service → Repository Issues\\n4. Agent work → GitHub Actions → TDD workflows\\n5. Progress updates → WebGL Visualization → Real-time display\\n6. Completion → Database → Metrics dashboard\\n\\n## Visual Design Principles\\n- Retro-futuristic aesthetic inspired by SETI@home\\n- 3D starfield with coding activity visualization\\n- Color-coded agent types and statuses\\n- Smooth animations and transitions\\n- Responsive design for different screen sizes\"",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-07-03T05:35:25.519Z",
+      "updatedAt": "2025-07-03T05:35:25.519Z",
+      "lastAccessedAt": "2025-07-03T05:35:25.519Z",
+      "version": 1,
+      "size": 2131,
+      "compressed": true,
+      "checksum": "e6bb5f9cd35620e04ce272d9427a73909fc0b87732fc91294fc2db9b97aff5cc",
+      "references": [],
+      "dependencies": []
+    }
+  ],
+  "statistics": {
+    "overview": {
+      "totalEntries": 1,
+      "totalSize": 2131,
+      "compressedEntries": 1,
+      "compressionRatio": 0,
+      "indexSize": 50,
+      "memoryUsage": 9616032,
+      "diskUsage": 0
+    },
+    "distribution": {
+      "byNamespace": {
+        "default": {
+          "count": 1,
+          "size": 2131
+        }
+      },
+      "byType": {
+        "string": {
+          "count": 1,
+          "size": 2131
+        }
+      },
+      "byOwner": {
+        "system": {
+          "count": 1,
+          "size": 2131
+        }
+      },
+      "byAccessLevel": {
+        "shared": {
+          "count": 1,
+          "size": 2131
+        }
+      }
+    },
+    "temporal": {
+      "entriesCreatedLast24h": 1,
+      "entriesUpdatedLast24h": 1,
+      "entriesAccessedLast24h": 1,
+      "oldestEntry": "2025-07-03T05:35:25.519Z",
+      "newestEntry": "2025-07-03T05:35:25.519Z"
+    },
+    "performance": {
+      "averageQueryTime": 0,
+      "averageWriteTime": 1,
+      "cacheHitRatio": 0,
+      "indexEfficiency": 0.95
+    },
+    "health": {
+      "expiredEntries": 0,
+      "orphanedReferences": 0,
+      "duplicateKeys": 0,
+      "corruptedEntries": 0,
+      "recommendedCleanup": false
+    },
+    "optimization": {
+      "suggestions": [],
+      "potentialSavings": {
+        "compression": 0,
+        "cleanup": 0,
+        "deduplication": 0
+      },
+      "indexOptimization": [
+        "Consider periodic index rebuilding for optimal performance"
+      ]
+    }
+  }
+}

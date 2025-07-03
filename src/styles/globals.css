@@ -1,0 +1,234 @@
+/* SASI@home Global Styles - Inspired by SETI@home retro-futuristic design */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --primary-bg: #000818;
+  --secondary-bg: #001122;
+  --accent-bg: #002244;
+  --primary-text: #00ff88;
+  --secondary-text: #00ccff;
+  --accent-text: #ffaa00;
+  --warning-text: #ff4444;
+  --success-text: #44ff44;
+  --border-color: #00ff8844;
+  --glow-color: #00ff88;
+  --particle-color: #00ccff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Orbitron', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  overflow: hidden;
+  cursor: default;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.sasi-logo {
+  margin-bottom: 2rem;
+}
+
+.sasi-text {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--primary-text);
+  text-shadow: 
+    0 0 10px var(--glow-color),
+    0 0 20px var(--glow-color),
+    0 0 30px var(--glow-color);
+  letter-spacing: 0.3em;
+}
+
+.loading-bar {
+  width: 300px;
+  height: 4px;
+  background: var(--secondary-bg);
+  margin: 1rem auto;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-text), var(--secondary-text));
+  animation: loading-progress 2s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--glow-color);
+}
+
+.loading-message {
+  font-size: 1.2rem;
+  color: var(--secondary-text);
+  opacity: 0.8;
+  animation: fade-in-out 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes loading-progress {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
+}
+
+@keyframes fade-in-out {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    text-shadow: 
+      0 0 10px var(--glow-color),
+      0 0 20px var(--glow-color),
+      0 0 30px var(--glow-color);
+  }
+  50% { 
+    text-shadow: 
+      0 0 20px var(--glow-color),
+      0 0 30px var(--glow-color),
+      0 0 40px var(--glow-color);
+  }
+}
+
+/* Utility Classes */
+.glow-text {
+  text-shadow: 
+    0 0 10px var(--glow-color),
+    0 0 20px var(--glow-color),
+    0 0 30px var(--glow-color);
+}
+
+.retro-button {
+  background: transparent;
+  border: 2px solid var(--primary-text);
+  color: var(--primary-text);
+  padding: 0.8rem 2rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.retro-button:hover {
+  background: var(--primary-text);
+  color: var(--primary-bg);
+  box-shadow: 
+    0 0 20px var(--glow-color),
+    inset 0 0 20px var(--glow-color);
+}
+
+.retro-button:active {
+  transform: scale(0.98);
+}
+
+.panel {
+  background: var(--secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.1),
+    inset 0 0 20px rgba(0, 255, 136, 0.05);
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-active {
+  background: var(--success-text);
+  box-shadow: 0 0 10px var(--success-text);
+}
+
+.status-inactive {
+  background: var(--warning-text);
+  box-shadow: 0 0 10px var(--warning-text);
+}
+
+.status-processing {
+  background: var(--accent-text);
+  box-shadow: 0 0 10px var(--accent-text);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-text);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-text);
+}
+
+/* Selection Styling */
+::selection {
+  background: var(--primary-text);
+  color: var(--primary-bg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sasi-text {
+    font-size: 2rem;
+  }
+  
+  .loading-bar {
+    width: 250px;
+  }
+  
+  .loading-message {
+    font-size: 1rem;
+  }
+}
