@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20.18.0"
+  NPM_VERSION = "10.9.2"
+
+# Enable Node.js Corepack for package manager support
+[build.processing]
+  skip_processing = false
+
+# Redirect rules for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

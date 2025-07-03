@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { Agent } from '../contexts/SwarmContext'
 import '../styles/SwarmVisualization.css'
@@ -17,12 +17,8 @@ const SwarmVisualization: React.FC<SwarmVisualizationProps> = ({
   const sceneRef = useRef<THREE.Scene>()
   const rendererRef = useRef<THREE.WebGLRenderer>()
   const cameraRef = useRef<THREE.PerspectiveCamera>()
-  const agentMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map())
-  const connectionLinesRef = useRef<THREE.LineSegments[]>([])
   const animationIdRef = useRef<number>()
   const spectrumRef = useRef<{ spectrumGroup: THREE.Group; bars: THREE.Mesh[]; freqBins: number; timeBins: number } | null>(null)
-  const [selectedAgent] = useState<Agent | null>(null)
-  const [cameraMode, setCameraMode] = useState<'orbit' | 'follow' | 'free'>('orbit')
   const [webglError, setWebglError] = useState<string | null>(null)
 
   // Create classic SETI@home style 3D frequency spectrum waterfall
@@ -258,15 +254,13 @@ const SwarmVisualization: React.FC<SwarmVisualizationProps> = ({
         const deltaX = event.clientX - mouseX
         const deltaY = event.clientY - mouseY
         
-        if (cameraMode === 'orbit') {
-          const spherical = new THREE.Spherical()
-          spherical.setFromVector3(camera.position)
-          spherical.theta -= deltaX * 0.005  // Slower rotation
-          spherical.phi += deltaY * 0.005    // Slower rotation
-          spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi))
-          camera.position.setFromSpherical(spherical)
-          camera.lookAt(0, 10, 0)  // Look at center of spectrum
-        }
+        const spherical = new THREE.Spherical()
+        spherical.setFromVector3(camera.position)
+        spherical.theta -= deltaX * 0.005  // Slower rotation
+        spherical.phi += deltaY * 0.005    // Slower rotation
+        spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi))
+        camera.position.setFromSpherical(spherical)
+        camera.lookAt(0, 10, 0)  // Look at center of spectrum
         
         mouseX = event.clientX
         mouseY = event.clientY
