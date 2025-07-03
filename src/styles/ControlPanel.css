@@ -1,12 +1,14 @@
 /* ControlPanel Styles */
 
 .control-panel {
-  padding: 1.5rem;
+  padding: 1rem; /* Reduced from 1.5rem */
   background: var(--primary-bg);
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal overflow */
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem; /* Reduced from 1.5rem */
+  box-sizing: border-box;
 }
 
 .panel-header {
@@ -27,7 +29,8 @@
   background: var(--secondary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1rem; /* Reduced from 1.5rem */
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -46,16 +49,16 @@
 .control-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.8rem; /* Reduced from 1rem */
 }
 
 .control-button {
   background: transparent;
   border: 2px solid var(--border-color);
   color: var(--secondary-text);
-  padding: 1rem;
+  padding: 0.7rem 0.5rem; /* Reduced from 1rem */
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Reduced from 0.9rem */
   font-weight: 600;
   cursor: pointer;
   border-radius: 6px;
@@ -65,7 +68,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.3rem; /* Reduced from 0.5rem */
+  box-sizing: border-box;
+  min-height: 44px; /* Ensure touch target size */
 }
 
 .control-button:hover {
@@ -299,14 +304,30 @@
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Responsive Design - Switch to single column earlier */
+@media (max-width: 1400px) {
   .control-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column for narrow sidebars */
   }
   
   .quick-actions {
     grid-template-columns: 1fr;
+  }
+  
+  .control-button {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .control-panel {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+  
+  .control-section {
+    padding: 0.8rem;
   }
 }
 

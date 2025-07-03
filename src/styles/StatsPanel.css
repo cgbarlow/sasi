@@ -1,14 +1,16 @@
 /* StatsPanel Styles */
 
 .stats-panel {
-  padding: 1.5rem;
+  padding: 1rem; /* Reduced from 1.5rem */
   background: var(--secondary-bg);
   border-right: 1px solid var(--border-color);
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal overflow */
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.2rem; /* Reduced from 2rem */
+  box-sizing: border-box;
 }
 
 .panel-header {
@@ -44,19 +46,20 @@
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.8rem; /* Reduced from 1rem */
 }
 
 .stat-card {
   background: var(--primary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.8rem; /* Reduced from 1rem */
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem; /* Reduced from 1rem */
   transition: all 0.3s ease;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .stat-card:hover {
@@ -66,8 +69,8 @@
 }
 
 .stat-icon {
-  font-size: 1.5rem;
-  min-width: 40px;
+  font-size: 1.3rem; /* Reduced from 1.5rem */
+  min-width: 35px; /* Reduced from 40px */
   text-align: center;
 }
 
@@ -334,20 +337,33 @@
   }
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Responsive Design - Switch to single column earlier */
+@media (max-width: 1400px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column for narrow sidebars */
   }
   
   .stat-card {
-    padding: 0.8rem;
+    padding: 0.7rem;
   }
   
   .progress-section,
   .efficiency-section,
   .real-time-section {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .stats-panel {
+    padding: 0.8rem;
+    gap: 1rem;
+  }
+  
+  .progress-section,
+  .efficiency-section,
+  .real-time-section {
+    padding: 0.8rem;
   }
 }
 

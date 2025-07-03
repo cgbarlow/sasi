@@ -97,13 +97,14 @@
   pointer-events: none;
 }
 
-/* Classic SETI@home floating panels */
+/* Classic SETI@home floating panels - Responsive */
 .seti-panel {
   background: rgba(0, 100, 200, 0.15);
   border: 2px solid rgba(0, 150, 255, 0.6);
   border-radius: 6px;
   padding: 1rem 1.5rem;
-  min-width: 280px;
+  min-width: 250px; /* Reduced from 280px */
+  max-width: 320px; /* Add max-width constraint */
   backdrop-filter: blur(8px);
   box-shadow: 
     0 0 20px rgba(0, 150, 255, 0.3),
@@ -112,6 +113,7 @@
   font-family: 'Courier New', monospace;
   pointer-events: auto;
   animation: seti-panel-glow 3s ease-in-out infinite alternate;
+  box-sizing: border-box; /* Include padding in width */
 }
 
 @keyframes seti-panel-glow {
@@ -486,62 +488,134 @@
   right: 2rem;
 }
 
-/* Responsive Design */
+/* Responsive Design - Prevent Overlapping */
+@media (max-width: 1400px) {
+  .visualization-info {
+    max-width: 300px; /* Constrain panel width */
+  }
+  
+  .seti-panel {
+    min-width: 220px; /* Smaller panels */
+    max-width: 280px;
+  }
+}
+
 @media (max-width: 1024px) {
   .visualization-controls {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.8rem;
+    max-width: 300px; /* Prevent overflow */
   }
   
   .control-group {
     flex-direction: column;
     gap: 0.3rem;
     align-items: flex-start;
+    padding: 0.6rem 1rem; /* Smaller padding */
   }
   
   .visualization-info {
-    position: static;
-    margin: 1rem;
+    position: absolute; /* Keep floating but constrained */
+    top: 1rem;
+    right: 1rem;
+    max-width: 280px; /* Prevent overflow */
+    max-height: calc(100vh - 200px); /* Prevent vertical overflow */
+    overflow-y: auto; /* Allow scrolling if needed */
+  }
+  
+  .seti-panel {
+    min-width: 200px; /* Even smaller */
+    max-width: 250px;
+    padding: 0.8rem 1rem; /* Smaller padding */
   }
 }
 
 @media (max-width: 768px) {
   .visualization-controls {
-    position: static;
-    margin: 1rem;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: auto;
+    max-width: calc(100vw - 320px); /* Leave space for panels */
     background: var(--secondary-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
   }
   
-  .info-panel,
-  .agent-info-panel {
-    min-width: auto;
-    margin: 0 1rem;
+  .visualization-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    max-width: 280px;
+    gap: 1rem; /* Smaller gap between panels */
   }
   
-  .legend-item {
-    justify-content: space-between;
+  .seti-panel {
+    min-width: 180px;
+    max-width: 220px;
+    padding: 0.8rem;
+  }
+  
+  .seti-data-line {
+    font-size: 0.8rem; /* Smaller text */
+  }
+}
+
+@media (max-width: 600px) {
+  /* Stack panels vertically to prevent horizontal overlap */
+  .visualization-info {
+    position: static; /* Remove floating */
+    display: flex;
+    flex-direction: row; /* Horizontal layout */
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1rem;
+    max-width: none;
+    justify-content: center;
+  }
+  
+  .visualization-controls {
+    position: static;
+    margin: 1rem;
+    max-width: none;
+  }
+  
+  .seti-panel {
+    min-width: 150px;
+    max-width: 180px;
+    flex: 1;
+    padding: 0.6rem;
+  }
+  
+  .seti-panel h3 {
+    font-size: 0.9rem; /* Smaller headings */
+  }
+  
+  .seti-data-line {
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
   }
 }
 
 @media (max-width: 480px) {
+  /* Single column layout on very small screens */
+  .visualization-info {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .seti-panel {
+    min-width: 140px;
+    max-width: calc(100vw - 2rem); /* Full width minus margins */
+    padding: 0.5rem;
+  }
+  
   .visualization-controls {
     margin: 0.5rem;
   }
   
   .control-group {
-    padding: 0.6rem;
-  }
-  
-  .info-panel,
-  .agent-info-panel {
-    margin: 0 0.5rem;
-    padding: 1rem;
-  }
-  
-  .legend-item {
-    margin-bottom: 0.5rem;
+    padding: 0.5rem;
   }
 }
