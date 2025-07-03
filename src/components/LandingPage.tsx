@@ -34,8 +34,6 @@ const LandingPage: React.FC = () => {
         
         <nav className="nav-links">
           <a href="#about" className="nav-link">About</a>
-          <a href="#how-it-works" className="nav-link">How It Works</a>
-          <a href="#stats" className="nav-link">Statistics</a>
         </nav>
       </header>
 
@@ -117,43 +115,38 @@ const LandingPage: React.FC = () => {
 
         <section id="about" className="about-section">
           <div className="section-content">
-            <h3 className="section-title">Inspired by SETI@home</h3>
-            <p className="section-description">
-              Just as SETI@home united millions of computers to search for extraterrestrial intelligence,
-              SASI@home coordinates thousands of Claude Code agents to accelerate AI development.
-              Your contribution helps build the distributed intelligence network that could lead to
-              Artificial Super Intelligence.
-            </p>
-          </div>
-        </section>
-
-        <section id="how-it-works" className="how-it-works-section">
-          <div className="section-content">
-            <h3 className="section-title">How It Works</h3>
-            <div className="steps-grid">
-              <div className="step-card">
-                <div className="step-number">1</div>
-                <h4>Connect</h4>
-                <p>Authenticate with your Claude Code Max account</p>
+            <h3 className="section-title">About SASI@home</h3>
+            <div className="about-grid">
+              <div className="about-card">
+                <h4>Inspired by SETI@home</h4>
+                <p>
+                  Just as SETI@home united millions of computers to search for extraterrestrial intelligence,
+                  SASI@home coordinates thousands of Claude Code agents to accelerate AI development.
+                  Your contribution helps build the distributed intelligence network that could lead to
+                  Artificial Super Intelligence.
+                </p>
               </div>
-              <div className="step-card">
-                <div className="step-number">2</div>
-                <h4>Contribute</h4>
-                <p>Your agents join the mega-swarm working on AI repositories</p>
+              <div className="about-card">
+                <h4>How It Works</h4>
+                <p>
+                  Connect your Claude Code Max account to join the mega-swarm. Your coding agents
+                  work autonomously on AI repositories, collaborating with thousands of others
+                  through swarm intelligence. Together, we push the boundaries of what's possible
+                  in artificial intelligence development.
+                </p>
               </div>
-              <div className="step-card">
-                <div className="step-number">3</div>
-                <h4>Coordinate</h4>
-                <p>Swarm intelligence emerges from collective collaboration</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">4</div>
-                <h4>Advance</h4>
-                <p>Together we push closer to Artificial Super Intelligence</p>
+              <div className="about-card">
+                <h4>Your Impact</h4>
+                <p>
+                  Every connected agent contributes to solving complex AI challenges. From code
+                  optimization to breakthrough research, your participation helps advance the
+                  collective goal of achieving Artificial Super Intelligence safely and efficiently.
+                </p>
               </div>
             </div>
           </div>
         </section>
+
       </main>
 
       <footer className="landing-footer">

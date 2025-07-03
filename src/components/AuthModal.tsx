@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUser } from '../contexts/UserContext'
 import '../styles/AuthModal.css'
 
 const AuthModal: React.FC = () => {
+  const navigate = useNavigate()
   const { isAuthModalOpen, setIsAuthModalOpen, login, mockLogin } = useUser()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('demo@claudemax.ai')
+  const [password, setPassword] = useState('SwarIntelligence2025!')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -16,6 +18,7 @@ const AuthModal: React.FC = () => {
 
     try {
       await login({ username, password })
+      navigate('/dashboard')
     } catch (err) {
       setError('Authentication failed. Please try again.')
     } finally {
@@ -33,6 +36,7 @@ const AuthModal: React.FC = () => {
   const handleMockLogin = () => {
     mockLogin()
     handleClose()
+    navigate('/dashboard')
   }
 
   if (!isAuthModalOpen) return null
@@ -54,16 +58,20 @@ const AuthModal: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
+            <div className="demo-credentials-notice">
+              <p><strong>Demo Credentials:</strong> The following are pre-filled for demonstration purposes</p>
+            </div>
+
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Claude Max Email</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                className="auth-input"
-                required
+                className="auth-input demo-input"
+                readOnly
               />
             </div>
 
@@ -75,8 +83,8 @@ const AuthModal: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="auth-input"
-                required
+                className="auth-input demo-input"
+                readOnly
               />
             </div>
 

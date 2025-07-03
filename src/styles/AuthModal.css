@@ -120,6 +120,34 @@
   opacity: 0.6;
 }
 
+.demo-credentials-notice {
+  background: rgba(255, 170, 0, 0.1);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.demo-credentials-notice p {
+  margin: 0;
+  color: var(--warning-text);
+  font-size: 0.9rem;
+}
+
+.auth-input.demo-input {
+  background: rgba(0, 255, 136, 0.05);
+  border-color: rgba(0, 255, 136, 0.3);
+  cursor: default;
+  color: var(--primary-text);
+  opacity: 0.8;
+}
+
+.auth-input.demo-input:focus {
+  border-color: rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
 .error-message {
   color: var(--warning-text);
   font-size: 0.9rem;
