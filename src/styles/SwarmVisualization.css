@@ -92,8 +92,112 @@
   right: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   z-index: 10;
+  pointer-events: none;
+}
+
+/* Classic SETI@home floating panels */
+.seti-panel {
+  background: rgba(0, 100, 200, 0.15);
+  border: 2px solid rgba(0, 150, 255, 0.6);
+  border-radius: 6px;
+  padding: 1rem 1.5rem;
+  min-width: 280px;
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 0 20px rgba(0, 150, 255, 0.3),
+    inset 0 0 20px rgba(0, 150, 255, 0.1);
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+  pointer-events: auto;
+  animation: seti-panel-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes seti-panel-glow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(0, 150, 255, 0.2),
+      inset 0 0 15px rgba(0, 150, 255, 0.08);
+  }
+  100% {
+    box-shadow: 
+      0 0 25px rgba(0, 150, 255, 0.4),
+      inset 0 0 25px rgba(0, 150, 255, 0.15);
+  }
+}
+
+.seti-panel.agent-info {
+  background: rgba(0, 150, 80, 0.15);
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.3),
+    inset 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.seti-panel h3 {
+  color: #00ddff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px #00ddff;
+}
+
+.seti-data-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.seti-data-line span:first-child {
+  color: #aaccff;
+  font-weight: normal;
+}
+
+.data-value {
+  color: #ffffff;
+  font-weight: bold;
+  text-shadow: 0 0 5px currentColor;
+}
+
+.data-value.highlight {
+  color: #ffaa00;
+  text-shadow: 0 0 8px #ffaa00;
+}
+
+.data-value.success {
+  color: #00ff88;
+  text-shadow: 0 0 8px #00ff88;
+}
+
+.spectrum-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spectrum-red {
+  background: linear-gradient(90deg, #ff0000, #ff4444);
+  box-shadow: 0 0 8px #ff0000;
+}
+
+.spectrum-yellow {
+  background: linear-gradient(90deg, #ffff00, #ffaa00);
+  box-shadow: 0 0 8px #ffaa00;
+}
+
+.spectrum-green {
+  background: linear-gradient(90deg, #00ff00, #44ff44);
+  box-shadow: 0 0 8px #00ff00;
+}
+
+.spectrum-blue {
+  background: linear-gradient(90deg, #0088ff, #4444ff);
+  box-shadow: 0 0 8px #0088ff;
 }
 
 .info-panel {
@@ -210,6 +314,134 @@
 .fps-counter {
   color: var(--primary-text);
   font-weight: 700;
+}
+
+/* WebGL Fallback Styles - Classic SETI@home inspired */
+.webgl-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #000011 0%, #000033 100%);
+  z-index: 10;
+}
+
+.fallback-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  color: var(--primary-text);
+}
+
+.seti-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.seti-header h3 {
+  color: #00ccff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px #00ccff;
+  letter-spacing: 0.1em;
+}
+
+.seti-header p {
+  color: #88ccff;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px #88ccff;
+}
+
+.analysis-panels {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.data-panel {
+  background: rgba(0, 50, 100, 0.3);
+  border: 2px solid #0066cc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 300px;
+  box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+}
+
+.data-panel h4 {
+  color: #00ccff;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px #00ccff;
+}
+
+.spectrum-bars {
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 80px;
+  margin: 1rem 0;
+  padding: 0 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.spectrum-bar {
+  width: 8px;
+  min-height: 2px;
+  border-radius: 2px;
+  box-shadow: 0 0 5px currentColor;
+  animation: spectrum-pulse 2s ease-in-out infinite;
+}
+
+@keyframes spectrum-pulse {
+  0%, 100% { opacity: 0.7; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+.info-panel-fallback {
+  background: rgba(0, 80, 50, 0.3);
+  border: 2px solid #00aa66;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 250px;
+  box-shadow: 0 0 20px rgba(0, 170, 102, 0.3);
+}
+
+.info-panel-fallback h4 {
+  color: #00ff88;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px #00ff88;
+}
+
+.info-panel-fallback p {
+  color: #88ffaa;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+.fallback-note {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(100, 50, 0, 0.3);
+  border: 1px solid #cc6600;
+  border-radius: 6px;
+  color: #ffaa66;
+}
+
+.fallback-note p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
 }
 
 /* Animations */
