@@ -6,12 +6,13 @@ import StatisticsView from './StatisticsView'
 import ControlPanel from './ControlPanel'
 import AgentList from './AgentList'
 import RepositoryList from './RepositoryList'
+import PerformanceDashboard from './PerformanceDashboard'
 import '../styles/Dashboard.css'
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useUser()
   const { stats, agents, repositories, isSwarmActive, startSwarm, stopSwarm } = useSwarm()
-  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'projects'>('swarm')
+  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'projects' | 'performance'>('swarm')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -87,6 +88,12 @@ const Dashboard: React.FC = () => {
             >
               Statistics
             </button>
+            <button 
+              className={`view-btn ${selectedView === 'performance' ? 'active' : ''}`}
+              onClick={() => setSelectedView('performance')}
+            >
+              Performance
+            </button>
           </div>
         </div>
         
@@ -116,13 +123,13 @@ const Dashboard: React.FC = () => {
       </header>
 
       <div className="dashboard-body">
-        {selectedView !== 'statistics' && (
+        {selectedView !== 'statistics' && selectedView !== 'performance' && (
           <aside className="sidebar">
             <ControlPanel />
           </aside>
         )}
 
-        <main className={`main-content ${selectedView === 'statistics' ? 'full-width' : ''}`}>
+        <main className={`main-content ${selectedView === 'statistics' || selectedView === 'performance' ? 'full-width' : ''}`}>
           {selectedView === 'swarm' && (
             <div className="visualization-container">
               <SwarmVisualization 
@@ -152,6 +159,12 @@ const Dashboard: React.FC = () => {
           {selectedView === 'projects' && (
             <div className="content-panel">
               <RepositoryList repositories={repositories} />
+            </div>
+          )}
+          
+          {selectedView === 'performance' && (
+            <div className="content-panel">
+              <PerformanceDashboard />
             </div>
           )}
         </main>
