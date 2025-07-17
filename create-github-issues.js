@@ -226,7 +226,7 @@ function generateSummaryReport(createdIssues, issuesData) {
   log(`   npx claude-flow@alpha hooks notify --message "issue-#1-started: Neural Agent Integration"`, 'cyan');
 }
 
-function main() {
+async function main() {
   log(`🚀 GitHub Issues Creation Script`, 'magenta');
   log(`${'='.repeat(50)}`, 'magenta');
   
@@ -264,7 +264,7 @@ function main() {
     
     // Small delay to avoid rate limiting
     if (!dryRun) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await delay(1000);
     }
   }
   
