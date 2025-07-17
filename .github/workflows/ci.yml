@@ -1,0 +1,494 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 6 * * *' # Daily at 6 AM UTC
+
+env:
+  NODE_VERSION: '20'
+  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
+  CLAUDE_FLOW_VERSION: '2.0.0-alpha.43'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          restore-keys: |
+            node-modules-
+            
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+        
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+
+  lint-and-typecheck:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Run linting
+        run: npm run lint
+        
+      - name: Run type checking
+        run: npm run typecheck
+        
+      - name: Check code formatting
+        run: npm run format:check
+
+  unit-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-suite: [unit, integration, wasm]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Initialize claude-flow hooks
+        run: |
+          npx claude-flow@alpha hooks pre-task --description "CI test setup"
+          
+      - name: Run ${{ matrix.test-suite }} tests
+        run: npm run test:${{ matrix.test-suite }}
+        
+      - name: Upload coverage
+        if: matrix.test-suite == 'unit'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unit-tests
+          name: unit-tests-coverage
+          
+      - name: Store test results
+        run: |
+          npx claude-flow@alpha hooks post-task --task-id "ci-${{ matrix.test-suite }}-tests"
+
+  performance-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Run performance tests
+        run: npm run test:performance
+        
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: coverage/performance-report.json
+          
+      - name: Benchmark comparison
+        run: npm run benchmark
+
+  e2e-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Start test servers
+        run: |
+          npm run dev &
+          sleep 30
+          
+      - name: Run E2E tests
+        run: npm run test:e2e
+        
+      - name: Upload E2E screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: tests/e2e/screenshots/
+          
+      - name: Upload E2E videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-videos
+          path: tests/e2e/videos/
+
+  cross-platform-tests:
+    needs: setup
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20, 22]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Run cross-platform tests
+        run: npm run test:unit
+        
+      - name: Test WASM compatibility
+        run: npm run test:wasm
+
+  docker-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build test image
+        run: docker build -t sasi-synaptic-tests .
+        
+      - name: Run Docker tests
+        run: docker run --rm sasi-synaptic-tests npm run test:ci
+        
+      - name: Test Docker compose
+        run: docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+
+  security-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
+        
+      - name: Run dependency check
+        run: npx depcheck
+        
+      - name: Run security tests
+        run: npm run test:security
+
+  mutation-tests:
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Run mutation tests
+        run: npm run test:mutation
+        
+      - name: Upload mutation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-results
+          path: reports/mutation/
+
+  stress-tests:
+    needs: [unit-tests, performance-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Run stress tests
+        run: npm run test:stress
+        
+      - name: Upload stress test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-test-results
+          path: reports/stress/
+
+  coverage-report:
+    needs: [unit-tests, integration-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Generate coverage report
+        run: npm run test:coverage
+        
+      - name: Check coverage thresholds
+        run: npm run coverage:check
+        
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: all-tests
+          name: full-coverage-report
+          
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+            const comment = \`## Coverage Report
+            
+            | Metric | Percentage |
+            |--------|------------|
+            | Lines | \${coverage.total.lines.pct}% |
+            | Functions | \${coverage.total.functions.pct}% |
+            | Branches | \${coverage.total.branches.pct}% |
+            | Statements | \${coverage.total.statements.pct}% |
+            \`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  deployment-tests:
+    needs: [unit-tests, integration-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */node_modules
+          key: ${{ env.CACHE_KEY }}
+          
+      - name: Build production bundles
+        run: |
+          cd sasi && npm run build
+          cd ../synaptic-mesh && npm run build
+          
+      - name: Test production builds
+        run: npm run test:production
+        
+      - name: Deploy to staging
+        run: npm run deploy:staging
+        
+      - name: Run smoke tests on staging
+        run: npm run test:smoke:staging
+
+  notify:
+    needs: [lint-and-typecheck, unit-tests, performance-tests, e2e-tests, coverage-report]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install claude-flow
+        run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
+        
+      - name: Notify completion
+        run: |
+          npx claude-flow@alpha hooks notification --message "CI pipeline completed for ${{ github.sha }}"
+          
+      - name: Generate test report
+        run: |
+          echo "# Test Results Summary" > test-summary.md
+          echo "" >> test-summary.md
+          echo "## Build Information" >> test-summary.md
+          echo "- **Commit**: ${{ github.sha }}" >> test-summary.md
+          echo "- **Branch**: ${{ github.ref }}" >> test-summary.md
+          echo "- **Workflow**: ${{ github.workflow }}" >> test-summary.md
+          echo "- **Run Number**: ${{ github.run_number }}" >> test-summary.md
+          echo "" >> test-summary.md
+          echo "## Test Results" >> test-summary.md
+          echo "- **Lint & TypeCheck**: ${{ needs.lint-and-typecheck.result }}" >> test-summary.md
+          echo "- **Unit Tests**: ${{ needs.unit-tests.result }}" >> test-summary.md
+          echo "- **Performance Tests**: ${{ needs.performance-tests.result }}" >> test-summary.md
+          echo "- **E2E Tests**: ${{ needs.e2e-tests.result }}" >> test-summary.md
+          echo "- **Coverage Report**: ${{ needs.coverage-report.result }}" >> test-summary.md
+          
+      - name: Upload test summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: test-summary.md
