@@ -1,0 +1,141 @@
+{
+  "deployment": {
+    "environment": "production",
+    "version": "2.0.0-phase2b",
+    "buildTarget": "dist/",
+    "deploymentStrategy": "rolling",
+    "healthCheck": {
+      "enabled": true,
+      "endpoint": "/health",
+      "interval": "30s",
+      "timeout": "10s",
+      "retries": 3
+    }
+  },
+  "performance": {
+    "targets": {
+      "agentSpawnTime": "75ms",
+      "neuralInference": "100ms",
+      "memoryPerAgent": "50MB",
+      "frameRate": "60fps",
+      "wasmLoadTime": "500ms"
+    },
+    "optimizations": {
+      "enableSIMD": true,
+      "enableWASMCaching": true,
+      "enableMemoryPooling": true,
+      "enableGPUAcceleration": true,
+      "batchSize": 32,
+      "cacheSize": "128MB"
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "realTimeMetrics": true,
+    "alerting": {
+      "enabled": true,
+      "thresholds": {
+        "memoryUsage": "80%",
+        "responseTime": "120ms",
+        "errorRate": "5%",
+        "frameRateDrop": "50fps"
+      },
+      "notifications": {
+        "email": "alerts@sasi.dev",
+        "webhook": "https://monitoring.sasi.dev/alerts"
+      }
+    },
+    "metrics": {
+      "collection": {
+        "interval": "10s",
+        "retention": "7d",
+        "aggregation": "1m"
+      },
+      "endpoints": {
+        "metrics": "/api/metrics",
+        "health": "/api/health",
+        "status": "/api/status"
+      }
+    }
+  },
+  "scaling": {
+    "auto": {
+      "enabled": true,
+      "minAgents": 1,
+      "maxAgents": 10,
+      "targetCPU": "70%",
+      "targetMemory": "80%"
+    },
+    "resources": {
+      "memoryLimit": "500MB",
+      "cpuLimit": "2",
+      "diskSpace": "1GB"
+    }
+  },
+  "database": {
+    "sqlite": {
+      "enabled": true,
+      "path": "./data/production.db",
+      "backup": {
+        "enabled": true,
+        "interval": "1h",
+        "retention": "7d",
+        "path": "./backups/"
+      }
+    },
+    "persistence": {
+      "crossSession": true,
+      "memoryStorage": true,
+      "compression": true
+    }
+  },
+  "security": {
+    "https": {
+      "enabled": true,
+      "redirect": true
+    },
+    "cors": {
+      "enabled": true,
+      "origins": ["https://sasi.dev", "https://app.sasi.dev"]
+    },
+    "rateLimit": {
+      "enabled": true,
+      "requests": 1000,
+      "window": "15m"
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "outputs": ["console", "file"],
+    "rotation": {
+      "enabled": true,
+      "maxSize": "100MB",
+      "maxFiles": 10
+    }
+  },
+  "neural": {
+    "mesh": {
+      "topology": "hierarchical",
+      "maxAgents": 10,
+      "coordination": {
+        "enabled": true,
+        "realTime": true,
+        "persistentMemory": true
+      }
+    },
+    "wasm": {
+      "modules": {
+        "enabled": true,
+        "path": "./wasm/",
+        "fallback": true,
+        "cache": true
+      },
+      "simd": {
+        "enabled": true,
+        "detection": true,
+        "fallback": "javascript"
+      }
+    }
+  }
+}

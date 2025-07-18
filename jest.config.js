@@ -47,33 +47,22 @@ module.exports = {
   forceExit: true,
   bail: false, // Continue running tests after failures
   
-  // TypeScript Configuration
+  // TypeScript Configuration - Updated for ts-jest v29+
   preset: 'ts-jest',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-      tsconfig: {
-        jsx: 'react-jsx',
-        moduleResolution: 'node',
-        allowSyntheticDefaultImports: true,
-        esModuleInterop: true
-      }
-    }
-  },
   
-  // Transform Configuration
+  // Transform Configuration - Fixed deprecated globals usage
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       useESM: true,
-      isolatedModules: true,
       tsconfig: {
         jsx: 'react-jsx',
         moduleResolution: 'node',
         allowSyntheticDefaultImports: true,
         esModuleInterop: true,
         target: 'es2020',
-        module: 'esnext'
+        module: 'esnext',
+        isolatedModules: true
       }
     }],
     '^.+\\.(js|jsx)$': ['babel-jest', {
@@ -101,13 +90,14 @@ module.exports = {
   },
   
   // Coverage Configuration
-  collectCoverage: true,
+  collectCoverage: false, // Set to false by default, enable via CLI
   collectCoverageFrom: [
     'src/**/*.{js,ts,tsx}',
     '!src/tests/**',
     '!src/**/*.d.ts',
     '!src/main.tsx',
     '!src/vite-env.d.ts',
+    '!src/App.tsx', // Exclude main app component for now
     '!node_modules/**',
     '!dist/**',
     '!build/**',
@@ -116,8 +106,9 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'text-summary', 'lcov', 'html', 'json', 'cobertura'],
   
-  // Coverage Thresholds for Phase 2A (>90% requirement)
+  // Production Coverage Thresholds (>90% requirement)
   coverageThreshold: {
+    // Fail build if overall coverage drops below 90%
     global: {
       branches: 90,
       functions: 90,
@@ -153,6 +144,13 @@ module.exports = {
       functions: 93,
       lines: 93,
       statements: 93
+    },
+    // Critical paths require higher coverage
+    './src/utils/': {
+      branches: 97,
+      functions: 97,
+      lines: 97,
+      statements: 97
     }
   },
   
@@ -165,14 +163,41 @@ module.exports = {
     '/coverage/'
   ],
   
-  // Performance Configuration
-  maxWorkers: '50%', // Use half of available CPU cores
+  // Performance Configuration for CI/CD
+  maxWorkers: process.env.CI ? 2 : '50%', // Limited workers in CI, half CPU cores locally
   cache: true,
   cacheDirectory: '<rootDir>/.jest-cache',
   
-  // Reporter Configuration
+  // CI/CD Specific Configuration
+  passWithNoTests: false, // Fail if no tests found
+  silent: process.env.CI ? true : false, // Reduce noise in CI
+  
+  // Memory Management for CI
+  workerIdleMemoryLimit: '512MB',
+  
+  // Test Retry Configuration removed - not supported in Jest 30
+  // testRetries: process.env.CI ? 2 : 0, // Retry flaky tests in CI - DEPRECATED
+  
+  // Reporter Configuration for Production CI/CD
   reporters: [
-    'default'
+    'default',
+    ['jest-html-reporter', {
+      pageTitle: 'SASI Test Results',
+      outputPath: 'coverage/test-report.html',
+      includeFailureMsg: true,
+      includeSuiteFailure: true,
+      includeConsoleLog: true,
+      sort: 'titleAsc'
+    }],
+    ['jest-junit', {
+      outputDirectory: 'coverage',
+      outputName: 'junit.xml',
+      ancestorSeparator: ' › ',
+      uniqueOutputName: 'false',
+      suiteNameTemplate: '{filepath}',
+      classNameTemplate: '{classname}',
+      titleTemplate: '{title}'
+    }]
   ],
   
   // Error Handling

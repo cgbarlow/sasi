@@ -50,7 +50,7 @@ describe('Phase 2A Performance Benchmarks', () => {
         { type: 'transformer', architecture: [512, 256, 128] }
       ];
       
-      const { result } = await performanceTestUtils.testConcurrentPerformance(
+      const result = await performanceTestUtils.testConcurrentPerformance(
         'concurrent-agent-spawn',
         async () => {
           const config = agentConfigs[Math.floor(Math.random() * agentConfigs.length)];

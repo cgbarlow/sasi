@@ -1,0 +1,383 @@
+e064346fc99b674c0a0f28141bb5b089
+/* istanbul ignore next */
+function cov_1u2xh52x64() {
+  var path = "/workspaces/agentists-quickstart-workspace-basic/sasi/src/App.tsx";
+  var hash = "4d9aed4e338b0ff6b190a273f1f0e7fc5c2d74cd";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/workspaces/agentists-quickstart-workspace-basic/sasi/src/App.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 9,
+          column: 12
+        },
+        end: {
+          line: 22,
+          column: 1
+        }
+      },
+      "1": {
+        start: {
+          line: 10,
+          column: 38
+        },
+        end: {
+          line: 10,
+          column: 52
+        }
+      },
+      "2": {
+        start: {
+          line: 11,
+          column: 4
+        },
+        end: {
+          line: 17,
+          column: 11
+        }
+      },
+      "3": {
+        start: {
+          line: 13,
+          column: 22
+        },
+        end: {
+          line: 15,
+          column: 16
+        }
+      },
+      "4": {
+        start: {
+          line: 14,
+          column: 12
+        },
+        end: {
+          line: 14,
+          column: 32
+        }
+      },
+      "5": {
+        start: {
+          line: 16,
+          column: 8
+        },
+        end: {
+          line: 16,
+          column: 41
+        }
+      },
+      "6": {
+        start: {
+          line: 16,
+          column: 21
+        },
+        end: {
+          line: 16,
+          column: 40
+        }
+      },
+      "7": {
+        start: {
+          line: 18,
+          column: 4
+        },
+        end: {
+          line: 20,
+          column: 5
+        }
+      },
+      "8": {
+        start: {
+          line: 19,
+          column: 8
+        },
+        end: {
+          line: 19,
+          column: 457
+        }
+      },
+      "9": {
+        start: {
+          line: 21,
+          column: 4
+        },
+        end: {
+          line: 21,
+          column: 336
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 9,
+            column: 12
+          },
+          end: {
+            line: 9,
+            column: 13
+          }
+        },
+        loc: {
+          start: {
+            line: 9,
+            column: 18
+          },
+          end: {
+            line: 22,
+            column: 1
+          }
+        },
+        line: 9
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 11,
+            column: 14
+          },
+          end: {
+            line: 11,
+            column: 15
+          }
+        },
+        loc: {
+          start: {
+            line: 11,
+            column: 20
+          },
+          end: {
+            line: 17,
+            column: 5
+          }
+        },
+        line: 11
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 13,
+            column: 33
+          },
+          end: {
+            line: 13,
+            column: 34
+          }
+        },
+        loc: {
+          start: {
+            line: 13,
+            column: 39
+          },
+          end: {
+            line: 15,
+            column: 9
+          }
+        },
+        line: 13
+      },
+      "3": {
+        name: "(anonymous_3)",
+        decl: {
+          start: {
+            line: 16,
+            column: 15
+          },
+          end: {
+            line: 16,
+            column: 16
+          }
+        },
+        loc: {
+          start: {
+            line: 16,
+            column: 21
+          },
+          end: {
+            line: 16,
+            column: 40
+          }
+        },
+        line: 16
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 18,
+            column: 4
+          },
+          end: {
+            line: 20,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 18,
+            column: 4
+          },
+          end: {
+            line: 20,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 18
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0
+    },
+    b: {
+      "0": [0, 0]
+    },
+    inputSourceMap: {
+      file: "/workspaces/agentists-quickstart-workspace-basic/sasi/src/App.tsx",
+      mappings: ";AAAA,OAAO,KAAK,EAAE,EAAE,QAAQ,EAAE,SAAS,EAAE,MAAM,OAAO,CAAA;AAClD,OAAO,EAAE,aAAa,IAAI,MAAM,EAAE,MAAM,EAAE,KAAK,EAAE,MAAM,kBAAkB,CAAA;AACzE,OAAO,WAAW,MAAM,0BAA0B,CAAA;AAClD,OAAO,SAAS,MAAM,wBAAwB,CAAA;AAC9C,OAAO,SAAS,MAAM,wBAAwB,CAAA;AAC9C,OAAO,EAAE,YAAY,EAAE,MAAM,wBAAwB,CAAA;AACrD,OAAO,EAAE,aAAa,EAAE,MAAM,yBAAyB,CAAA;AAEvD,MAAM,GAAG,GAAa,GAAG,EAAE;IACzB,MAAM,CAAC,SAAS,EAAE,YAAY,CAAC,GAAG,QAAQ,CAAC,IAAI,CAAC,CAAA;IAEhD,SAAS,CAAC,GAAG,EAAE;QACb,2BAA2B;QAC3B,MAAM,KAAK,GAAG,UAAU,CAAC,GAAG,EAAE;YAC5B,YAAY,CAAC,KAAK,CAAC,CAAA;QACrB,CAAC,EAAE,IAAI,CAAC,CAAA;QAER,OAAO,GAAG,EAAE,CAAC,YAAY,CAAC,KAAK,CAAC,CAAA;IAClC,CAAC,EAAE,EAAE,CAAC,CAAA;IAEN,IAAI,SAAS,EAAE,CAAC;QACd,OAAO,CACL,cAAK,SAAS,EAAC,gBAAgB,YAC7B,eAAK,SAAS,EAAC,iBAAiB,aAC9B,eAAK,SAAS,EAAC,WAAW,aACxB,eAAM,SAAS,EAAC,WAAW,0BAAiB,EAC5C,cAAK,SAAS,EAAC,aAAa,YAC1B,cAAK,SAAS,EAAC,kBAAkB,GAAO,GACpC,IACF,EACN,YAAG,SAAS,EAAC,iBAAiB,+DAAmD,IAC7E,GACF,CACP,CAAA;IACH,CAAC;IAED,OAAO,CACL,KAAC,YAAY,cACX,KAAC,aAAa,cACZ,KAAC,MAAM,cACL,eAAK,SAAS,EAAC,KAAK,aAClB,MAAC,MAAM,eACL,KAAC,KAAK,IAAC,IAAI,EAAC,GAAG,EAAC,OAAO,EAAE,KAAC,WAAW,KAAG,GAAI,EAC5C,KAAC,KAAK,IAAC,IAAI,EAAC,YAAY,EAAC,OAAO,EAAE,KAAC,SAAS,KAAG,GAAI,IAC5C,EACT,KAAC,SAAS,KAAG,IACT,GACC,GACK,GACH,CAChB,CAAA;AACH,CAAC,CAAA;AAED,eAAe,GAAG,CAAA",
+      names: [],
+      sources: ["/workspaces/agentists-quickstart-workspace-basic/sasi/src/App.tsx"],
+      sourcesContent: ["import React, { useState, useEffect } from 'react'\nimport { BrowserRouter as Router, Routes, Route } from 'react-router-dom'\nimport LandingPage from './components/LandingPage'\nimport Dashboard from './components/Dashboard'\nimport AuthModal from './components/AuthModal'\nimport { UserProvider } from './contexts/UserContext'\nimport { SwarmProvider } from './contexts/SwarmContext'\n\nconst App: React.FC = () => {\n  const [isLoading, setIsLoading] = useState(true)\n\n  useEffect(() => {\n    // Simulate initial loading\n    const timer = setTimeout(() => {\n      setIsLoading(false)\n    }, 2000)\n\n    return () => clearTimeout(timer)\n  }, [])\n\n  if (isLoading) {\n    return (\n      <div className=\"loading-screen\">\n        <div className=\"loading-content\">\n          <div className=\"sasi-logo\">\n            <span className=\"sasi-text\">SASI@home</span>\n            <div className=\"loading-bar\">\n              <div className=\"loading-progress\"></div>\n            </div>\n          </div>\n          <p className=\"loading-message\">Initializing mega-swarm coordination system...</p>\n        </div>\n      </div>\n    )\n  }\n\n  return (\n    <UserProvider>\n      <SwarmProvider>\n        <Router>\n          <div className=\"app\">\n            <Routes>\n              <Route path=\"/\" element={<LandingPage />} />\n              <Route path=\"/dashboard\" element={<Dashboard />} />\n            </Routes>\n            <AuthModal />\n          </div>\n        </Router>\n      </SwarmProvider>\n    </UserProvider>\n  )\n}\n\nexport default App"],
+      version: 3
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "4d9aed4e338b0ff6b190a273f1f0e7fc5c2d74cd"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1u2xh52x64 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1u2xh52x64();
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard';
+import AuthModal from './components/AuthModal';
+import { UserProvider } from './contexts/UserContext';
+import { SwarmProvider } from './contexts/SwarmContext';
+/* istanbul ignore next */
+cov_1u2xh52x64().s[0]++;
+const App = () => {
+  /* istanbul ignore next */
+  cov_1u2xh52x64().f[0]++;
+  const [isLoading, setIsLoading] =
+  /* istanbul ignore next */
+  (cov_1u2xh52x64().s[1]++, useState(true));
+  /* istanbul ignore next */
+  cov_1u2xh52x64().s[2]++;
+  useEffect(() => {
+    /* istanbul ignore next */
+    cov_1u2xh52x64().f[1]++;
+    // Simulate initial loading
+    const timer =
+    /* istanbul ignore next */
+    (cov_1u2xh52x64().s[3]++, setTimeout(() => {
+      /* istanbul ignore next */
+      cov_1u2xh52x64().f[2]++;
+      cov_1u2xh52x64().s[4]++;
+      setIsLoading(false);
+    }, 2000));
+    /* istanbul ignore next */
+    cov_1u2xh52x64().s[5]++;
+    return () => {
+      /* istanbul ignore next */
+      cov_1u2xh52x64().f[3]++;
+      cov_1u2xh52x64().s[6]++;
+      return clearTimeout(timer);
+    };
+  }, []);
+  /* istanbul ignore next */
+  cov_1u2xh52x64().s[7]++;
+  if (isLoading) {
+    /* istanbul ignore next */
+    cov_1u2xh52x64().b[0][0]++;
+    cov_1u2xh52x64().s[8]++;
+    return _jsx("div", {
+      className: "loading-screen",
+      children: _jsxs("div", {
+        className: "loading-content",
+        children: [_jsxs("div", {
+          className: "sasi-logo",
+          children: [_jsx("span", {
+            className: "sasi-text",
+            children: "SASI@home"
+          }), _jsx("div", {
+            className: "loading-bar",
+            children: _jsx("div", {
+              className: "loading-progress"
+            })
+          })]
+        }), _jsx("p", {
+          className: "loading-message",
+          children: "Initializing mega-swarm coordination system..."
+        })]
+      })
+    });
+  } else
+  /* istanbul ignore next */
+  {
+    cov_1u2xh52x64().b[0][1]++;
+  }
+  cov_1u2xh52x64().s[9]++;
+  return _jsx(UserProvider, {
+    children: _jsx(SwarmProvider, {
+      children: _jsx(Router, {
+        children: _jsxs("div", {
+          className: "app",
+          children: [_jsxs(Routes, {
+            children: [_jsx(Route, {
+              path: "/",
+              element: _jsx(LandingPage, {})
+            }), _jsx(Route, {
+              path: "/dashboard",
+              element: _jsx(Dashboard, {})
+            })]
+          }), _jsx(AuthModal, {})]
+        })
+      })
+    })
+  });
+};
+export default App;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMXUyeGg1Mng2NCIsImFjdHVhbENvdmVyYWdlIiwiUmVhY3QiLCJ1c2VTdGF0ZSIsInVzZUVmZmVjdCIsIkJyb3dzZXJSb3V0ZXIiLCJSb3V0ZXIiLCJSb3V0ZXMiLCJSb3V0ZSIsIkxhbmRpbmdQYWdlIiwiRGFzaGJvYXJkIiwiQXV0aE1vZGFsIiwiVXNlclByb3ZpZGVyIiwiU3dhcm1Qcm92aWRlciIsInMiLCJBcHAiLCJmIiwiaXNMb2FkaW5nIiwic2V0SXNMb2FkaW5nIiwidGltZXIiLCJzZXRUaW1lb3V0IiwiY2xlYXJUaW1lb3V0IiwiYiIsIl9qc3giLCJjbGFzc05hbWUiLCJjaGlsZHJlbiIsIl9qc3hzIiwicGF0aCIsImVsZW1lbnQiXSwic291cmNlcyI6WyIvd29ya3NwYWNlcy9hZ2VudGlzdHMtcXVpY2tzdGFydC13b3Jrc3BhY2UtYmFzaWMvc2FzaS9zcmMvQXBwLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QsIHsgdXNlU3RhdGUsIHVzZUVmZmVjdCB9IGZyb20gJ3JlYWN0J1xuaW1wb3J0IHsgQnJvd3NlclJvdXRlciBhcyBSb3V0ZXIsIFJvdXRlcywgUm91dGUgfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJ1xuaW1wb3J0IExhbmRpbmdQYWdlIGZyb20gJy4vY29tcG9uZW50cy9MYW5kaW5nUGFnZSdcbmltcG9ydCBEYXNoYm9hcmQgZnJvbSAnLi9jb21wb25lbnRzL0Rhc2hib2FyZCdcbmltcG9ydCBBdXRoTW9kYWwgZnJvbSAnLi9jb21wb25lbnRzL0F1dGhNb2RhbCdcbmltcG9ydCB7IFVzZXJQcm92aWRlciB9IGZyb20gJy4vY29udGV4dHMvVXNlckNvbnRleHQnXG5pbXBvcnQgeyBTd2FybVByb3ZpZGVyIH0gZnJvbSAnLi9jb250ZXh0cy9Td2FybUNvbnRleHQnXG5cbmNvbnN0IEFwcDogUmVhY3QuRkMgPSAoKSA9PiB7XG4gIGNvbnN0IFtpc0xvYWRpbmcsIHNldElzTG9hZGluZ10gPSB1c2VTdGF0ZSh0cnVlKVxuXG4gIHVzZUVmZmVjdCgoKSA9PiB7XG4gICAgLy8gU2ltdWxhdGUgaW5pdGlhbCBsb2FkaW5nXG4gICAgY29uc3QgdGltZXIgPSBzZXRUaW1lb3V0KCgpID0+IHtcbiAgICAgIHNldElzTG9hZGluZyhmYWxzZSlcbiAgICB9LCAyMDAwKVxuXG4gICAgcmV0dXJuICgpID0+IGNsZWFyVGltZW91dCh0aW1lcilcbiAgfSwgW10pXG5cbiAgaWYgKGlzTG9hZGluZykge1xuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImxvYWRpbmctc2NyZWVuXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibG9hZGluZy1jb250ZW50XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzYXNpLWxvZ29cIj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInNhc2ktdGV4dFwiPlNBU0lAaG9tZTwvc3Bhbj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibG9hZGluZy1iYXJcIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJsb2FkaW5nLXByb2dyZXNzXCI+PC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJsb2FkaW5nLW1lc3NhZ2VcIj5Jbml0aWFsaXppbmcgbWVnYS1zd2FybSBjb29yZGluYXRpb24gc3lzdGVtLi4uPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIClcbiAgfVxuXG4gIHJldHVybiAoXG4gICAgPFVzZXJQcm92aWRlcj5cbiAgICAgIDxTd2FybVByb3ZpZGVyPlxuICAgICAgICA8Um91dGVyPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYXBwXCI+XG4gICAgICAgICAgICA8Um91dGVzPlxuICAgICAgICAgICAgICA8Um91dGUgcGF0aD1cIi9cIiBlbGVtZW50PXs8TGFuZGluZ1BhZ2UgLz59IC8+XG4gICAgICAgICAgICAgIDxSb3V0ZSBwYXRoPVwiL2Rhc2hib2FyZFwiIGVsZW1lbnQ9ezxEYXNoYm9hcmQgLz59IC8+XG4gICAgICAgICAgICA8L1JvdXRlcz5cbiAgICAgICAgICAgIDxBdXRoTW9kYWwgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9Sb3V0ZXI+XG4gICAgICA8L1N3YXJtUHJvdmlkZXI+XG4gICAgPC9Vc2VyUHJvdmlkZXI+XG4gIClcbn1cblxuZXhwb3J0IGRlZmF1bHQgQXBwIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQWlCSTtJQUFBQSxjQUFBLFlBQUFBLENBQUE7TUFBQSxPQUFBQyxjQUFBO0lBQUE7RUFBQTtFQUFBLE9BQUFBLGNBQUE7QUFBQTtBQUFBRCxjQUFBOztBQWpCSixPQUFPRSxLQUFLLElBQUlDLFFBQVEsRUFBRUMsU0FBUyxRQUFRLE9BQU87QUFDbEQsU0FBU0MsYUFBYSxJQUFJQyxNQUFNLEVBQUVDLE1BQU0sRUFBRUMsS0FBSyxRQUFRLGtCQUFrQjtBQUN6RSxPQUFPQyxXQUFXLE1BQU0sMEJBQTBCO0FBQ2xELE9BQU9DLFNBQVMsTUFBTSx3QkFBd0I7QUFDOUMsT0FBT0MsU0FBUyxNQUFNLHdCQUF3QjtBQUM5QyxTQUFTQyxZQUFZLFFBQVEsd0JBQXdCO0FBQ3JELFNBQVNDLGFBQWEsUUFBUSx5QkFBeUI7QUFBQTtBQUFBYixjQUFBLEdBQUFjLENBQUE7QUFFdkQsTUFBTUMsR0FBRyxH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

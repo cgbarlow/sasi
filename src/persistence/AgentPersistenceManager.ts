@@ -22,6 +22,7 @@ import type {
   DatabaseConnectionConfig,
   BatchOperation
 } from '../types/agent';
+import { SecurityValidator } from '../security/SecurityValidator';
 
 export class AgentPersistenceManager {
   private db: DatabaseType | null = null;
@@ -30,9 +31,15 @@ export class AgentPersistenceManager {
   private isInitialized: boolean = false;
   private writeQueue: Array<() => Promise<any>> = [];
   private isProcessingQueue: boolean = false;
+  private securityValidator: SecurityValidator;
 
   constructor(dbPath: string = './.swarm/agents.db') {
     this.dbPath = path.resolve(dbPath);
+    this.securityValidator = new SecurityValidator({
+      enableInputValidation: true,
+      enableAuditLogging: true,
+      maxInputSize: 1024 * 1024 // 1MB
+    });
     this.config = {
       path: this.dbPath,
       timeout: 30000,
@@ -279,6 +286,15 @@ export class AgentPersistenceManager {
       throw new Error('Database not initialized');
     }
 
+    // Security validation
+    const validation = this.securityValidator.validateSQLParameters(
+      'SELECT * FROM agents WHERE id = ?',
+      [id]
+    );
+    if (!validation.isValid) {
+      throw new Error(`Security validation failed: ${validation.errors.join(', ')}`);
+    }
+
     const startTime = performance.now();
 
     try {
@@ -286,7 +302,7 @@ export class AgentPersistenceManager {
         SELECT * FROM agents WHERE id = ?
       `);
 
-      const row = stmt.get(id) as any;
+      const row = stmt.get(validation.sanitizedInput![0]) as any;
 
       const retrieveTime = performance.now() - startTime;
       
@@ -330,6 +346,15 @@ export class AgentPersistenceManager {
       throw new Error('Database not initialized');
     }
 
+    // Security validation
+    const validation = this.securityValidator.validateSQLParameters(
+      'UPDATE agents SET status = ?, last_active = ? WHERE id = ?',
+      [status, Date.now(), id]
+    );
+    if (!validation.isValid) {
+      throw new Error(`Security validation failed: ${validation.errors.join(', ')}`);
+    }
+
     const startTime = performance.now();
 
     try {
@@ -337,7 +362,8 @@ export class AgentPersistenceManager {
         UPDATE agents SET status = ?, last_active = ? WHERE id = ?
       `);
 
-      const result = stmt.run(status, Date.now(), id);
+      const sanitizedParams = validation.sanitizedInput!;
+      const result = stmt.run(sanitizedParams[0], sanitizedParams[1], sanitizedParams[2]);
 
       if (result.changes === 0) {
         throw new Error(`Agent not found: ${id}`);
@@ -497,8 +523,14 @@ export class AgentPersistenceManager {
 
     query += ' ORDER BY created_at DESC';
 
+    // Security validation for parameterized query
+    const validation = this.securityValidator.validateSQLParameters(query, params);
+    if (!validation.isValid) {
+      throw new Error(`Security validation failed: ${validation.errors.join(', ')}`);
+    }
+
     const stmt = this.db.prepare(query);
-    const rows = stmt.all(...params) as any[];
+    const rows = stmt.all(...(validation.sanitizedInput || params)) as any[];
 
     return rows.map(row => ({
       id: row.id,

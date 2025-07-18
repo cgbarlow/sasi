@@ -11,14 +11,21 @@
  */
 
 import { EventEmitter } from 'events';
+import { ProductionWasmBridge } from '../utils/ProductionWasmBridge';
 import type { 
   NeuralAgent, 
   NeuralConfiguration, 
-  AgentState, 
   PerformanceMetrics,
   LearningSession,
   NetworkTopology 
 } from '../types/neural';
+
+export enum AgentState {
+  INITIALIZING = 'initializing',
+  ACTIVE = 'active',
+  LEARNING = 'learning',
+  TERMINATING = 'terminating'
+}
 
 export interface NeuralAgentManagerConfig {
   maxAgents: number;
@@ -34,7 +41,7 @@ export interface NeuralAgentManagerConfig {
 export class NeuralAgentManager extends EventEmitter {
   private config: NeuralAgentManagerConfig;
   private agents: Map<string, NeuralAgent> = new Map();
-  private wasmModule: any = null;
+  private wasmBridge: ProductionWasmBridge;
   private performanceMetrics: PerformanceMetrics;
   private isInitialized: boolean = false;
   private database: any = null; // SQLite connection
@@ -53,6 +60,9 @@ export class NeuralAgentManager extends EventEmitter {
       wasmModulePath: config.wasmModulePath || '/assets/neural-runtime.wasm',
       ...config
     };
+    
+    // Initialize production WASM bridge
+    this.wasmBridge = new ProductionWasmBridge();
     
     this.performanceMetrics = {
       totalAgentsSpawned: 0,
@@ -102,30 +112,41 @@ export class NeuralAgentManager extends EventEmitter {
   }
   
   /**
-   * Initialize WASM neural runtime
+   * Initialize production WASM neural runtime
    */
   private async initializeWASM(): Promise<void> {
     try {
-      // Dynamic import for WASM module
-      const wasmUrl = this.config.wasmModulePath;
-      console.log(`📦 Loading WASM module from: ${wasmUrl}`);
+      console.log('🚀 Initializing Production WASM Neural Runtime...');
       
-      // Simulate WASM loading for now - replace with actual implementation
-      this.wasmModule = {
-        createNeuralNetwork: this.createMockNeuralNetwork.bind(this),
-        runInference: this.runMockInference.bind(this),
-        trainNetwork: this.trainMockNetwork.bind(this),
-        serializeWeights: this.serializeMockWeights.bind(this),
-        deserializeWeights: this.deserializeMockWeights.bind(this),
-        getMemoryUsage: () => Math.floor(Math.random() * this.config.memoryLimitPerAgent * 0.8),
-        enableSIMD: this.config.simdEnabled
-      };
+      // Initialize production WASM bridge
+      const wasmInitialized = await this.wasmBridge.initialize();
       
-      console.log('✅ WASM neural runtime loaded');
+      if (!wasmInitialized) {
+        throw new Error('Failed to initialize production WASM bridge');
+      }
+      
+      // Verify SIMD support if required
+      if (this.config.simdEnabled && !this.wasmBridge.isSIMDSupported()) {
+        console.warn('⚠️ SIMD acceleration not available, falling back to scalar operations');
+      }
+      
+      // Validate performance targets
+      const health = this.wasmBridge.healthCheck();
+      if (health.status === 'error') {
+        throw new Error(`WASM health check failed: ${health.issues.join(', ')}`);
+      }
+      
+      if (health.status === 'warning') {
+        console.warn('⚠️ WASM performance warnings:', health.issues);
+      }
+      
+      console.log('✅ Production WASM neural runtime initialized');
+      console.log(`🔧 SIMD acceleration: ${this.wasmBridge.isSIMDSupported()}`);
+      console.log(`📊 Load time: ${health.metrics.loadTime.toFixed(2)}ms`);
       
     } catch (error) {
-      console.error('❌ Failed to load WASM module:', error);
-      throw new Error(`WASM initialization failed: ${error.message}`);
+      console.error('❌ Failed to initialize production WASM runtime:', error);
+      throw new Error(`Production WASM initialization failed: ${error.message}`);
     }
   }
   
@@ -247,13 +268,16 @@ export class NeuralAgentManager extends EventEmitter {
     const startTime = Date.now();
     
     try {
-      // Run inference via WASM
+      // Convert inputs to Float32Array for WASM
+      const inputArray = new Float32Array(inputs);
+      
+      // Run inference via production WASM bridge with timeout
       const outputs = await Promise.race([
-        this.wasmModule.runInference(agent.network, inputs),
+        Promise.resolve(this.wasmBridge.calculateNeuralActivation(inputArray)),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Inference timeout')), this.config.inferenceTimeout)
         )
-      ]) as number[];
+      ]) as Float32Array;
       
       const inferenceTime = Date.now() - startTime;
       
@@ -272,7 +296,8 @@ export class NeuralAgentManager extends EventEmitter {
         outputSize: outputs.length
       });
       
-      return outputs;
+      // Convert Float32Array back to number array for compatibility
+      return Array.from(outputs);
       
     } catch (error) {
       console.error(`❌ Inference failed for agent ${agentId}: ${error.message}`);
@@ -476,6 +501,11 @@ export class NeuralAgentManager extends EventEmitter {
     const agentIds = Array.from(this.agents.keys());
     for (const agentId of agentIds) {
       await this.terminateAgent(agentId);
+    }
+    
+    // Cleanup production WASM bridge
+    if (this.wasmBridge) {
+      this.wasmBridge.cleanup();
     }
     
     // Close database connection

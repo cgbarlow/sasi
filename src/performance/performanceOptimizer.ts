@@ -178,6 +178,13 @@ export class PerformanceOptimizer {
    * Initialize performance observers
    */
   private async initializePerformanceObservers(): Promise<void> {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') {
+      // Node.js environment - use node performance API or mock
+      console.warn('⚠️ Browser window not available - using Node.js performance monitoring')
+      return
+    }
+    
     if (!('PerformanceObserver' in window)) {
       console.warn('⚠️ PerformanceObserver not supported')
       return

@@ -95,19 +95,48 @@ export class MockNeuralMeshService {
   private eventListeners: Map<string, Function[]> = new Map();
   private connection: NeuralMeshConnection | null = null;
   private agents: Map<string, NeuralAgent> = new Map();
+  private sharedMeshId: string;
 
   constructor() {
     this.connection = NeuralAgentFactory.createMockMeshConnection();
+    this.sharedMeshId = this.connection.meshId;
   }
 
   // Mock all public methods from NeuralMeshService
   async initialize(): Promise<boolean> {
-    this.emit('connected', this.connection);
+    if (this.connection) {
+      this.connection.status = 'connected';
+      this.emit('connected', this.connection);
+    }
     return true;
   }
 
   async createNeuralAgent(type: Agent['type'], config?: any): Promise<NeuralAgent | null> {
-    const agent = NeuralAgentFactory.createMockNeuralAgent({ type });
+    const neuronId = `neuron_${Math.random().toString(36).substr(2, 9)}`;
+    const agent = NeuralAgentFactory.createMockNeuralAgent({ 
+      type,
+      neuralId: neuronId, // Ensure consistency between neuralId and neuralProperties.neuronId
+      meshConnection: {
+        connected: true,
+        meshId: this.sharedMeshId,
+        nodeType: 'inter',
+        layer: Math.floor(Math.random() * 6) + 1,
+        synapses: Math.floor(Math.random() * 50) + 10,
+        activation: Math.random(),
+        lastSpike: new Date()
+      },
+      neuralProperties: {
+        neuronId: neuronId, // Same as neuralId for consistency
+        meshId: this.sharedMeshId, // Ensure same mesh ID
+        nodeType: 'inter',
+        layer: Math.floor(Math.random() * 6) + 1,
+        threshold: 0.5 + (Math.random() - 0.5) * 0.4,
+        activation: Math.random(),
+        connections: Array.from({ length: 5 }, () => Math.random().toString(36).substr(2, 9)),
+        spikeHistory: Array.from({ length: 10 }, () => Math.random()),
+        lastSpike: new Date()
+      }
+    });
     this.agents.set(agent.id, agent);
     this.emit('agent_created', agent);
     return agent;
@@ -188,7 +217,10 @@ export class MockNeuralMeshService {
   private emit(event: string, data?: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(callback => callback(data));
+      // Use setTimeout to make events asynchronous but immediate
+      setTimeout(() => {
+        listeners.forEach(callback => callback(data));
+      }, 0);
     }
   }
 

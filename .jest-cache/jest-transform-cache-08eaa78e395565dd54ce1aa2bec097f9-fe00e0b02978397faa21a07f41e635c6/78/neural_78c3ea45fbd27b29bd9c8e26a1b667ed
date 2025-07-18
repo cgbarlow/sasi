@@ -1,0 +1,615 @@
+3333cc65229ebedcc4d69620a03f5be1
+"use strict";
+
+/**
+ * Neural Agent Type Definitions for SASI Integration
+ * Comprehensive TypeScript interfaces for neural agent system
+ */
+/* istanbul ignore next */
+function cov_1fq7x8l2hi() {
+  var path = "/workspaces/agentists-quickstart-workspace-basic/sasi/src/types/neural.ts";
+  var hash = "8796c3d136ea2c2fd1cffb8a86c783c84fec6ec3";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/workspaces/agentists-quickstart-workspace-basic/sasi/src/types/neural.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 6,
+          column: 0
+        },
+        end: {
+          line: 6,
+          column: 62
+        }
+      },
+      "1": {
+        start: {
+          line: 7,
+          column: 0
+        },
+        end: {
+          line: 7,
+          column: 102
+        }
+      },
+      "2": {
+        start: {
+          line: 9,
+          column: 0
+        },
+        end: {
+          line: 16,
+          column: 57
+        }
+      },
+      "3": {
+        start: {
+          line: 10,
+          column: 4
+        },
+        end: {
+          line: 10,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 11,
+          column: 4
+        },
+        end: {
+          line: 11,
+          column: 36
+        }
+      },
+      "5": {
+        start: {
+          line: 12,
+          column: 4
+        },
+        end: {
+          line: 12,
+          column: 40
+        }
+      },
+      "6": {
+        start: {
+          line: 13,
+          column: 4
+        },
+        end: {
+          line: 13,
+          column: 32
+        }
+      },
+      "7": {
+        start: {
+          line: 14,
+          column: 4
+        },
+        end: {
+          line: 14,
+          column: 46
+        }
+      },
+      "8": {
+        start: {
+          line: 15,
+          column: 4
+        },
+        end: {
+          line: 15,
+          column: 34
+        }
+      },
+      "9": {
+        start: {
+          line: 20,
+          column: 8
+        },
+        end: {
+          line: 20,
+          column: 23
+        }
+      },
+      "10": {
+        start: {
+          line: 21,
+          column: 8
+        },
+        end: {
+          line: 26,
+          column: 11
+        }
+      },
+      "11": {
+        start: {
+          line: 27,
+          column: 8
+        },
+        end: {
+          line: 32,
+          column: 11
+        }
+      },
+      "12": {
+        start: {
+          line: 33,
+          column: 8
+        },
+        end: {
+          line: 38,
+          column: 11
+        }
+      },
+      "13": {
+        start: {
+          line: 39,
+          column: 8
+        },
+        end: {
+          line: 39,
+          column: 39
+        }
+      },
+      "14": {
+        start: {
+          line: 42,
+          column: 0
+        },
+        end: {
+          line: 42,
+          column: 44
+        }
+      },
+      "15": {
+        start: {
+          line: 45,
+          column: 8
+        },
+        end: {
+          line: 45,
+          column: 23
+        }
+      },
+      "16": {
+        start: {
+          line: 46,
+          column: 8
+        },
+        end: {
+          line: 51,
+          column: 11
+        }
+      },
+      "17": {
+        start: {
+          line: 52,
+          column: 8
+        },
+        end: {
+          line: 57,
+          column: 11
+        }
+      },
+      "18": {
+        start: {
+          line: 58,
+          column: 8
+        },
+        end: {
+          line: 58,
+          column: 32
+        }
+      },
+      "19": {
+        start: {
+          line: 61,
+          column: 0
+        },
+        end: {
+          line: 61,
+          column: 30
+        }
+      },
+      "20": {
+        start: {
+          line: 64,
+          column: 8
+        },
+        end: {
+          line: 64,
+          column: 23
+        }
+      },
+      "21": {
+        start: {
+          line: 65,
+          column: 8
+        },
+        end: {
+          line: 70,
+          column: 11
+        }
+      },
+      "22": {
+        start: {
+          line: 71,
+          column: 8
+        },
+        end: {
+          line: 76,
+          column: 11
+        }
+      },
+      "23": {
+        start: {
+          line: 77,
+          column: 8
+        },
+        end: {
+          line: 82,
+          column: 11
+        }
+      },
+      "24": {
+        start: {
+          line: 83,
+          column: 8
+        },
+        end: {
+          line: 83,
+          column: 39
+        }
+      },
+      "25": {
+        start: {
+          line: 86,
+          column: 0
+        },
+        end: {
+          line: 86,
+          column: 44
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 9,
+            column: 1
+          },
+          end: {
+            line: 9,
+            column: 2
+          }
+        },
+        loc: {
+          start: {
+            line: 9,
+            column: 23
+          },
+          end: {
+            line: 16,
+            column: 1
+          }
+        },
+        line: 9
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 19,
+            column: 4
+          },
+          end: {
+            line: 19,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 19,
+            column: 49
+          },
+          end: {
+            line: 40,
+            column: 5
+          }
+        },
+        line: 19
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 44,
+            column: 4
+          },
+          end: {
+            line: 44,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 44,
+            column: 45
+          },
+          end: {
+            line: 59,
+            column: 5
+          }
+        },
+        line: 44
+      },
+      "3": {
+        name: "(anonymous_3)",
+        decl: {
+          start: {
+            line: 63,
+            column: 4
+          },
+          end: {
+            line: 63,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 63,
+            column: 51
+          },
+          end: {
+            line: 84,
+            column: 5
+          }
+        },
+        line: 63
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 16,
+            column: 3
+          },
+          end: {
+            line: 16,
+            column: 55
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 16,
+            column: 3
+          },
+          end: {
+            line: 16,
+            column: 13
+          }
+        }, {
+          start: {
+            line: 16,
+            column: 18
+          },
+          end: {
+            line: 16,
+            column: 54
+          }
+        }],
+        line: 16
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0,
+      "25": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0
+    },
+    b: {
+      "0": [0, 0]
+    },
+    inputSourceMap: {
+      file: "/workspaces/agentists-quickstart-workspace-basic/sasi/src/types/neural.ts",
+      mappings: ";AAAA;;;GAGG;;;AAEH,IAAY,UAOX;AAPD,WAAY,UAAU;IACpB,2CAA6B,CAAA;IAC7B,+BAAiB,CAAA;IACjB,mCAAqB,CAAA;IACrB,2BAAa,CAAA;IACb,yCAA2B,CAAA;IAC3B,6BAAe,CAAA;AACjB,CAAC,EAPW,UAAU,0BAAV,UAAU,QAOrB;AA6RD,cAAc;AAEd,MAAa,gBAAiB,SAAQ,KAAK;IACzC,YACE,OAAe,EACR,IAAY,EACZ,OAAgB,EAChB,OAAa;QAEpB,KAAK,CAAC,OAAO,CAAC,CAAC;QAJf;;;;mBAAO,IAAI;WAAQ;QACnB;;;;mBAAO,OAAO;WAAS;QACvB;;;;mBAAO,OAAO;WAAM;QAGpB,IAAI,CAAC,IAAI,GAAG,kBAAkB,CAAC;IACjC,CAAC;CACF;AAVD,4CAUC;AAED,MAAa,SAAU,SAAQ,KAAK;IAClC,YACE,OAAe,EACR,SAAiB,EACjB,OAAa;QAEpB,KAAK,CAAC,OAAO,CAAC,CAAC;QAHf;;;;mBAAO,SAAS;WAAQ;QACxB;;;;mBAAO,OAAO;WAAM;QAGpB,IAAI,CAAC,IAAI,GAAG,WAAW,CAAC;IAC1B,CAAC;CACF;AATD,8BASC;AAED,MAAa,gBAAiB,SAAQ,KAAK;IACzC,YACE,OAAe,EACR,MAAc,EACd,KAAa,EACb,SAAiB;QAExB,KAAK,CAAC,OAAO,CAAC,CAAC;QAJf;;;;mBAAO,MAAM;WAAQ;QACrB;;;;mBAAO,KAAK;WAAQ;QACpB;;;;mBAAO,SAAS;WAAQ;QAGxB,IAAI,CAAC,IAAI,GAAG,kBAAkB,CAAC;IACjC,CAAC;CACF;AAVD,4CAUC",
+      names: [],
+      sources: ["/workspaces/agentists-quickstart-workspace-basic/sasi/src/types/neural.ts"],
+      sourcesContent: ["/**\n * Neural Agent Type Definitions for SASI Integration\n * Comprehensive TypeScript interfaces for neural agent system\n */\n\nexport enum AgentState {\n  INITIALIZING = 'initializing',\n  ACTIVE = 'active',\n  LEARNING = 'learning',\n  IDLE = 'idle',\n  TERMINATING = 'terminating',\n  ERROR = 'error'\n}\n\nexport interface NeuralConfiguration {\n  type: 'mlp' | 'lstm' | 'cnn' | 'transformer' | 'custom';\n  architecture: number[]; // Layer sizes [input, hidden1, hidden2, ..., output]\n  activationFunction?: 'relu' | 'sigmoid' | 'tanh' | 'leaky_relu' | 'gelu';\n  learningRate?: number;\n  momentum?: number;\n  regularization?: {\n    type: 'l1' | 'l2' | 'dropout';\n    value: number;\n  };\n  simdOptimized?: boolean;\n  customConfig?: Record<string, any>;\n}\n\nexport interface NeuralAgent {\n  id: string;\n  config: NeuralConfiguration;\n  network: any; // WASM network instance\n  state: AgentState;\n  createdAt: number;\n  lastActive: number;\n  memoryUsage: number; // bytes\n  totalInferences: number;\n  averageInferenceTime: number; // ms\n  learningProgress: number; // 0-1\n  connectionStrength: number; // 0-1\n  metadata?: Record<string, any>;\n}\n\nexport interface PerformanceMetrics {\n  totalAgentsSpawned: number;\n  averageSpawnTime: number; // ms\n  averageInferenceTime: number; // ms\n  memoryUsage: number; // bytes\n  activeLearningTasks: number;\n  systemHealthScore: number; // 0-100\n}\n\nexport interface LearningSession {\n  sessionId: string;\n  agentId: string;\n  startTime: number;\n  duration: number;\n  epochs: number;\n  finalAccuracy: number;\n  dataPoints: number;\n  convergenceEpoch: number;\n}\n\nexport interface NetworkTopology {\n  nodes: Array<{\n    id: string;\n    type: string;\n    state: AgentState;\n    performance: number;\n    memoryUsage: number;\n  }>;\n  connections: Array<[string, string, number]>; // [from, to, strength]\n  totalNodes: number;\n  activeConnections: number;\n  networkHealth: number; // 0-100\n}\n\nexport interface AgentMetrics {\n  id: string;\n  name: string;\n  type: string;\n  status: 'active' | 'idle' | 'learning' | 'error';\n  performance: number;\n  memoryUsage: number;\n  lastActivity: number;\n  totalTasks: number;\n  successRate: number;\n  learningProgress: number;\n  connections: string[];\n}\n\nexport interface SwarmStatistics {\n  totalAgents: number;\n  activeAgents: number;\n  averagePerformance: number;\n  totalMemoryUsage: number;\n  totalTasks: number;\n  systemHealth: number;\n  networkTopology: NetworkTopology;\n  learningMetrics: {\n    activeSessions: number;\n    completedSessions: number;\n    averageAccuracy: number;\n    knowledgeTransfers: number;\n  };\n}\n\n// SASI Integration Types\n\nexport interface SASIAgent {\n  id: string;\n  name: string;\n  type: string;\n  status: 'active' | 'idle' | 'learning' | 'error';\n  performance: number;\n  memoryUsage: number;\n  lastActivity: number;\n  totalTasks: number;\n  successRate: number;\n  learningProgress: number;\n  connections: string[];\n  neuralAgent?: NeuralAgent; // Optional neural backing\n}\n\nexport interface SASISwarmData {\n  agents: SASIAgent[];\n  statistics: SwarmStatistics;\n  topology: NetworkTopology;\n  isNeuralEnabled: boolean;\n  performanceMetrics: PerformanceMetrics;\n}\n\n// Performance Integration Types\n\nexport interface PerformanceTarget {\n  agentSpawnTime: number; // ms\n  inferenceTime: number; // ms  \n  memoryPerAgent: number; // bytes\n  wasmOperationTime: number; // ms\n}\n\nexport interface PerformanceAlert {\n  type: 'spawn_time' | 'inference_time' | 'memory_usage' | 'system_health';\n  severity: 'low' | 'medium' | 'high' | 'critical';\n  message: string;\n  value: number;\n  threshold: number;\n  timestamp: number;\n  agentId?: string;\n}\n\nexport interface PerformanceReport {\n  timestamp: number;\n  targets: PerformanceTarget;\n  current: {\n    averageSpawnTime: number;\n    averageInferenceTime: number;\n    memoryUsage: number;\n    wasmOperationTime: number;\n  };\n  alerts: PerformanceAlert[];\n  healthScore: number;\n  recommendations: string[];\n}\n\n// WASM Integration Types\n\nexport interface WASMModule {\n  createNeuralNetwork(config: NeuralConfiguration): Promise<any>;\n  runInference(network: any, inputs: number[]): Promise<number[]>;\n  trainNetwork(network: any, data: TrainingData[], epochs: number): Promise<TrainingResult>;\n  serializeWeights(network: any): Promise<ArrayBuffer>;\n  deserializeWeights(network: any, weights: ArrayBuffer, influence?: number): Promise<void>;\n  getMemoryUsage(): number;\n  enableSIMD: boolean;\n  destroyNetwork?(network: any): void;\n}\n\nexport interface TrainingData {\n  inputs: number[];\n  outputs: number[];\n}\n\nexport interface TrainingResult {\n  accuracy: number;\n  loss: number;\n  convergenceEpoch?: number;\n  trainingTime: number;\n}\n\n// Database Types\n\nexport interface AgentStateRecord {\n  agentId: string;\n  state: AgentState;\n  config: NeuralConfiguration;\n  createdAt: number;\n  lastActive: number;\n  metadata: string; // JSON\n}\n\nexport interface WeightsRecord {\n  agentId: string;\n  weights: ArrayBuffer;\n  savedAt: number;\n  checksum: string;\n}\n\nexport interface LearningRecord {\n  sessionId: string;\n  agentId: string;\n  startTime: number;\n  duration: number;\n  accuracy: number;\n  metadata: string; // JSON\n}\n\n// Event Types\n\nexport interface AgentEventData {\n  agentId: string;\n  timestamp: number;\n  [key: string]: any;\n}\n\nexport interface AgentSpawnedEvent extends AgentEventData {\n  spawnTime: number;\n  config: NeuralConfiguration;\n  memoryUsage: number;\n}\n\nexport interface InferenceCompleteEvent extends AgentEventData {\n  inferenceTime: number;\n  inputSize: number;\n  outputSize: number;\n}\n\nexport interface LearningCompleteEvent extends AgentEventData {\n  sessionId: string;\n  duration: number;\n  finalAccuracy: number;\n  epochs: number;\n}\n\nexport interface AgentTerminatedEvent extends AgentEventData {\n  reason?: string;\n}\n\nexport interface KnowledgeSharedEvent extends AgentEventData {\n  sourceAgentId: string;\n  targetAgentIds: string[];\n}\n\n// Configuration Types\n\nexport interface NeuralSystemConfig {\n  manager: {\n    maxAgents: number;\n    memoryLimitPerAgent: number;\n    inferenceTimeout: number;\n    simdEnabled: boolean;\n    crossLearningEnabled: boolean;\n    persistenceEnabled: boolean;\n    performanceMonitoring: boolean;\n  };\n  performance: {\n    targets: PerformanceTarget;\n    alertThresholds: Record<string, number>;\n    monitoringInterval: number;\n  };\n  wasm: {\n    modulePath: string;\n    simdVariant: boolean;\n    memorySize: number;\n  };\n  database: {\n    enabled: boolean;\n    path: string;\n    backupInterval: number;\n  };\n}\n\n// Utility Types\n\nexport type AgentID = string;\nexport type NetworkID = string;\nexport type SessionID = string;\n\nexport interface PartialNeuralAgent extends Partial<NeuralAgent> {\n  id: string;\n}\n\nexport interface PartialSASIAgent extends Partial<SASIAgent> {\n  id: string;\n  name: string;\n}\n\n// Error Types\n\nexport class NeuralAgentError extends Error {\n  constructor(\n    message: string,\n    public code: string,\n    public agentId?: string,\n    public details?: any\n  ) {\n    super(message);\n    this.name = 'NeuralAgentError';\n  }\n}\n\nexport class WASMError extends Error {\n  constructor(\n    message: string,\n    public operation: string,\n    public details?: any\n  ) {\n    super(message);\n    this.name = 'WASMError';\n  }\n}\n\nexport class PerformanceError extends Error {\n  constructor(\n    message: string,\n    public metric: string,\n    public value: number,\n    public threshold: number\n  ) {\n    super(message);\n    this.name = 'PerformanceError';\n  }\n}\n\n// Export all types\nexport type {\n  NeuralConfiguration,\n  NeuralAgent,\n  PerformanceMetrics,\n  LearningSession,\n  NetworkTopology,\n  AgentMetrics,\n  SwarmStatistics,\n  SASIAgent,\n  SASISwarmData,\n  PerformanceTarget,\n  PerformanceAlert,\n  PerformanceReport,\n  WASMModule,\n  TrainingData,\n  TrainingResult,\n  AgentStateRecord,\n  WeightsRecord,\n  LearningRecord,\n  AgentEventData,\n  AgentSpawnedEvent,\n  InferenceCompleteEvent,\n  LearningCompleteEvent,\n  AgentTerminatedEvent,\n  KnowledgeSharedEvent,\n  NeuralSystemConfig\n};"],
+      version: 3
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "8796c3d136ea2c2fd1cffb8a86c783c84fec6ec3"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1fq7x8l2hi = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1fq7x8l2hi();
+cov_1fq7x8l2hi().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_1fq7x8l2hi().s[1]++;
+exports.PerformanceError = exports.WASMError = exports.NeuralAgentError = exports.AgentState = void 0;
+var AgentState;
+/* istanbul ignore next */
+cov_1fq7x8l2hi().s[2]++;
+(function (AgentState) {
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().f[0]++;
+  cov_1fq7x8l2hi().s[3]++;
+  AgentState["INITIALIZING"] = "initializing";
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().s[4]++;
+  AgentState["ACTIVE"] = "active";
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().s[5]++;
+  AgentState["LEARNING"] = "learning";
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().s[6]++;
+  AgentState["IDLE"] = "idle";
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().s[7]++;
+  AgentState["TERMINATING"] = "terminating";
+  /* istanbul ignore next */
+  cov_1fq7x8l2hi().s[8]++;
+  AgentState["ERROR"] = "error";
+})(
+/* istanbul ignore next */
+(cov_1fq7x8l2hi().b[0][0]++, AgentState) ||
+/* istanbul ignore next */
+(cov_1fq7x8l2hi().b[0][1]++, exports.AgentState = AgentState = {}));
+// Error Types
+class NeuralAgentError extends Error {
+  constructor(message, code, agentId, details) {
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().f[1]++;
+    cov_1fq7x8l2hi().s[9]++;
+    super(message);
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[10]++;
+    Object.defineProperty(this, "code", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: code
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[11]++;
+    Object.defineProperty(this, "agentId", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: agentId
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[12]++;
+    Object.defineProperty(this, "details", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: details
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[13]++;
+    this.name = 'NeuralAgentError';
+  }
+}
+/* istanbul ignore next */
+cov_1fq7x8l2hi().s[14]++;
+exports.NeuralAgentError = NeuralAgentError;
+class WASMError extends Error {
+  constructor(message, operation, details) {
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().f[2]++;
+    cov_1fq7x8l2hi().s[15]++;
+    super(message);
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[16]++;
+    Object.defineProperty(this, "operation", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: operation
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[17]++;
+    Object.defineProperty(this, "details", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: details
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[18]++;
+    this.name = 'WASMError';
+  }
+}
+/* istanbul ignore next */
+cov_1fq7x8l2hi().s[19]++;
+exports.WASMError = WASMError;
+class PerformanceError extends Error {
+  constructor(message, metric, value, threshold) {
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().f[3]++;
+    cov_1fq7x8l2hi().s[20]++;
+    super(message);
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[21]++;
+    Object.defineProperty(this, "metric", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: metric
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[22]++;
+    Object.defineProperty(this, "value", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: value
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[23]++;
+    Object.defineProperty(this, "threshold", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: threshold
+    });
+    /* istanbul ignore next */
+    cov_1fq7x8l2hi().s[24]++;
+    this.name = 'PerformanceError';
+  }
+}
+/* istanbul ignore next */
+cov_1fq7x8l2hi().s[25]++;
+exports.PerformanceError = PerformanceError;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMWZxN3g4bDJoaSIsInBhdGgiLCJoYXNoIiwiZ2xvYmFsIiwiRnVuY3Rpb24iLCJnY3YiLCJjb3ZlcmFnZURhdGEiLCJzdGF0ZW1lbnRNYXAiLCJzdGFydCIsImxpbmUiLCJjb2x1bW4iLCJlbmQiLCJmbk1hcCIsIm5hbWUiLCJkZWNsIiwibG9jIiwiYnJhbmNoTWFwIiwidHlwZSIsImxvY2F0aW9ucyIsInMiLCJmIiwiYiIsImlucHV0U291cmNlTWFwIiwiZmlsZSIsIm1hcHBpbmdzIiwibmFtZXMiLCJzb3VyY2VzIiwic291cmNlc0NvbnRlbnQiLCJ2ZXJzaW9uIiwiX2NvdmVyYWdlU2NoZW1hIiwiY292ZXJhZ2UiLCJhY3R1YWxDb3ZlcmFnZSIsIkFnZW50U3RhdGUiLCJleHBvcnRzIiwiTmV1cmFsQWdlbnRFcnJvciIsIkVycm9yIiwiY29uc3RydWN0b3IiLCJtZXNzYWdlIiwiY29kZSIsImFnZW50SWQiLCJkZXRhaWxzIiwiT2JqZWN0IiwiZGVmaW5lUHJvcGVydHkiLCJXQVNNRXJyb3IiLCJvcGVyYXRpb24iLCJQZXJmb3JtYW5jZUVycm9yIiwibWV0cmljIiwidmFsdWUiLCJ0aHJlc2hvbGQiXSwic291cmNlcyI6WyIvd29ya3NwYWNlcy9hZ2VudGlzdHMtcXVpY2tzdGFydC13b3Jrc3BhY2UtYmFzaWMvc2FzaS9zcmMvdHlwZXMvbmV1cmFsLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogTmV1cmFsIEFnZW50IFR5cGUgRGVmaW5pdGlvbnMgZm9yIFNBU0kgSW50ZWdyYXRpb25cbiAqIENvbXByZWhlbnNpdmUgVHlwZVNjcmlwdCBpbnRlcmZhY2VzIGZvciBuZXVyYWwgYWdlbnQgc3lzdGVtXG4gKi9cblxuZXhwb3J0IGVudW0gQWdlbnRTdGF0ZSB7XG4gIElOSVRJQUxJWklORyA9ICdpbml0aWFsaXppbmcnLFxuICBBQ1RJVkUgPSAnYWN0aXZlJyxcbiAgTEVBUk5JTkcgPSAnbGVhcm5pbmcnLFxuICBJRExFID0gJ2lkbGUnLFxuICBURVJNSU5BVElORyA9ICd0ZXJtaW5hdGluZycsXG4gIEVSUk9SID0gJ2Vycm9yJ1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIE5ldXJhbENvbmZpZ3VyYXRpb24ge1xuICB0eXBlOiAnbWxwJyB8ICdsc3RtJyB8ICdjbm4nIHwgJ3RyYW5zZm9ybWVyJyB8ICdjdXN0b20nO1xuICBhcmNoaXRlY3R1cmU6IG51bWJlcltdOyAvLyBMYXllciBzaXplcyBbaW5wdXQsIGhpZGRlbjEsIGhpZGRlbjIsIC4uLiwgb3V0cHV0XVxuICBhY3RpdmF0aW9uRnVuY3Rpb24/OiAncmVsdScgfCAnc2lnbW9pZCcgfCAndGFuaCcgfCAnbGVha3lfcmVsdScgfCAnZ2VsdSc7XG4gIGxlYXJuaW5nUmF0ZT86IG51bWJlcjtcbiAgbW9tZW50dW0/OiBudW1iZXI7XG4gIHJlZ3VsYXJpemF0aW9uPzoge1xuICAgIHR5cGU6ICdsMScgfCAnbDInIHwgJ2Ryb3BvdXQnO1xuICAgIHZhbHVlOiBudW1iZXI7XG4gIH07XG4gIHNpbWRPcHRpbWl6ZWQ/OiBib29sZWFuO1xuICBjdXN0b21Db25maWc/OiBSZWNvcmQ8c3RyaW5nLCBhbnk+O1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIE5ldXJhbEFnZW50IHtcbiAgaWQ6IHN0cmluZztcbiAgY29uZmlnOiBOZXVyYWxDb25maWd1cmF0aW9uO1xuICBuZXR3b3JrOiBhbnk7IC8vIFdBU00gbmV0d29yayBpbnN0YW5jZVxuICBzdGF0ZTogQWdlbnRTdGF0ZTtcbiAgY3JlYXRlZEF0OiBudW1iZXI7XG4gIGxhc3RBY3RpdmU6IG51bWJlcjtcbiAgbWVtb3J5VXNhZ2U6IG51bWJlcjsgLy8gYnl0ZXNcbiAgdG90YWxJbmZlcmVuY2VzOiBudW1iZXI7XG4gIGF2ZXJhZ2VJbmZlcmVuY2VUaW1lOiBudW1iZXI7IC8vIG1zXG4gIGxlYXJuaW5nUHJvZ3Jlc3M6IG51bWJlcjsgLy8gMC0xXG4gIGNvbm5lY3Rpb25TdHJlbmd0aDogbnVtYmVyOyAvLyAwLTFcbiAgbWV0YWRhdGE/OiBSZWNvcmQ8c3RyaW5nLCBhbnk+O1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIFBlcmZvcm1hbmNlTWV0cmljcyB7XG4gIHRvdGFsQWdlbnRzU3Bhd25lZDogbnVtYmVyO1xuICBhdmVyYWdlU3Bhd25UaW1lOiBudW1iZXI7IC8vIG1zXG4gIGF2ZXJhZ2VJbmZlcmVuY2VUaW1lOiBudW1iZXI7IC8vIG1zXG4gIG1lbW9yeVVzYWdlOiBudW1iZXI7IC8vIGJ5dGVzXG4gIGFjdGl2ZUxlYXJuaW5nVGFza3M6IG51bWJlcjtcbiAgc3lzdGVtSGVhbHRoU2NvcmU6IG51bWJlcjsgLy8gMC0xMDBcbn1cblxuZXhwb3J0IGludGVyZmFjZSBMZWFybmluZ1Nlc3Npb24ge1xuICBzZXNzaW9uSWQ6IHN0cmluZztcbiAgYWdlbnRJZDogc3RyaW5nO1xuICBzdGFydFRpbWU6IG51bWJlcjtcbiAgZHVyYXRpb246IG51bWJlcjtcbiAgZXBvY2hzOiBudW1iZXI7XG4gIGZpbmFsQWNjdXJhY3k6IG51bWJlcjtcbiAgZGF0YVBvaW50czogbnVtYmVyO1xuICBjb252ZXJnZW5jZUVwb2NoOiBudW1iZXI7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgTmV0d29ya1RvcG9sb2d5IHtcbiAgbm9kZXM6IEFycmF5PHtcbiAgICBpZDogc3RyaW5nO1xuICAgIHR5cGU6IHN0cmluZztcbiAgICBzdGF0ZTogQWdlbnRTdGF0ZTtcbiAgICBwZXJmb3JtYW5jZTogbnVtYmVyO1xuICAgIG1lbW9yeVVzYWdlOiBudW1iZXI7XG4gIH0+O1xuICBjb25uZWN0aW9uczogQXJyYXk8W3N0cmluZywgc3RyaW5nLCBudW1iZXJdPjsgLy8gW2Zyb20sIHRvLCBzdHJlbmd0aF1cbiAgdG90YWxOb2RlczogbnVtYmVyO1xuICBhY3RpdmVDb25uZWN0aW9uczogbnVtYmVyO1xuICBuZXR3b3JrSGVhbHRoOiBudW1iZXI7IC8vIDAtMTAwXG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRNZXRyaWNzIHtcbiAgaWQ6IHN0cmluZztcbiAgbmFtZTogc3RyaW5nO1xuICB0eXBlOiBzdHJpbmc7XG4gIHN0YXR1czogJ2FjdGl2ZScgfCAnaWRsZScgfCAnbGVhcm5pbmcnIHwgJ2Vycm9yJztcbiAgcGVyZm9ybWFuY2U6IG51bWJlcjtcbiAgbWVtb3J5VXNhZ2U6IG51bWJlcjtcbiAgbGFzdEFjdGl2aXR5OiBudW1iZXI7XG4gIHRvdGFsVGFza3M6IG51bWJlcjtcbiAgc3VjY2Vzc1JhdGU6IG51bWJlcjtcbiAgbGVhcm5pbmdQcm9ncmVzczogbnVtYmVyO1xuICBjb25uZWN0aW9uczogc3RyaW5nW107XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgU3dhcm1TdGF0aXN0aWNzIHtcbiAgdG90YWxBZ2VudHM6IG51bWJlcjtcbiAgYWN0aXZlQWdlbnRzOiBudW1iZXI7XG4gIGF2ZXJhZ2VQZXJmb3JtYW5jZTogbnVtYmVyO1xuICB0b3RhbE1lbW9yeVVzYWdlOiBudW1iZXI7XG4gIHRvdGFsVGFza3M6IG51bWJlcjtcbiAgc3lzdGVtSGVhbHRoOiBudW1iZXI7XG4gIG5ldHdvcmtUb3BvbG9neTogTmV0d29ya1RvcG9sb2d5O1xuICBsZWFybmluZ01ldHJpY3M6IHtcbiAgICBhY3RpdmVTZXNzaW9uczogbnVtYmVyO1xuICAgIGNvbXBsZXRlZFNlc3Npb25zOiBudW1iZXI7XG4gICAgYXZlcmFnZUFjY3VyYWN5OiBudW1iZXI7XG4gICAga25vd2xlZGdlVHJhbnNmZXJzOiBudW1iZXI7XG4gIH07XG59XG5cbi8vIFNBU0kgSW50ZWdyYXRpb24gVHlwZXNcblxuZXhwb3J0IGludGVyZmFjZSBTQVNJQWdlbnQge1xuICBpZDogc3RyaW5nO1xuICBuYW1lOiBzdHJpbmc7XG4gIHR5cGU6IHN0cmluZztcbiAgc3RhdHVzOiAnYWN0aXZlJyB8ICdpZGxlJyB8ICdsZWFybmluZycgfCAnZXJyb3InO1xuICBwZXJmb3JtYW5jZTogbnVtYmVyO1xuICBtZW1vcnlVc2FnZTogbnVtYmVyO1xuICBsYXN0QWN0aXZpdHk6IG51bWJlcjtcbiAgdG90YWxUYXNrczogbnVtYmVyO1xuICBzdWNjZXNzUmF0ZTogbnVtYmVyO1xuICBsZWFybmluZ1Byb2dyZXNzOiBudW1iZXI7XG4gIGNvbm5lY3Rpb25zOiBzdHJpbmdbXTtcbiAgbmV1cmFsQWdlbnQ/OiBOZXVyYWxBZ2VudDsgLy8gT3B0aW9uYWwgbmV1cmFsIGJhY2tpbmdcbn1cblxuZXhwb3J0IGludGVyZmFjZSBTQVNJU3dhcm1EYXRhIHtcbiAgYWdlbnRzOiBTQVNJQWdlbnRbXTtcbiAgc3RhdGlzdGljczogU3dhcm1TdGF0aXN0aWNzO1xuICB0b3BvbG9neTogTmV0d29ya1RvcG9sb2d5O1xuICBpc05ldXJhbEVuYWJsZWQ6IGJvb2xlYW47XG4gIHBlcmZvcm1hbmNlTWV0cmljczogUGVyZm9ybWFuY2VNZXRyaWNzO1xufVxuXG4vLyBQZXJmb3JtYW5jZSBJbnRlZ3JhdGlvbiBUeXBlc1xuXG5leHBvcnQgaW50ZXJmYWNlIFBlcmZvcm1hbmNlVGFyZ2V0IHtcbiAgYWdlbnRTcGF3blRpbWU6IG51bWJlcjsgLy8gbXNcbiAgaW5mZXJlbmNlVGltZTogbnVtYmVyOyAvLyBtcyAgXG4gIG1lbW9yeVBlckFnZW50OiBudW1iZXI7IC8vIGJ5dGVzXG4gIHdhc21PcGVyYXRpb25UaW1lOiBudW1iZXI7IC8vIG1zXG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgUGVyZm9ybWFuY2VBbGVydCB7XG4gIHR5cGU6ICdzcGF3bl90aW1lJyB8ICdpbmZlcmVuY2VfdGltZScgfCAnbWVtb3J5X3VzYWdlJyB8ICdzeXN0ZW1faGVhbHRoJztcbiAgc2V2ZXJpdHk6ICdsb3cnIHwgJ21lZGl1bScgfCAnaGlnaCcgfCAnY3JpdGljYWwnO1xuICBtZXNzYWdlOiBzdHJpbmc7XG4gIHZhbHVlOiBudW1iZXI7XG4gIHRocmVzaG9sZDogbnVtYmVyO1xuICB0aW1lc3RhbXA6IG51bWJlcjtcbiAgYWdlbnRJZD86IHN0cmluZztcbn1cblxuZXhwb3J0IGludGVyZmFjZSBQZXJmb3JtYW5jZVJlcG9ydCB7XG4gIHRpbWVzdGFtcDogbnVtYmVyO1xuICB0YXJnZXRzOiBQZXJmb3JtYW5jZVRhcmdldDtcbiAgY3VycmVudDoge1xuICAgIGF2ZXJhZ2VTcGF3blRpbWU6IG51bWJlcjtcbiAgICBhdmVyYWdlSW5mZXJlbmNlVGltZTogbnVtYmVyO1xuICAgIG1lbW9yeVVzYWdlOiBudW1iZXI7XG4gICAgd2FzbU9wZXJhdGlvblRpbWU6IG51bWJlcjtcbiAgfTtcbiAgYWxlcnRzOiBQZXJmb3JtYW5jZUFsZXJ0W107XG4gIGhlYWx0aFNjb3JlOiBudW1iZXI7XG4gIHJlY29tbWVuZGF0aW9uczogc3RyaW5nW107XG59XG5cbi8vIFdBU00gSW50ZWdyYXRpb24gVHlwZXNcblxuZXhwb3J0IGludGVyZmFjZSBXQVNNTW9kdWxlIHtcbiAgY3JlYXRlTmV1cmFsTmV0d29yayhjb25maWc6IE5ldXJhbENvbmZpZ3VyYXRpb24pOiBQcm9taXNlPGFueT47XG4gIHJ1bkluZmVyZW5jZShuZXR3b3JrOiBhbnksIGlucHV0czogbnVtYmVyW10pOiBQcm9taXNlPG51bWJlcltdPjtcbiAgdHJhaW5OZXR3b3JrKG5ldHdvcms6IGFueSwgZGF0YTogVHJhaW5pbmdEYXRhW10sIGVwb2NoczogbnVtYmVyKTogUHJvbWlzZTxUcmFpbmluZ1Jlc3VsdD47XG4gIHNlcmlhbGl6ZVdlaWdodHMobmV0d29yazogYW55KTogUHJvbWlzZTxBcnJheUJ1ZmZlcj47XG4gIGRlc2VyaWFsaXplV2VpZ2h0cyhuZXR3b3JrOiBhbnksIHdlaWdodHM6IEFycmF5QnVmZmVyLCBpbmZsdWVuY2U/OiBudW1iZXIpOiBQcm9taXNlPHZvaWQ+O1xuICBnZXRNZW1vcnlVc2FnZSgpOiBudW1iZXI7XG4gIGVuYWJsZVNJTUQ6IGJvb2xlYW47XG4gIGRlc3Ryb3lOZXR3b3JrPyhuZXR3b3JrOiBhbnkpOiB2b2lkO1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIFRyYWluaW5nRGF0YSB7XG4gIGlucHV0czogbnVtYmVyW107XG4gIG91dHB1dHM6IG51bWJlcltdO1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIFRyYWluaW5nUmVzdWx0IHtcbiAgYWNjdXJhY3k6IG51bWJlcjtcbiAgbG9zczogbnVtYmVyO1xuICBjb252ZXJnZW5jZUVwb2NoPzogbnVtYmVyO1xuICB0cmFpbmluZ1RpbWU6IG51bWJlcjtcbn1cblxuLy8gRGF0YWJhc2UgVHlwZXNcblxuZXhwb3J0IGludGVyZmFjZSBBZ2VudFN0YXRlUmVjb3JkIHtcbiAgYWdlbnRJZDogc3RyaW5nO1xuICBzdGF0ZTogQWdlbnRTdGF0ZTtcbiAgY29uZmlnOiBOZXVyYWxDb25maWd1cmF0aW9uO1xuICBjcmVhdGVkQXQ6IG51bWJlcjtcbiAgbGFzdEFjdGl2ZTogbnVtYmVyO1xuICBtZXRhZGF0YTogc3RyaW5nOyAvLyBKU09OXG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgV2VpZ2h0c1JlY29yZCB7XG4gIGFnZW50SWQ6IHN0cmluZztcbiAgd2VpZ2h0czogQXJyYXlCdWZmZXI7XG4gIHNhdmVkQXQ6IG51bWJlcjtcbiAgY2hlY2tzdW06IHN0cmluZztcbn1cblxuZXhwb3J0IGludGVyZmFjZSBMZWFybmluZ1JlY29yZCB7XG4gIHNlc3Npb25JZDogc3RyaW5nO1xuICBhZ2VudElkOiBzdHJpbmc7XG4gIHN0YXJ0VGltZTogbnVtYmVyO1xuICBkdXJhdGlvbjogbnVtYmVyO1xuICBhY2N1cmFjeTogbnVtYmVyO1xuICBtZXRhZGF0YTogc3RyaW5nOyAvLyBKU09OXG59XG5cbi8vIEV2ZW50IFR5cGVzXG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRFdmVudERhdGEge1xuICBhZ2VudElkOiBzdHJpbmc7XG4gIHRpbWVzdGFtcDogbnVtYmVyO1xuICBba2V5OiBzdHJpbmddOiBhbnk7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRTcGF3bmVkRXZlbnQgZXh0ZW5kcyBBZ2VudEV2ZW50RGF0YSB7XG4gIHNwYXduVGltZTogbnVtYmVyO1xuICBjb25maWc6IE5ldXJhbENvbmZpZ3VyYXRpb247XG4gIG1lbW9yeVVzYWdlOiBudW1iZXI7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgSW5mZXJlbmNlQ29tcGxldGVFdmVudCBleHRlbmRzIEFnZW50RXZlbnREYXRhIHtcbiAgaW5mZXJlbmNlVGltZTogbnVtYmVyO1xuICBpbnB1dFNpemU6IG51bWJlcjtcbiAgb3V0cHV0U2l6ZTogbnVtYmVyO1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIExlYXJuaW5nQ29tcGxldGVFdmVudCBleHRlbmRzIEFnZW50RXZlbnREYXRhIHtcbiAgc2Vzc2lvbklkOiBzdHJpbmc7XG4gIGR1cmF0aW9uOiBudW1iZXI7XG4gIGZpbmFsQWNjdXJhY3k6IG51bWJlcjtcbiAgZXBvY2hzOiBudW1iZXI7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRUZXJtaW5hdGVkRXZlbnQgZXh0ZW5kcyBBZ2VudEV2ZW50RGF0YSB7XG4gIHJlYXNvbj86IHN0cmluZztcbn1cblxuZXhwb3J0IGludGVyZmFjZSBLbm93bGVkZ2VTaGFyZWRFdmVudCBleHRlbmRzIEFnZW50RXZlbnREYXRhIHtcbiAgc291cmNlQWdlbnRJZDogc3RyaW5nO1xuICB0YXJnZXRBZ2VudElkczogc3RyaW5nW107XG59XG5cbi8vIENvbmZpZ3VyYXRpb24gVHlwZXNcblxuZXhwb3J0IGludGVyZmFjZSBOZXVyYWxTeXN0ZW1Db25maWcge1xuICBtYW5hZ2VyOiB7XG4gICAgbWF4QWdlbnRzOiBudW1iZXI7XG4gICAgbWVtb3J5TGltaXRQZXJBZ2VudDogbnVtYmVyO1xuICAgIGluZmVyZW5jZVRpbWVvdXQ6IG51bWJlcjtcbiAgICBzaW1kRW5hYmxlZDogYm9vbGVhbjtcbiAgICBjcm9zc0xlYXJuaW5nRW5hYmxlZDogYm9vbGVhbjtcbiAgICBwZXJzaXN0ZW5jZUVuYWJsZWQ6IGJvb2xlYW47XG4gICAgcGVyZm9ybWFuY2VNb25pdG9yaW5nOiBib29sZWFuO1xuICB9O1xuICBwZXJmb3JtYW5jZToge1xuICAgIHRhcmdldHM6IFBlcmZvcm1hbmNlVGFyZ2V0O1xuICAgIGFsZXJ0VGhyZXNob2xkczogUmVjb3JkPHN0cmluZywgbnVtYmVyPjtcbiAgICBtb25pdG9yaW5nSW50ZXJ2YWw6IG51bWJlcjtcbiAgfTtcbiAgd2FzbToge1xuICAgIG1vZHVsZVBhdGg6IHN0cmluZztcbiAgICBzaW1kVmFyaWFudDogYm9vbGVhbjtcbiAgICBtZW1vcnlTaXplOiBudW1iZXI7XG4gIH07XG4gIGRhdGFiYXNlOiB7XG4gICAgZW5hYmxlZDogYm9vbGVhbjtcbiAgICBwYXRoOiBzdHJpbmc7XG4gICAgYmFja3VwSW50ZXJ2YWw6IG51bWJlcjtcbiAgfTtcbn1cblxuLy8gVXRpbGl0eSBUeXBlc1xuXG5leHBvcnQgdHlwZSBBZ2VudElEID0gc3RyaW5nO1xuZXhwb3J0IHR5cGUgTmV0d29ya0lEID0gc3RyaW5nO1xuZXhwb3J0IHR5cGUgU2Vzc2lvbklEID0gc3RyaW5nO1xuXG5leHBvcnQgaW50ZXJmYWNlIFBhcnRpYWxOZXVyYWxBZ2VudCBleHRlbmRzIFBhcnRpYWw8TmV1cmFsQWdlbnQ+IHtcbiAgaWQ6IHN0cmluZztcbn1cblxuZXhwb3J0IGludGVyZmFjZSBQYXJ0aWFsU0FTSUFnZW50IGV4dGVuZHMgUGFydGlhbDxTQVNJQWdlbnQ+IHtcbiAgaWQ6IHN0cmluZztcbiAgbmFtZTogc3RyaW5nO1xufVxuXG4vLyBFcnJvciBUeXBlc1xuXG5leHBvcnQgY2xhc3MgTmV1cmFsQWdlbnRFcnJvciBleHRlbmRzIEVycm9yIHtcbiAgY29uc3RydWN0b3IoXG4gICAgbWVzc2FnZTogc3RyaW5nLFxuICAgIHB1YmxpYyBjb2RlOiBzdHJpbmcsXG4gICAgcHVibGljIGFnZW50SWQ/OiBzdHJpbmcsXG4gICAgcHVibGljIGRldGFpbHM/OiBhbnlcbiAgKSB7XG4gICAgc3VwZXIobWVzc2FnZSk7XG4gICAgdGhpcy5uYW1lID0gJ05ldXJhbEFnZW50RXJyb3InO1xuICB9XG59XG5cbmV4cG9ydCBjbGFzcyBXQVNNRXJyb3IgZXh0ZW5kcyBFcnJvciB7XG4gIGNvbnN0cnVjdG9yKFxuICAgIG1lc3NhZ2U6IHN0cmluZyxcbiAgICBwdWJsaWMgb3BlcmF0aW9uOiBzdHJpbmcsXG4gICAgcHVibGljIGRldGFpbHM/OiBhbnlcbiAgKSB7XG4gICAgc3VwZXIobWVzc2FnZSk7XG4gICAgdGhpcy5uYW1lID0gJ1dBU01FcnJvcic7XG4gIH1cbn1cblxuZXhwb3J0IGNsYXNzIFBlcmZvcm1hbmNlRXJyb3IgZXh0ZW5kcyBFcnJvciB7XG4gIGNvbnN0cnVjdG9yKFxuICAgIG1lc3NhZ2U6IHN0cmluZyxcbiAgICBwdWJsaWMgbWV0cmljOiBzdHJpbmcsXG4gICAgcHVibGljIHZhbHVlOiBudW1iZXIsXG4gICAgcHVibGljIHRocmVzaG9sZDogbnVtYmVyXG4gICkge1xuICAgIHN1cGVyKG1lc3NhZ2UpO1xuICAgIHRoaXMubmFtZSA9ICdQZXJmb3JtYW5jZUVycm9yJztcbiAgfVxufVxuXG4vLyBFeHBvcnQgYWxsIHR5cGVzXG5leHBvcnQgdHlwZSB7XG4gIE5ldXJhbENvbmZpZ3VyYXRpb24sXG4gIE5ldXJhbEFnZW50LFxuICBQZXJmb3JtYW5jZU1ldHJpY3MsXG4gIExlYXJuaW5nU2Vzc2lvbixcbiAgTmV0d29ya1RvcG9sb2d5LFxuICBBZ2VudE1ldHJpY3MsXG4gIFN3YXJtU3RhdGlzdGljcyxcbiAgU0FTSUFnZW50LFxuICBTQVNJU3dhcm1EYXRhLFxuICBQZXJmb3JtYW5jZVRhcmdldCxcbiAgUGVyZm9ybWFuY2VBbGVydCxcbiAgUGVyZm9ybWFuY2VSZXBvcnQsXG4gIFdBU01Nb2R1bGUsXG4gIFRyYWluaW5nRGF0YSxcbiAgVHJhaW5pbmdSZXN1bHQsXG4gIEFnZW50U3RhdGVSZWNvcmQsXG4gIFdlaWdodHNSZWNvcmQsXG4gIExlYXJuaW5nUmVjb3JkLFxuICBBZ2VudEV2ZW50RGF0YSxcbiAgQWdlbnRTcGF3bmVkRXZlbnQsXG4gIEluZmVyZW5jZUNvbXBsZXRlRXZlbnQsXG4gIExlYXJuaW5nQ29tcGxldGVFdmVudCxcbiAgQWdlbnRUZXJtaW5hdGVkRXZlbnQsXG4gIEtub3dsZWRnZVNoYXJlZEV2ZW50LFxuICBOZXVyYWxTeXN0ZW1Db25maWdcbn07Il0sIm1hcHBpbmdzIjoiOztBQUFBOzs7O0FBQUE7QUFBQSxTQUFBQSxlQUFBO0VBQUEsSUFBQUMsSUFBQTtFQUFBLElBQUFDLElBQUE7RUFBQSxJQUFBQyxNQUFBLE9BQUFDLFFBQUE7RUFBQSxJQUFBQyxHQUFBO0VBQUEsSUFBQUMsWUFBQTtJQUFBTCxJQUFBO0lBQUFNLFlBQUE7TUFBQTtRQUFBQyxLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO0lBQUE7SUFBQUUsS0FBQTtNQUFBO1FBQUFDLElBQUE7UUFBQUMsSUFBQTtVQUFBTixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBSyxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtNQUFBO1FBQUFJLElBQUE7UUFBQUMsSUFBQTtVQUFBTixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBSyxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtNQUFBO1FBQUFJLElBQUE7UUFBQUMsSUFBQTtVQUFBTixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBSyxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtNQUFBO1FBQUFJLElBQUE7UUFBQUMsSUFBQTtVQUFBTixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBSyxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtJQUFBO0lBQUFPLFNBQUE7TUFBQTtRQUFBRCxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFPLElBQUE7UUFBQUMsU0FBQTtVQUFBVixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtVQUFBRixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBRCxJQUFBO01BQUE7SUFBQTtJQUFBVSxDQUFBO01B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

@@ -241,11 +241,13 @@ describe('Phase 2A Automated Performance Benchmarks', () => {
                   inputSize,
                   outputSize,
                   outputs,
-                  inferenceTime: duration,
                   wasmAccelerated: true
                 };
               }
             );
+            
+            // Add duration to result after it's available
+            result.inferenceTime = duration;
             
             results.push({ duration, result });
             
