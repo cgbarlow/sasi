@@ -124,13 +124,13 @@ export class ProductionWasmBridge {
       }
       
       // Dynamic import for ES modules
-      const { default: WASMNeuralLoader } = await import('../../public/wasm/wasm-loader.js')
+      const { WASMNeuralLoader } = await import('./wasm-loader.js')
       this.wasmLoader = new WASMNeuralLoader()
       
     } catch (error) {
       // Fallback: try different paths
       try {
-        const { default: WASMNeuralLoader } = await import('/wasm/wasm-loader.js')
+        const { WASMNeuralLoader } = await import('./wasm-loader.js')
         this.wasmLoader = new WASMNeuralLoader()
       } catch (fallbackError) {
         throw new Error(`Failed to load WASM loader: ${error.message}`)

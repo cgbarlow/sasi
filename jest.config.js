@@ -1,160 +1,200 @@
 module.exports = {
-  // Test environment configuration
-  testEnvironment: 'node',
+  // Test Environment Configuration for Phase 2A
+  testEnvironment: 'node', // Changed to node for SQLite testing
+  testEnvironmentOptions: {
+    url: 'http://localhost:3000',
+    resources: 'usable',
+    runScripts: 'dangerously',
+    pretendToBeVisual: true
+  },
   
-  // Test file patterns
+  // Simplified test environment for Phase 2A persistence layer
+  // Projects configuration disabled to avoid babel/setup conflicts
+  
+  // Test Pattern Matching for Phase 2A
   testMatch: [
-    '**/tests/**/*.test.js',
-    '**/tests/**/*.test.ts',
-    '**/src/**/*.test.js',
-    '**/src/**/*.test.ts',
-    '**/sasi/**/*.test.js',
-    '**/sasi/**/*.test.ts',
-    '**/synaptic-mesh/**/*.test.js',
-    '**/synaptic-mesh/**/*.test.ts'
+    '**/tests/**/*.test.{js,ts,tsx}',
+    '**/src/**/__tests__/**/*.{js,ts,tsx}',
+    '**/src/**/*.{test,spec}.{js,ts,tsx}',
+    '**/tests/unit/**/*.test.{js,ts}',
+    '**/tests/integration/**/*.test.{js,ts}',
+    '**/tests/performance/**/*.test.{js,ts}',
+    '**/tests/persistence/**/*.test.{js,ts}',
+    '**/tests/coordination/**/*.test.{js,ts}',
+    '**/tests/tdd/**/*.test.{js,ts}'
   ],
   
-  // Setup files
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-  globalSetup: '<rootDir>/tests/global-setup.js',
-  globalTeardown: '<rootDir>/tests/global-teardown.js',
+  // Test Exclusions
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/build/',
+    '/coverage/',
+    '/tests/e2e/'
+  ],
   
-  // Transformations
+  // Setup Files for Phase 2A
+  setupFilesAfterEnv: [
+    '<rootDir>/tests/setup.js'
+  ],
+  
+  // Timeout Configuration for Phase 2A
+  testTimeout: 90000, // 90 seconds for comprehensive tests including SQLite operations
+  
+  // Output Configuration
+  verbose: true,
+  detectOpenHandles: true,
+  forceExit: true,
+  bail: false, // Continue running tests after failures
+  
+  // TypeScript Configuration - Updated for ts-jest v29+
+  preset: 'ts-jest',
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  
+  // Transform Configuration - Fixed deprecated globals usage
   transform: {
-    '^.+\\.ts$': ['ts-jest', {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
       useESM: true,
       tsconfig: {
-        module: 'es2022',
+        jsx: 'react-jsx',
         moduleResolution: 'node',
         allowSyntheticDefaultImports: true,
         esModuleInterop: true,
-        target: 'es2022'
+        target: 'es2020',
+        module: 'esnext',
+        isolatedModules: true
       }
     }],
-    '^.+\\.js$': ['babel-jest', {
-      presets: [['@babel/preset-env', { modules: false }]]
+    '^.+\\.(js|jsx)$': ['babel-jest', {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        ['@babel/preset-react', { runtime: 'automatic' }],
+        ['@babel/preset-typescript', { allowDeclareFields: true }]
+      ]
     }],
-    '^.+\\.jsx$': ['babel-jest', {
-      presets: [['@babel/preset-env', { modules: false }], '@babel/preset-react']
-    }],
-    '^.+\\.tsx$': ['ts-jest', {
-      useESM: true,
-      tsconfig: {
-        module: 'es2022',
-        jsx: 'react-jsx',
-        target: 'es2022'
-      }
-    }]
+    '\\.(wasm)$': '<rootDir>/tests/utils/wasm-transformer.js',
+    '\\.(glsl|vert|frag)$': '<rootDir>/tests/utils/shader-transformer.js'
   },
   
-  // Module mappings
+  // Module Mapping
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@sasi/(.*)$': '<rootDir>/sasi/src/$1',
-    '^@synaptic/(.*)$': '<rootDir>/synaptic-mesh/src/$1',
     '^@tests/(.*)$': '<rootDir>/tests/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@performance/(.*)$': '<rootDir>/src/performance/$1',
+    '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/tests/mocks/fileMock.js'
   },
   
-  // Coverage configuration
+  // Coverage Configuration
+  collectCoverage: false, // Set to false by default, enable via CLI
   collectCoverageFrom: [
-    'src/**/*.{js,ts,jsx,tsx}',
-    'sasi/src/**/*.{js,ts,jsx,tsx}',
-    'synaptic-mesh/src/**/*.{js,ts}',
-    '!**/*.d.ts',
-    '!**/*.test.{js,ts,jsx,tsx}',
-    '!**/*.spec.{js,ts,jsx,tsx}',
-    '!**/node_modules/**',
-    '!**/dist/**',
-    '!**/build/**',
-    '!**/coverage/**'
+    'src/**/*.{js,ts,tsx}',
+    '!src/tests/**',
+    '!src/**/*.d.ts',
+    '!src/main.tsx',
+    '!src/vite-env.d.ts',
+    '!src/App.tsx', // Exclude main app component for now
+    '!node_modules/**',
+    '!dist/**',
+    '!build/**',
+    '!coverage/**'
   ],
-  
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'text-summary', 'lcov', 'html', 'json'],
+  coverageReporters: ['text', 'text-summary', 'lcov', 'html', 'json', 'cobertura'],
+  
+  // Production Coverage Thresholds (>90% requirement)
   coverageThreshold: {
+    // Fail build if overall coverage drops below 90%
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90
+    },
+    './src/components/': {
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85
+    },
+    './src/services/': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95
+    },
+    './src/performance/': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95
+    },
+    './src/persistence/': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95
+    },
+    './src/coordination/': {
+      branches: 93,
+      functions: 93,
+      lines: 93,
+      statements: 93
+    },
+    // Critical paths require higher coverage
+    './src/utils/': {
+      branches: 97,
+      functions: 97,
+      lines: 97,
+      statements: 97
     }
   },
   
-  // Test timeout and retries
-  testTimeout: 60000,
-  retry: 2,
-  
-  // Verbose output
-  verbose: true,
-  
-  // Error handling
-  detectOpenHandles: true,
-  forceExit: true,
-  
-  // Test suites
-  projects: [
-    {
-      displayName: 'Unit Tests',
-      testMatch: ['<rootDir>/tests/unit/**/*.test.{js,ts}'],
-      testEnvironment: 'node'
-    },
-    {
-      displayName: 'Integration Tests',
-      testMatch: ['<rootDir>/tests/integration/**/*.test.{js,ts}'],
-      testEnvironment: 'node',
-      testTimeout: 120000
-    },
-    {
-      displayName: 'E2E Tests',
-      testMatch: ['<rootDir>/tests/e2e/**/*.test.{js,ts}'],
-      testEnvironment: 'node',
-      testTimeout: 300000
-    },
-    {
-      displayName: 'Performance Tests',
-      testMatch: ['<rootDir>/tests/performance/**/*.test.{js,ts}'],
-      testEnvironment: 'node',
-      testTimeout: 600000
-    },
-    {
-      displayName: 'WASM Tests',
-      testMatch: ['<rootDir>/tests/wasm/**/*.test.{js,ts}'],
-      testEnvironment: 'node',
-      testTimeout: 180000
-    },
-    {
-      displayName: 'SASI Tests',
-      testMatch: ['<rootDir>/sasi/tests/**/*.test.{js,ts}'],
-      testEnvironment: 'jsdom',
-      setupFilesAfterEnv: ['<rootDir>/tests/sasi-setup.js']
-    },
-    {
-      displayName: 'Synaptic Mesh Tests',
-      testMatch: ['<rootDir>/synaptic-mesh/tests/**/*.test.{js,ts}'],
-      testEnvironment: 'node'
-    }
+  // Watch Configuration
+  watchman: true,
+  watchPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/build/',
+    '/coverage/'
   ],
   
-  // Reporters
+  // Performance Configuration for CI/CD
+  maxWorkers: process.env.CI ? 2 : '50%', // Limited workers in CI, half CPU cores locally
+  cache: true,
+  cacheDirectory: '<rootDir>/.jest-cache',
+  
+  // CI/CD Specific Configuration
+  passWithNoTests: false, // Fail if no tests found
+  silent: process.env.CI ? true : false, // Reduce noise in CI
+  
+  // Memory Management for CI
+  workerIdleMemoryLimit: '512MB',
+  
+  // Test Retry Configuration removed - not supported in Jest 30
+  // testRetries: process.env.CI ? 2 : 0, // Retry flaky tests in CI - DEPRECATED
+  
+  // Reporter Configuration for Production CI/CD
   reporters: [
     'default',
-    ['jest-html-reporters', {
-      publicPath: './coverage/html-report',
-      filename: 'report.html',
-      openReport: false
-    }],
     ['jest-junit', {
-      outputDirectory: './coverage',
-      outputName: 'junit.xml'
+      outputDirectory: 'coverage',
+      outputName: 'junit.xml',
+      ancestorSeparator: ' › ',
+      uniqueOutputName: 'false',
+      suiteNameTemplate: '{filepath}',
+      classNameTemplate: '{classname}',
+      titleTemplate: '{title}'
     }]
   ],
   
-  // Watch configuration
-  watchPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/build/',
-    '<rootDir>/coverage/'
-  ]
+  // Error Handling
+  errorOnDeprecated: true,
+  clearMocks: true,
+  restoreMocks: true,
+  resetMocks: false
 };

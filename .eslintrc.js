@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     es2021: true,
@@ -6,16 +7,25 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
+    "@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
   ],
+  ignorePatterns: ["dist", ".eslintrc.js"],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 12,
+    ecmaVersion: "latest",
     sourceType: "module",
   },
+  plugins: ["react-refresh", "@typescript-eslint"],
   rules: {
-    "no-unused-vars": "warn",
+    "react-refresh/only-export-components": [
+      "warn",
+      { allowConstantExport: true },
+    ],
+    "@typescript-eslint/no-unused-vars": "warn",
     "no-console": "warn",
   },
 };

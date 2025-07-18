@@ -1,4 +1,7 @@
-// Jest setup for E2E tests
+// Global test setup for SASI/Synaptic-mesh integration
+const path = require('path');
+
+// Set global timeout for all tests
 jest.setTimeout(60000);
 
 // Global test configuration
@@ -28,12 +31,6 @@ console.log = (...args) => {
     originalLog(...args);
   }
 };
-// Global test setup for SASI/Synaptic-mesh integration
-const { jest } = require('@jest/globals');
-const path = require('path');
-
-// Increase timeout for all tests
-jest.setTimeout(60000);
 
 // Mock WebGL context for browser-based tests
 global.WebGLRenderingContext = class MockWebGLRenderingContext {};
@@ -89,52 +86,64 @@ global.WebSocket = class MockWebSocket {
   }
 };
 
-// Mock claude-flow hooks
-jest.mock('claude-flow', () => ({
-  hooks: {
-    preTask: jest.fn(),
-    postEdit: jest.fn(),
-    notification: jest.fn(),
-    postTask: jest.fn()
-  },
-  memory: {
-    store: jest.fn(),
-    retrieve: jest.fn(),
-    list: jest.fn()
-  },
-  swarm: {
-    init: jest.fn(),
-    spawn: jest.fn(),
-    orchestrate: jest.fn(),
-    status: jest.fn()
-  }
-}));
+// Mock claude-flow hooks (conditional mock)
+try {
+  jest.mock('claude-flow', () => ({
+    hooks: {
+      preTask: jest.fn(),
+      postEdit: jest.fn(),
+      notification: jest.fn(),
+      postTask: jest.fn()
+    },
+    memory: {
+      store: jest.fn(),
+      retrieve: jest.fn(),
+      list: jest.fn()
+    },
+    swarm: {
+      init: jest.fn(),
+      spawn: jest.fn(),
+      orchestrate: jest.fn(),
+      status: jest.fn()
+    }
+  }));
+} catch (e) {
+  // claude-flow not available in this environment
+}
 
-// Mock ruv-swarm for integration tests
-jest.mock('ruv-swarm', () => ({
-  SwarmManager: jest.fn().mockImplementation(() => ({
-    init: jest.fn(),
-    spawn: jest.fn(),
-    orchestrate: jest.fn(),
-    status: jest.fn(),
-    destroy: jest.fn()
-  })),
-  Agent: jest.fn().mockImplementation(() => ({
-    execute: jest.fn(),
-    coordinate: jest.fn(),
-    learn: jest.fn()
-  }))
-}));
+// Mock ruv-swarm for integration tests (conditional mock)
+try {
+  jest.mock('ruv-swarm', () => ({
+    SwarmManager: jest.fn().mockImplementation(() => ({
+      init: jest.fn(),
+      spawn: jest.fn(),
+      orchestrate: jest.fn(),
+      status: jest.fn(),
+      destroy: jest.fn()
+    })),
+    Agent: jest.fn().mockImplementation(() => ({
+      execute: jest.fn(),
+      coordinate: jest.fn(),
+      learn: jest.fn()
+    }))
+  }));
+} catch (e) {
+  // ruv-swarm not available in this environment
+}
 
-// Mock WASM modules
-jest.mock('../../synaptic-mesh/src/rs/neural-mesh/pkg', () => ({
-  init: jest.fn(),
-  NeuralMesh: jest.fn().mockImplementation(() => ({
-    process: jest.fn(),
-    train: jest.fn(),
-    predict: jest.fn()
-  }))
-}));
+// Mock WASM modules (conditional mock)
+try {
+  jest.mock('../../synaptic-mesh/src/rs/neural-mesh/pkg', () => ({
+    init: jest.fn(),
+    NeuralMesh: jest.fn().mockImplementation(() => ({
+      process: jest.fn(),
+      train: jest.fn(),
+      predict: jest.fn()
+    }))
+  }));
+} catch (e) {
+  // WASM module not available in this environment
+}
 
 // Mock crypto for DAA tests
 Object.defineProperty(global, 'crypto', {

@@ -14,16 +14,8 @@ web-sys = { version = "0.3", features = [
   "console",
   "Window",
   "Performance",
-] }
-
-[dependencies.web-sys]
-version = "0.3"
-features = [
-  "console",
-  "Window",
-  "Performance",
   "PerformanceTiming",
-]
+] }
 
 [profile.release]
 opt-level = 3

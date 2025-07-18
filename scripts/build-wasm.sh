@@ -62,8 +62,8 @@ echo "📋 Setting up WASM loader..."
 cd ../../
 
 # Create WASM loader if it doesn't exist
-if [ ! -f "public/wasm/wasm-loader.js" ]; then
-    cat > public/wasm/wasm-loader.js << 'EOF'
+if [ ! -f "src/utils/wasm-loader.js" ]; then
+    cat > src/utils/wasm-loader.js << 'EOF'
 /**
  * WASM Loader for SASI Neural Runtime
  * Provides initialization and performance optimization
