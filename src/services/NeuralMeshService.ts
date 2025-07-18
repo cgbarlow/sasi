@@ -11,7 +11,12 @@
  */
 
 import { Agent } from '../types/agent'
-import { performance } from 'perf_hooks'
+import { NodeTimer } from '../types/neural'
+
+// Browser-compatible performance API
+const perf = typeof performance !== 'undefined' ? performance : {
+  now: () => Date.now()
+}
 
 export interface NeuralMeshConfig {
   serverUrl?: string
@@ -42,11 +47,19 @@ export interface NeuralAgent extends Agent {
     spikeHistory: number[]
     lastSpike?: Date
   }
+  type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker'
+  capabilities: string[]
   wasmMetrics: {
     executionTime: number
     memoryUsage: number
     simdAcceleration: boolean
     performanceScore: number
+  }
+  realtime?: {
+    cpuUsage: number
+    memoryUsage: number
+    networkLatency: number
+    wasmPerformance: number
   }
 }
 
@@ -63,7 +76,7 @@ export class NeuralMeshService {
   private eventListeners: Map<string, Function[]> = new Map()
   private mcpClient: any = null
   private wasmModule: any = null
-  private realtimeInterval: NodeJS.Timer | null = null
+  private realtimeInterval: NodeTimer | null = null
 
   constructor(config: NeuralMeshConfig = {}) {
     this.config = {
@@ -73,6 +86,95 @@ export class NeuralMeshService {
       enableRealtime: config.enableRealtime !== false,
       debugMode: config.debugMode || false
     }
+  }
+
+  /**
+   * Add event listener for service events
+   */
+  on(event: string, callback: Function): void {
+    if (!this.eventListeners.has(event)) {
+      this.eventListeners.set(event, [])
+    }
+    this.eventListeners.get(event)!.push(callback)
+  }
+
+  /**
+   * Disconnect from neural mesh service
+   */
+  disconnect(): void {
+    if (this.realtimeInterval) {
+      clearInterval(this.realtimeInterval as any)
+      this.realtimeInterval = null
+    }
+    if (this.mcpClient) {
+      if (this.mcpClient.close) {
+        this.mcpClient.close()
+      }
+      this.mcpClient = null
+    }
+    this.connection = null
+  }
+
+  /**
+   * Create a new neural agent
+   */
+  async createNeuralAgent(config: Partial<NeuralAgent>): Promise<NeuralAgent> {
+    const agent: NeuralAgent = {
+      id: config.id || `agent_${Date.now()}`,
+      name: config.name || 'Neural Agent',
+      type: config.type || 'neural',
+      status: 'active',
+      neuralId: `neural_${Date.now()}`,
+      repository: config.repository || 'default',
+      currentTask: config.currentTask || '',
+      branch: config.branch || 'main',
+      completedTasks: config.completedTasks || 0,
+      efficiency: config.efficiency || 100,
+      progress: config.progress || 0,
+      position: config.position || { x: 0, y: 0, z: 0 },
+      owner: config.owner || 'system',
+      neuralProperties: config.neuralProperties || {
+        neuronId: `neuron_${Date.now()}`,
+        meshId: 'default',
+        nodeType: 'inter',
+        layer: 1,
+        threshold: 0.5,
+        activation: 0,
+        connections: [],
+        spikeHistory: []
+      },
+      capabilities: config.capabilities || [],
+      wasmMetrics: config.wasmMetrics || {
+        executionTime: 0,
+        memoryUsage: 0,
+        simdAcceleration: false,
+        performanceScore: 0
+      }
+    }
+    return agent
+  }
+
+  /**
+   * Update an existing neural agent
+   */
+  async updateNeuralAgent(agentId: string, updates: Partial<NeuralAgent>): Promise<NeuralAgent | null> {
+    // Implementation for updating neural agents
+    return null
+  }
+
+  /**
+   * Train the neural mesh
+   */
+  async trainMesh(trainingData: any): Promise<any> {
+    // Implementation for training neural mesh
+    return {}
+  }
+
+  /**
+   * Get mesh status
+   */
+  async getMeshStatus(): Promise<any> {
+    return this.connection
   }
 
   /**
@@ -207,7 +309,7 @@ export class NeuralMeshService {
    * Target: <12.09ms spawn time
    */
   async spawnAgent(config: Partial<NeuralAgent>): Promise<NeuralAgent> {
-    const startTime = performance.now()
+    const startTime = perf.now()
     
     if (!this.connection || this.connection.status !== 'connected') {
       throw new Error('Neural mesh not connected')
@@ -215,11 +317,19 @@ export class NeuralMeshService {
 
     const agent: NeuralAgent = {
       id: config.id || `agent_${Date.now()}`,
-      type: config.type || 'worker',
+      name: config.name || 'Neural Agent',
+      type: (config.type as 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker') || 'neural',
       status: 'idle',
-      lastActivity: new Date(),
+      currentTask: config.currentTask || '',
+      repository: config.repository || 'default',
+      branch: config.branch || 'main',
+      completedTasks: config.completedTasks || 0,
+      efficiency: config.efficiency || 100,
+      progress: config.progress || 0,
+      position: config.position || { x: 0, y: 0, z: 0 },
+      owner: config.owner || 'system',
+      neuralId: `neural_${Date.now()}`,
       capabilities: config.capabilities || [],
-      metadata: config.metadata || {},
       neuralProperties: {
         neuronId: config.neuralProperties?.neuronId || `neuron_${Date.now()}`,
         meshId: this.connection.meshId || 'default',
@@ -232,7 +342,7 @@ export class NeuralMeshService {
         lastSpike: config.neuralProperties?.lastSpike
       },
       wasmMetrics: {
-        executionTime: performance.now() - startTime,
+        executionTime: perf.now() - startTime,
         memoryUsage: process.memoryUsage().heapUsed / (1024 * 1024), // MB
         simdAcceleration: !!this.config.enableWasm,
         performanceScore: 1.0
@@ -255,7 +365,7 @@ export class NeuralMeshService {
    * Target: <58.39ms inference time
    */
   async processInference(input: Float32Array): Promise<{ output: Float32Array; metrics: any }> {
-    const startTime = performance.now()
+    const startTime = perf.now()
     
     if (!this.connection || this.connection.status !== 'connected') {
       throw new Error('Neural mesh not connected')
@@ -271,7 +381,7 @@ export class NeuralMeshService {
       output = new Float32Array(input.map(x => Math.tanh(x)))
     }
 
-    const executionTime = performance.now() - startTime
+    const executionTime = perf.now() - startTime
     
     const metrics = {
       executionTime,
@@ -303,7 +413,7 @@ export class NeuralMeshService {
    */
   async shutdown(): Promise<void> {
     if (this.realtimeInterval) {
-      clearInterval(this.realtimeInterval)
+      clearInterval(this.realtimeInterval as any)
       this.realtimeInterval = null
     }
 

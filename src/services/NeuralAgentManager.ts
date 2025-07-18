@@ -42,6 +42,7 @@ export class NeuralAgentManager extends EventEmitter {
   private config: NeuralAgentManagerConfig;
   private agents: Map<string, NeuralAgent> = new Map();
   private wasmBridge: ProductionWasmBridge;
+  private wasmModule: any = null;
   private performanceMetrics: PerformanceMetrics;
   private isInitialized: boolean = false;
   private database: any = null; // SQLite connection
@@ -284,10 +285,10 @@ export class NeuralAgentManager extends EventEmitter {
       // Update agent statistics
       agent.totalInferences++;
       agent.lastActive = Date.now();
-      agent.averageInferenceTime = this.updateAverageInferenceTime(agent, inferenceTime);
+      agent.averageInferenceTime = this.updateAgentAverageInferenceTime(agent, inferenceTime);
       
       // Update global performance metrics
-      this.updateAverageInferenceTime(inferenceTime);
+      this.updateGlobalAverageInferenceTime(inferenceTime);
       
       this.emit('inferenceComplete', {
         agentId,
@@ -527,7 +528,7 @@ export class NeuralAgentManager extends EventEmitter {
       (this.performanceMetrics.averageSpawnTime * (count - 1) + spawnTime) / count;
   }
   
-  private updateAverageInferenceTime(inferenceTime: number): void {
+  private updateGlobalAverageInferenceTime(inferenceTime: number): void {
     // Global average calculation
     const totalInferences = Array.from(this.agents.values())
       .reduce((sum, agent) => sum + agent.totalInferences, 0);
@@ -538,7 +539,7 @@ export class NeuralAgentManager extends EventEmitter {
     }
   }
   
-  private updateAverageInferenceTime(agent: NeuralAgent, inferenceTime: number): number {
+  private updateAgentAverageInferenceTime(agent: NeuralAgent, inferenceTime: number): number {
     return (agent.averageInferenceTime * (agent.totalInferences - 1) + inferenceTime) / agent.totalInferences;
   }
   

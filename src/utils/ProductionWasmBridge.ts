@@ -118,8 +118,8 @@ export class ProductionWasmBridge {
   private async loadWasmLoader(): Promise<void> {
     try {
       // Check if running in browser environment
-      if (typeof window !== 'undefined' && window.WASMNeuralLoader) {
-        this.wasmLoader = new window.WASMNeuralLoader()
+      if (typeof window !== 'undefined' && (window as any).WASMNeuralLoader) {
+        this.wasmLoader = new (window as any).WASMNeuralLoader()
         return
       }
       

@@ -1,7 +1,7 @@
 export interface Agent {
   id: string
   name: string
-  type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic'
+  type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker'
   status: 'active' | 'idle' | 'processing' | 'completed' | 'neural_sync'
   currentTask: string
   repository: string

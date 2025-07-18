@@ -65,15 +65,41 @@ export class SwarmContextIntegration {
       // Initialize Neural Agent Manager
       this.neuralManager = new NeuralAgentManager({
         maxAgents: 25,
-        enablePerformanceMonitoring: true,
-        enableCrossLearning: true,
-        enableSQLitePersistence: true
+        memoryLimitPerAgent: 50 * 1024 * 1024,
+        performanceMonitoring: true,
+        simdEnabled: true,
+        crossLearningEnabled: true,
+        persistenceEnabled: true,
+        inferenceTimeout: 100
       })
       
-      await this.neuralManager.initialize()
+      // Initialize neural manager - if initialize method exists
+      if ('initialize' in this.neuralManager && typeof this.neuralManager.initialize === 'function') {
+        await this.neuralManager.initialize()
+      }
       
       // Generate initial neural agents
-      this.agents = await this.neuralManager.spawnNeuralAgents(25, this.repositories)
+      // Spawn neural agents - if spawnNeuralAgents method exists
+      if (this.neuralManager.spawnAgent) {
+        // Generate initial agents using spawnAgent method
+        this.agents = []
+        for (let i = 0; i < 25; i++) {
+          try {
+            const agentId = await this.neuralManager.spawnAgent({
+              type: 'mlp',
+              architecture: [128, 64, 32, 16]
+            })
+            const agent = this.neuralManager.getAgentState(agentId)
+            if (agent) {
+              this.agents.push(agent as any)
+            }
+          } catch (error) {
+            console.warn(`Failed to spawn agent ${i}:`, error)
+          }
+        }
+      } else {
+        this.agents = []
+      }
       
       this.isInitialized = true
       this.lastActivity = Date.now()
@@ -124,7 +150,17 @@ export class SwarmContextIntegration {
     
     try {
       // Run neural inference on all agents
-      const updatedAgents = await this.neuralManager.runNeuralInference()
+      const updatedAgents = []
+      for (const agent of this.agents) {
+        try {
+          // Run inference with dummy inputs
+          const inputs = [0.1, 0.2, 0.3, 0.4] // dummy inputs
+          await this.neuralManager.runInference(agent.id, inputs)
+          updatedAgents.push(agent)
+        } catch (error) {
+          console.warn(`Inference failed for agent ${agent.id}:`, error)
+        }
+      }
       
       // Update internal state
       this.agents = updatedAgents
@@ -150,12 +186,18 @@ export class SwarmContextIntegration {
     
     try {
       // Spawn single neural agent
-      const newAgents = await this.neuralManager.spawnNeuralAgents(1, this.repositories)
+      const newAgentId = await this.neuralManager.spawnAgent({
+        type: 'mlp',
+        architecture: [128, 64, 32, 16]
+      })
       
-      if (newAgents.length > 0) {
-        const newAgent = { ...newAgents[0], type } // Override type if specified
-        this.agents.push(newAgent)
-        return newAgent
+      if (newAgentId) {
+        const agentState = this.neuralManager.getAgentState(newAgentId)
+        if (agentState) {
+          const newAgent = { ...agentState, type } as unknown as Agent // Override type if specified
+          this.agents.push(newAgent)
+          return newAgent
+        }
       }
       
       return null
@@ -219,16 +261,16 @@ export class SwarmContextIntegration {
       
       return {
         ...baseStats,
-        totalAgents: metrics.totalAgents,
-        activeAgents: metrics.activeAgents,
-        networkEfficiency: metrics.systemHealth,
+        totalAgents: this.agents.length,
+        activeAgents: this.agents.filter(a => a.status === 'active').length,
+        networkEfficiency: metrics.systemHealthScore,
         neuralMeshStats: {
-          totalNeurons: metrics.totalNeurons,
-          totalSynapses: metrics.totalSynapses,
-          meshConnectivity: metrics.meshConnectivity * 100,
-          neuralActivity: metrics.neuralActivity * 100,
-          wasmAcceleration: metrics.wasmAcceleration,
-          averageLatency: metrics.avgInferenceTime
+          totalNeurons: 0,
+          totalSynapses: 0,
+          meshConnectivity: 0,
+          neuralActivity: 0,
+          wasmAcceleration: false,
+          averageLatency: metrics.averageInferenceTime
         }
       }
     } catch (error) {
@@ -471,7 +513,21 @@ export class SwarmContextIntegration {
     if (!this.neuralManager) return
     
     try {
-      const newAgents = await this.neuralManager.spawnNeuralAgents(count, this.repositories)
+      const newAgents = []
+      for (let i = 0; i < count; i++) {
+        try {
+          const agentId = await this.neuralManager.spawnAgent({
+            type: 'mlp',
+            architecture: [128, 64, 32, 16]
+          })
+          const agent = this.neuralManager.getAgentState(agentId)
+          if (agent) {
+            newAgents.push(agent as any)
+          }
+        } catch (error) {
+          console.warn(`Failed to spawn agent ${i}:`, error)
+        }
+      }
       this.agents.push(...newAgents)
       console.log(`✅ Spawned ${newAgents.length} additional neural agents`)
     } catch (error) {

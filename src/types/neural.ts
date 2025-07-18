@@ -332,31 +332,97 @@ export class PerformanceError extends Error {
   }
 }
 
-// Export all types
-export type {
-  NeuralConfiguration,
-  NeuralAgent,
-  PerformanceMetrics,
-  LearningSession,
-  NetworkTopology,
-  AgentMetrics,
-  SwarmStatistics,
-  SASIAgent,
-  SASISwarmData,
-  PerformanceTarget,
-  PerformanceAlert,
-  PerformanceReport,
-  WASMModule,
-  TrainingData,
-  TrainingResult,
-  AgentStateRecord,
-  WeightsRecord,
-  LearningRecord,
-  AgentEventData,
-  AgentSpawnedEvent,
-  InferenceCompleteEvent,
-  LearningCompleteEvent,
-  AgentTerminatedEvent,
-  KnowledgeSharedEvent,
-  NeuralSystemConfig
-};
+// Additional missing types for PerformanceIntegration
+
+export interface NeuralPerformanceSnapshot {
+  timestamp: number;
+  agentId: string;
+  spawnTime: number;
+  inferenceTime: number;
+  memoryUsage: number;
+  systemHealth: number;
+  cpuUsage: number;
+  neuralActivity: number;
+  totalNeurons: number;
+  totalSynapses: number;
+  meshConnectivity: number;
+  wasmAcceleration: boolean;
+  accuracy?: number;
+  performance?: number;
+  latency?: number;
+  memory?: number;
+}
+
+export interface SystemHealthMetrics {
+  overallScore: number;
+  componentScores: {
+    neural: number;
+    memory: number;
+    performance: number;
+    network: number;
+    wasm: number;
+  };
+  activeAlerts: any[];
+  recommendations: string[];
+  uptime: number;
+  lastCheck: Date;
+}
+
+// Extended PerformanceAlert interface with missing properties
+export interface ExtendedPerformanceAlert extends PerformanceAlert {
+  id: string;
+  acknowledged: boolean;
+  resolvedAt?: number;
+  details?: any;
+}
+
+// Enhanced NeuralAgent interface with required properties
+export interface EnhancedNeuralAgent extends NeuralAgent {
+  neuralProperties: {
+    neuronId: string;
+    meshId: string;
+    nodeType: 'sensory' | 'motor' | 'inter' | 'pyramidal' | 'purkinje';
+    layer: number;
+    threshold: number;
+    activation: number;
+    connections: string[];
+    spikeHistory: number[];
+    lastSpike?: Date;
+  };
+  type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker';
+  capabilities: string[];
+  realtime?: {
+    cpuUsage: number;
+    memoryUsage: number;
+    networkLatency: number;
+  };
+}
+
+// Extended PerformanceMetrics interface
+export interface ExtendedPerformanceMetrics extends PerformanceMetrics {
+  totalAgents: number;
+  activeAgents: number;
+  systemHealth: number;
+  totalNeurons: number;
+  totalSynapses: number;
+  meshConnectivity: number;
+  neuralActivity: number;
+  wasmAcceleration: boolean;
+  avgInferenceTime?: number; // Alternative to averageInferenceTime
+}
+
+// NeuralAgentManagerConfig interface
+export interface NeuralAgentManagerConfig {
+  maxAgents: number;
+  memoryLimitPerAgent: number;
+  performanceMonitoring: boolean;
+  simdEnabled: boolean;
+  crossLearningEnabled: boolean;
+  persistenceEnabled: boolean;
+  inferenceTimeout: number;
+}
+
+// Timer type for Node.js compatibility
+export type NodeTimer = ReturnType<typeof setTimeout>;
+
+// Types are already exported above as interfaces and classes;

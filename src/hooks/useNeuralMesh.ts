@@ -165,7 +165,7 @@ export const useNeuralMesh = (props: UseNeuralMeshProps = {}) => {
     if (!serviceRef.current) return null
     
     try {
-      const agent = await serviceRef.current.createNeuralAgent(type, config)
+      const agent = await serviceRef.current.createNeuralAgent({ type, ...config })
       return agent
     } catch (error) {
       setState(prev => ({
@@ -181,7 +181,7 @@ export const useNeuralMesh = (props: UseNeuralMeshProps = {}) => {
     if (!serviceRef.current) return null
     
     try {
-      const updatedAgent = await serviceRef.current.updateNeuralAgent(agent)
+      const updatedAgent = await serviceRef.current.updateNeuralAgent(agent.id, agent)
       return updatedAgent
     } catch (error) {
       setState(prev => ({

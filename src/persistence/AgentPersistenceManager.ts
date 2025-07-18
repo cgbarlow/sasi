@@ -595,10 +595,10 @@ export class AgentPersistenceManager {
     // Handle both string and object responses from better-sqlite3
     if (typeof result === 'string') {
       return result;
-    } else if (Array.isArray(result) && result.length > 0 && result[0].journal_mode) {
-      return result[0].journal_mode;
-    } else if (typeof result === 'object' && result.journal_mode) {
-      return result.journal_mode;
+    } else if (Array.isArray(result) && result.length > 0 && result[0] && 'journal_mode' in result[0]) {
+      return (result[0] as any).journal_mode;
+    } else if (typeof result === 'object' && result && 'journal_mode' in result) {
+      return (result as any).journal_mode;
     }
     
     return 'unknown';

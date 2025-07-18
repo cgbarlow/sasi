@@ -11,6 +11,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNeuralMesh } from '../hooks/useNeuralMesh'
 import { NeuralAgent } from '../services/NeuralMeshService'
 import { Agent } from '../types/agent'
+import { SASIAgent } from '../types/neural'
 
 // ===== IMPORT NEURAL ADAPTERS =====
 import {
@@ -130,7 +131,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     processingUnits: 0
   })
   const [isSwarmActive, setIsSwarmActive] = useState(false)
-  const [useNeuralMesh, setUseNeuralMesh] = useState(true)
+  const [enableNeuralMesh, setEnableNeuralMesh] = useState(true)
   const [neuralIntegrationState, setNeuralIntegrationState] = useState({
     isInitialized: false,
     performanceMetrics: null,
@@ -203,11 +204,11 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         setRepositories(neuralRepositories)
         
         // Initialize neural agent system
-        await initializeNeuralData(neuralRepositories)
+        await initializeNeuralData()
         
         // Generate initial neural agents
-        const initialAgents = generateNeuralAgents(25)
-        setAgents(initialAgents)
+        const initialAgents = await generateNeuralAgents(25)
+        setAgents(initialAgents as unknown as Agent[])
         
         // Update neural integration state
         const integrationStatus = getNeuralIntegrationStatus()
@@ -251,10 +252,10 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     const interval = setInterval(async () => {
       try {
         // Run neural inference on all agents
-        const updatedAgents = await simulateNeuralActivity()
+        await simulateNeuralActivity(agents as unknown as SASIAgent[])
         
-        if (updatedAgents.length > 0) {
-          setAgents(updatedAgents)
+        if (agents.length > 0) {
+          setAgents([...agents])
           
           // Update neural integration metrics
           const integrationStatus = getNeuralIntegrationStatus()
@@ -292,7 +293,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     }
     
     // Get enhanced stats with neural metrics
-    const enhancedStats = getEnhancedStats(baseStats)
+    const enhancedStats = getEnhancedStats(agents as unknown as SASIAgent[])
     setStats(enhancedStats)
   }
 
@@ -315,7 +316,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       const newAgent = await addNeuralAgent(type)
       
       if (newAgent) {
-        setAgents(current => [...current, newAgent])
+        setAgents(current => [...current, newAgent as unknown as Agent])
         console.log(`✅ Neural agent ${newAgent.name} created successfully`)
       } else {
         // Fallback to original agent creation
@@ -511,7 +512,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       getMeshStatus: neuralMeshHook.getMeshStatus,
       clearError: neuralMeshHook.clearError,
       reconnect: neuralMeshHook.reconnect,
-      toggleNeuralMesh: (enabled: boolean) => setUseNeuralMesh(enabled)
+      toggleNeuralMesh: (enabled: boolean) => setEnableNeuralMesh(enabled)
     },
     
     // Enhanced neural integration

@@ -266,7 +266,7 @@ export class SecurityValidator {
    */
   encryptData(data: string): string {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher('aes-256-gcm', this.encryptionKey);
+    const cipher = crypto.createCipheriv('aes-256-gcm', this.encryptionKey, iv);
     cipher.setAAD(Buffer.from('neural-agent-data'));
     
     let encrypted = cipher.update(data, 'utf8', 'hex');
@@ -290,7 +290,7 @@ export class SecurityValidator {
     const authTag = Buffer.from(parts[1], 'hex');
     const encrypted = parts[2];
 
-    const decipher = crypto.createDecipher('aes-256-gcm', this.encryptionKey);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
     decipher.setAAD(Buffer.from('neural-agent-data'));
     decipher.setAuthTag(authTag);
 

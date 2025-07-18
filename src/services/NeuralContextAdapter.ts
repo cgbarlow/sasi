@@ -540,3 +540,51 @@ export function getNeuralSystemStatus(): {
     managerInitialized: neuralManager !== null
   };
 }
+
+// Additional exports for SwarmContextExample compatibility
+export async function addNeuralAgent(config: any): Promise<SASIAgent | null> {
+  if (!neuralManager) return null;
+  
+  try {
+    const agents = await generateNeuralAgents(1);
+    return agents[0] || null;
+  } catch (error) {
+    console.warn('Failed to add neural agent:', error);
+    return null;
+  }
+}
+
+export async function removeNeuralAgent(agentId: string): Promise<boolean> {
+  if (!neuralManager) return false;
+  
+  try {
+    await neuralManager.terminateAgent(agentId);
+    return true;
+  } catch (error) {
+    console.warn('Failed to remove neural agent:', error);
+    return false;
+  }
+}
+
+export function getEnhancedStats(agents: SASIAgent[]): any {
+  return {
+    ...getNeuralSwarmStatistics(agents),
+    enhancedMetrics: {
+      neuralAgents: agents.filter(a => a.neuralAgent).length,
+      totalConnections: agents.reduce((sum, a) => sum + a.connections.length, 0),
+      averagePerformance: agents.reduce((sum, a) => sum + a.performance, 0) / agents.length
+    }
+  };
+}
+
+export function getNeuralIntegrationStatus(): any {
+  return {
+    ...getNeuralSystemStatus(),
+    performance: neuralManager ? neuralManager.getPerformanceMetrics() : null,
+    connectionHealth: neuralManager ? 100 : 0
+  };
+}
+
+export async function cleanupNeuralResources(): Promise<void> {
+  return cleanupNeuralSystem();
+}

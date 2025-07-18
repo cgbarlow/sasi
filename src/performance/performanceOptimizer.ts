@@ -259,7 +259,7 @@ export class PerformanceOptimizer {
   /**
    * Check SIMD support
    */
-  private isSIMDSupported(): boolean {
+  protected isSIMDSupported(): boolean {
     try {
       // Test basic SIMD support
       const simdTest = new Uint8Array([
@@ -398,7 +398,7 @@ export class PerformanceOptimizer {
   /**
    * Generate optimized ID
    */
-  private generateOptimizedId(): string {
+  protected generateOptimizedId(): string {
     const timestamp = Date.now().toString(36)
     const random = Math.random().toString(36).substr(2, 5)
     return `${timestamp}${random}`
@@ -431,7 +431,7 @@ export class PerformanceOptimizer {
   /**
    * Process batch of neural inputs
    */
-  private async processBatch(batch: Float32Array[], model: any): Promise<Float32Array[]> {
+  protected async processBatch(batch: Float32Array[], model: any): Promise<Float32Array[]> {
     // Simulate neural processing with matrix operations
     const results: Float32Array[] = []
     

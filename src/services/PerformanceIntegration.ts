@@ -6,7 +6,7 @@
  * connects to the existing performance dashboard infrastructure.
  */
 
-import { NeuralPerformanceSnapshot, PerformanceAlert, SystemHealthMetrics } from '../types/neural'
+import { NeuralPerformanceSnapshot, ExtendedPerformanceAlert, SystemHealthMetrics } from '../types/neural'
 import { Agent } from '../types/agent'
 
 export interface PerformanceIntegrationConfig {
@@ -31,7 +31,7 @@ export class PerformanceIntegration {
   private isInitialized = false
   private config: PerformanceIntegrationConfig
   private metricsHistory: Map<string, NeuralPerformanceSnapshot[]> = new Map()
-  private activeAlerts: Map<string, PerformanceAlert> = new Map()
+  private activeAlerts: Map<string, ExtendedPerformanceAlert> = new Map()
   private systemHealth: SystemHealthMetrics
   
   constructor(config: Partial<PerformanceIntegrationConfig> = {}) {
@@ -171,23 +171,22 @@ export class PerformanceIntegration {
     }
     
     const snapshot: NeuralPerformanceSnapshot = {
-      timestamp: new Date(),
+      timestamp: Date.now(),
       agentId,
+      spawnTime: metrics.spawnTime || 0,
       inferenceTime: metrics.inferenceTime || 0,
-      trainingTime: metrics.trainingTime,
-      preprocessingTime: metrics.preprocessingTime || 0,
-      postprocessingTime: metrics.postprocessingTime || 0,
       memoryUsage: metrics.memoryUsage || 0,
+      systemHealth: metrics.systemHealth || 100,
       cpuUsage: metrics.cpuUsage || 0,
-      gpuUsage: metrics.gpuUsage,
-      energyConsumption: metrics.energyConsumption || 0,
-      accuracy: metrics.accuracy || 0,
-      precision: metrics.precision || 0,
-      recall: metrics.recall || 0,
-      f1Score: metrics.f1Score || 0,
-      networkLatency: metrics.networkLatency || 0,
-      bandwidthUsage: metrics.bandwidthUsage || 0,
-      packetsLost: metrics.packetsLost || 0
+      neuralActivity: metrics.neuralActivity || 0,
+      totalNeurons: metrics.totalNeurons || 0,
+      totalSynapses: metrics.totalSynapses || 0,
+      meshConnectivity: metrics.meshConnectivity || 0,
+      wasmAcceleration: metrics.wasmAcceleration || false,
+      accuracy: metrics.accuracy,
+      performance: metrics.performance,
+      latency: metrics.latency,
+      memory: metrics.memory
     }
     
     // Store in history
@@ -221,7 +220,7 @@ export class PerformanceIntegration {
     
     if (!timeRange) return history
     
-    const cutoffTime = new Date(Date.now() - timeRange)
+    const cutoffTime = Date.now() - timeRange
     return history.filter(snapshot => snapshot.timestamp >= cutoffTime)
   }
   
@@ -247,7 +246,7 @@ export class PerformanceIntegration {
   /**
    * Get Active Alerts
    */
-  getActiveAlerts(): PerformanceAlert[] {
+  getActiveAlerts(): ExtendedPerformanceAlert[] {
     return Array.from(this.activeAlerts.values())
   }
   
@@ -269,7 +268,7 @@ export class PerformanceIntegration {
   resolveAlert(alertId: string): boolean {
     const alert = this.activeAlerts.get(alertId)
     if (alert) {
-      alert.resolvedAt = new Date()
+      alert.resolvedAt = Date.now()
       this.activeAlerts.delete(alertId)
       return true
     }
@@ -406,13 +405,15 @@ export class PerformanceIntegration {
   private handlePerformanceAlert(alert: any): void {
     console.log(`🚨 Performance alert: ${alert.type} (${alert.severity})`)
     
-    const performanceAlert: PerformanceAlert = {
+    const performanceAlert: ExtendedPerformanceAlert = {
       id: alert.id || `alert_${Date.now()}`,
       agentId: alert.agentId || 'system',
-      timestamp: new Date(),
+      timestamp: Date.now(),
       severity: alert.severity || 'medium',
-      type: 'performance',
+      type: 'system_health',
       message: alert.message || alert.type,
+      value: alert.value || 0,
+      threshold: alert.threshold || 0,
       details: alert.data || {},
       acknowledged: false
     }
@@ -486,14 +487,16 @@ export class PerformanceIntegration {
     }
   }
   
-  private generateAlert(type: string, severity: PerformanceAlert['severity'], details: any): void {
-    const alert: PerformanceAlert = {
+  private generateAlert(type: string, severity: ExtendedPerformanceAlert['severity'], details: any): void {
+    const alert: ExtendedPerformanceAlert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       agentId: details.agentId || 'system',
-      timestamp: new Date(),
+      timestamp: Date.now(),
       severity,
-      type: type as any,
+      type: 'system_health',
       message: this.generateAlertMessage(type, details),
+      value: details.value || 0,
+      threshold: details.threshold || 0,
       details,
       acknowledged: false
     }
@@ -555,7 +558,7 @@ export class PerformanceIntegration {
     
     // Deduct for alerts
     const neuralAlerts = Array.from(this.activeAlerts.values()).filter(
-      alert => alert.type === 'performance' || alert.type === 'accuracy'
+      alert => alert.type === 'system_health'
     )
     score -= neuralAlerts.length * 10
     
@@ -565,7 +568,7 @@ export class PerformanceIntegration {
   private calculateMemoryHealth(): number {
     let score = 100
     const memoryAlerts = Array.from(this.activeAlerts.values()).filter(
-      alert => alert.type === 'memory'
+      alert => alert.type === 'memory_usage'
     )
     score -= memoryAlerts.length * 15
     return Math.max(0, score)
@@ -574,7 +577,7 @@ export class PerformanceIntegration {
   private calculatePerformanceHealth(): number {
     let score = 100
     const performanceAlerts = Array.from(this.activeAlerts.values()).filter(
-      alert => alert.type === 'performance' || alert.type === 'latency'
+      alert => alert.type === 'system_health'
     )
     score -= performanceAlerts.length * 12
     return Math.max(0, score)
@@ -601,7 +604,7 @@ export class PerformanceIntegration {
       recommendations.push('High number of active alerts. Consider addressing critical issues first.')
     }
     
-    const memoryAlerts = Array.from(this.activeAlerts.values()).filter(a => a.type === 'memory')
+    const memoryAlerts = Array.from(this.activeAlerts.values()).filter(a => a.type === 'memory_usage')
     if (memoryAlerts.length > 0) {
       recommendations.push('Memory usage is high. Consider optimizing neural network architectures.')
     }

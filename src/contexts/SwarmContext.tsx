@@ -3,7 +3,7 @@ import { useNeuralMesh } from '../hooks/useNeuralMesh'
 import { NeuralAgent } from '../services/NeuralMeshService'
 import { Agent } from '../types/agent'
 
-export { Agent } from '../types/agent'
+export type { Agent } from '../types/agent'
 
 export interface SwarmStats {
   totalAgents: number
@@ -100,7 +100,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     processingUnits: 0
   })
   const [isSwarmActive, setIsSwarmActive] = useState(false)
-  const [useNeuralMesh, setUseNeuralMesh] = useState(true)
+  const [enableNeuralMesh, setEnableNeuralMesh] = useState(true)
   
   // Neural mesh integration
   const neuralMeshHook = useNeuralMesh({
@@ -379,7 +379,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       getMeshStatus: neuralMeshHook.getMeshStatus,
       clearError: neuralMeshHook.clearError,
       reconnect: neuralMeshHook.reconnect,
-      toggleNeuralMesh: (enabled: boolean) => setUseNeuralMesh(enabled)
+      toggleNeuralMesh: (enabled: boolean) => setEnableNeuralMesh(enabled)
     }
   }
 
