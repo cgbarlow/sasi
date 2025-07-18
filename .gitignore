@@ -8,6 +8,7 @@ pnpm-debug.log*
 # Build outputs
 dist/
 build/
+out/
 .vite/
 
 # Environment variables
@@ -16,9 +17,11 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 
 # IDE/Editor files
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -109,11 +112,48 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+*.tmp
+*.temp
+
+# Docker
+.docker/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.Python
+.devcontainer/installation-report.md
 
 # Claude-specific files (local data/cache)
 memory/
 claude-flow
 .swarm/
+.hive-mind/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+claude-flow.bat
+claude-flow.ps1
+hive-mind-prompt-*.txt
+
+# Claude Flow generated files
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
 
 # ESLint and analysis results
 eslint-results.json

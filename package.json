@@ -1,7 +1,7 @@
 {
   "name": "sasi-home",
   "version": "1.0.0",
-  "description": "SASI@home - Search for Artificial Super Intelligence visualization mockup",
+  "description": "SASI@home - Search for Artificial Super Intelligence with Synaptic-mesh integration",
   "main": "src/index.tsx",
   "scripts": {
     "dev": "vite",
@@ -39,6 +39,8 @@
     "test:full-ci": "npm run test:ci && npm run test:report",
     "test:regression-detection": "jest --testPathPatterns=tests/performance/regression-detector",
     "test:automation": "npm run test:full-ci",
+    "test:wasm": "jest --testPathPattern=tests/wasm --testTimeout=180000",
+    "test:synaptic": "jest --testPathPattern=synaptic-mesh/tests",
     "ci:lint": "eslint src --ext ts,tsx --format json --output-file eslint-results.json",
     "ci:audit": "npm audit --audit-level=high --json > security-audit.json || true",
     "ci:build-validate": "npm run build && node scripts/validate-build.js",
@@ -51,10 +53,12 @@
     "@types/jest": "^30.0.0",
     "@types/three": "^0.160.0",
     "better-sqlite3": "^12.2.0",
+    "claude-flow": "^2.0.0-alpha.43",
     "jest-environment-jsdom": "^30.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",
+    "ruv-swarm": "^1.0.14",
     "three": "^0.160.0",
     "ts-jest": "^29.4.0"
   },
@@ -94,8 +98,15 @@
     "swarm",
     "visualization",
     "webgl",
-    "three.js"
+    "three.js",
+    "synaptic-mesh",
+    "neural-networks",
+    "claude-flow"
   ],
   "author": "SASI@home Team",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cgbarlow/sasi.git"
+  }
 }
