@@ -5,6 +5,13 @@
 
 import React, { useState, useEffect } from 'react'
 import usePerformanceMonitoring from '../hooks/usePerformanceMonitoring'
+import PerformanceCacheManager from '../performance/PerformanceCacheManager'
+import PerformanceMonitoringSystem from '../performance/PerformanceMonitoringSystem'
+import MemoryOptimizationManager from '../performance/MemoryOptimizationManager'
+import PerformanceRegressionTester from '../performance/PerformanceRegressionTester'
+import WASMPerformanceOptimizer from '../performance/WASMPerformanceOptimizer'
+import AutomatedBenchmarkSuite from '../performance/AutomatedBenchmarkSuite'
+import PerformanceIntegrationSystem from '../performance/PerformanceIntegrationSystem'
 
 interface PerformanceDashboardProps {
   className?: string
@@ -107,6 +114,158 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
   const [benchmarkResults, setBenchmarkResults] = useState<any[]>([])
   const [showBenchmarks, setShowBenchmarks] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
+  const [showMemoryDetails, setShowMemoryDetails] = useState(false)
+  const [showCacheDetails, setShowCacheDetails] = useState(false)
+  const [showWASMDetails, setShowWASMDetails] = useState(false)
+  const [showRegressionDetails, setShowRegressionDetails] = useState(false)
+  const [showBenchmarkDetails, setShowBenchmarkDetails] = useState(false)
+  const [advancedSystems, setAdvancedSystems] = useState<{
+    cacheManager: PerformanceCacheManager | null
+    monitoringSystem: PerformanceMonitoringSystem | null
+    memoryManager: MemoryOptimizationManager | null
+    regressionTester: PerformanceRegressionTester | null
+    wasmOptimizer: WASMPerformanceOptimizer | null
+    benchmarkSuite: AutomatedBenchmarkSuite | null
+    integrationSystem: PerformanceIntegrationSystem | null
+  }>({
+    cacheManager: null,
+    monitoringSystem: null,
+    memoryManager: null,
+    regressionTester: null,
+    wasmOptimizer: null,
+    benchmarkSuite: null,
+    integrationSystem: null
+  })
+  const [systemHealth, setSystemHealth] = useState<any>(null)
+  const [memoryStats, setMemoryStats] = useState<any>(null)
+  const [cacheStats, setCacheStats] = useState<any>(null)
+  const [wasmStats, setWasmStats] = useState<any>(null)
+  const [regressionStats, setRegressionStats] = useState<any>(null)
+  const [comprehensiveMetrics, setComprehensiveMetrics] = useState<any>(null)
+  const [performanceReport, setPerformanceReport] = useState<any>(null)
+
+  // Initialize advanced performance systems
+  useEffect(() => {
+    const initializeAdvancedSystems = async () => {
+      try {
+        const cacheManager = new PerformanceCacheManager({
+          maxSize: 100 * 1024 * 1024, // 100MB
+          maxEntries: 1000,
+          compressionEnabled: true,
+          intelligentEviction: true
+        })
+
+        const memoryManager = new MemoryOptimizationManager({
+          enablePooling: true,
+          enableLeakDetection: true,
+          leakThreshold: 10 * 1024 * 1024 // 10MB
+        })
+
+        const monitoringSystem = new PerformanceMonitoringSystem(cacheManager)
+        monitoringSystem.startMonitoring(5000) // Monitor every 5 seconds
+
+        const regressionTester = new PerformanceRegressionTester()
+        const wasmOptimizer = new WASMPerformanceOptimizer()
+        const benchmarkSuite = new AutomatedBenchmarkSuite()
+        
+        // Initialize integration system
+        const integrationSystem = new PerformanceIntegrationSystem({
+          cache: { maxSize: 100 * 1024 * 1024, maxEntries: 1000, compressionEnabled: true, intelligentEviction: true },
+          memory: { enablePooling: true, enableLeakDetection: true, leakThreshold: 10 * 1024 * 1024, gcThreshold: 50 * 1024 * 1024 },
+          wasm: { enablePreloading: true, enableStreaming: true, enableSIMD: true, optimizationLevel: 'standard' as const },
+          monitoring: { intervalMs: 5000, enableAlerts: true, enableProfiling: true },
+          benchmarking: { autoRun: true, intervalHours: 24, enableRegression: true }
+        })
+
+        // Set up benchmark suite with performance systems
+        benchmarkSuite.setPerformanceSystems({
+          cacheManager,
+          wasmOptimizer
+        })
+
+        // Initialize WASM optimizer
+        await wasmOptimizer.initializeOptimizer()
+
+        // Start integration system
+        await integrationSystem.start()
+
+        setAdvancedSystems({
+          cacheManager,
+          monitoringSystem,
+          memoryManager,
+          regressionTester,
+          wasmOptimizer,
+          benchmarkSuite,
+          integrationSystem
+        })
+
+        console.log('🚀 Advanced performance systems initialized')
+      } catch (error) {
+        console.error('❌ Failed to initialize advanced performance systems:', error)
+      }
+    }
+
+    initializeAdvancedSystems()
+
+    return () => {
+      if (advancedSystems.monitoringSystem) {
+        advancedSystems.monitoringSystem.stopMonitoring()
+      }
+      if (advancedSystems.memoryManager) {
+        advancedSystems.memoryManager.shutdown()
+      }
+      if (advancedSystems.wasmOptimizer) {
+        await advancedSystems.wasmOptimizer.cleanup()
+      }
+      if (advancedSystems.integrationSystem) {
+        await advancedSystems.integrationSystem.stop()
+      }
+    }
+  }, [])
+
+  // Update advanced system metrics
+  useEffect(() => {
+    if (!advancedSystems.integrationSystem) return
+
+    const updateInterval = setInterval(async () => {
+      try {
+        // Get comprehensive metrics from integration system
+        const metrics = await advancedSystems.integrationSystem!.getComprehensiveMetrics()
+        setComprehensiveMetrics(metrics)
+
+        // Get individual component metrics
+        if (advancedSystems.monitoringSystem) {
+          const health = advancedSystems.monitoringSystem.getSystemHealth()
+          setSystemHealth(health)
+        }
+
+        if (advancedSystems.memoryManager) {
+          const memory = advancedSystems.memoryManager.getMemoryStatistics()
+          setMemoryStats(memory)
+        }
+
+        if (advancedSystems.cacheManager) {
+          const cache = advancedSystems.cacheManager.getStatusReport()
+          setCacheStats(cache)
+        }
+
+        if (advancedSystems.wasmOptimizer) {
+          const wasm = advancedSystems.wasmOptimizer.getPerformanceReport()
+          setWasmStats(wasm)
+        }
+
+        if (advancedSystems.regressionTester) {
+          const regression = advancedSystems.regressionTester.getRegressionReport()
+          setRegressionStats(regression)
+        }
+
+      } catch (error) {
+        console.error('Error updating advanced metrics:', error)
+      }
+    }, 5000)
+
+    return () => clearInterval(updateInterval)
+  }, [advancedSystems])
 
   // Determine metric status
   const getMetricStatus = (value: number, target: number, isLowerBetter: boolean = false) => {
@@ -351,6 +510,481 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
           status={getMetricStatus(metrics.agentSpawnTime, 1000, true)}
           trend={metrics.agentSpawnTime < 500 ? 'up' : 'down'}
         />
+      </div>
+
+      {/* System Health Overview */}
+      {systemHealth && (
+        <div className="system-health-section" style={{
+          backgroundColor: '#1f2937',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '20px'
+        }}>
+          <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#f3f4f6' }}>
+            🏥 System Health
+          </h3>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '12px',
+            marginBottom: '16px'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', marginBottom: '4px' }}>
+                {systemHealth.overall === 'healthy' ? '💚' : systemHealth.overall === 'warning' ? '🟡' : '🔴'}
+              </div>
+              <div style={{ fontSize: '14px', color: '#9ca3af' }}>Overall</div>
+              <div style={{ fontWeight: 'bold', color: '#f3f4f6' }}>
+                {systemHealth.score.toFixed(0)}/100
+              </div>
+            </div>
+            
+            {Object.entries(systemHealth.components).map(([component, status]) => (
+              <div key={component} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', marginBottom: '4px' }}>
+                  {status === 'healthy' ? '✅' : status === 'warning' ? '⚠️' : '❌'}
+                </div>
+                <div style={{ fontSize: '12px', color: '#9ca3af', textTransform: 'capitalize' }}>
+                  {component}
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {status}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Performance Metrics */}
+      <div className="advanced-metrics-section" style={{
+        backgroundColor: '#1f2937',
+        borderRadius: '8px',
+        padding: '16px',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <h3 style={{ margin: 0, fontSize: '18px', color: '#f3f4f6' }}>
+            ⚡ Advanced Performance Metrics
+          </h3>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => setShowMemoryDetails(!showMemoryDetails)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: showMemoryDetails ? '#7c3aed' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              💾 Memory
+            </button>
+            <button
+              onClick={() => setShowCacheDetails(!showCacheDetails)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: showCacheDetails ? '#7c3aed' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🗄️ Cache
+            </button>
+            <button
+              onClick={() => setShowWASMDetails(!showWASMDetails)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: showWASMDetails ? '#7c3aed' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              ⚡ WASM
+            </button>
+            <button
+              onClick={() => setShowRegressionDetails(!showRegressionDetails)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: showRegressionDetails ? '#7c3aed' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              📈 Regression
+            </button>
+            <button
+              onClick={() => setShowBenchmarkDetails(!showBenchmarkDetails)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: showBenchmarkDetails ? '#7c3aed' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🔍 Benchmarks
+            </button>
+          </div>
+        </div>
+
+        {/* Memory Details */}
+        {showMemoryDetails && memoryStats && (
+          <div style={{
+            backgroundColor: '#111827',
+            borderRadius: '6px',
+            padding: '12px',
+            marginBottom: '12px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#f3f4f6' }}>
+              💾 Memory Management
+            </h4>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              {memoryStats.current && (
+                <div>
+                  <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                    Current Usage
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                    {memoryStats.current.heapUsed}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                    Total: {memoryStats.current.heapTotal}
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Memory Pools
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {memoryStats.pools?.length || 0} Active
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  GC Requests: {memoryStats.gc?.requestCount || 0}
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Memory Leaks
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: memoryStats.leaks?.length > 0 ? '#f87171' : '#4ade80' }}>
+                  {memoryStats.leaks?.length || 0} Detected
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Growth: {memoryStats.growth}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cache Details */}
+        {showCacheDetails && cacheStats && (
+          <div style={{
+            backgroundColor: '#111827',
+            borderRadius: '6px',
+            padding: '12px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#f3f4f6' }}>
+              🗄️ Cache Performance
+            </h4>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Hit Ratio
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {((cacheStats.metrics?.hitRatio || 0) * 100).toFixed(1)}%
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Target: >80%
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Cache Size
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {((cacheStats.metrics?.totalSize || 0) / 1024 / 1024).toFixed(1)}MB
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Entries: {cacheStats.metrics?.entryCount || 0}
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Access Time
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {(cacheStats.metrics?.averageAccessTime || 0).toFixed(2)}ms
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Target: <5ms
+                </div>
+              </div>
+            </div>
+            
+            {cacheStats.recommendations && cacheStats.recommendations.length > 0 && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '8px' }}>
+                  💡 Recommendations:
+                </div>
+                {cacheStats.recommendations.map((rec: string, index: number) => (
+                  <div key={index} style={{ fontSize: '12px', color: '#fbbf24', marginBottom: '4px' }}>
+                    • {rec}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* WASM Details */}
+        {showWASMDetails && wasmStats && (
+          <div style={{
+            backgroundColor: '#111827',
+            borderRadius: '6px',
+            padding: '12px',
+            marginBottom: '12px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#f3f4f6' }}>
+              ⚡ WASM Performance
+            </h4>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Loaded Modules
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {wasmStats.loadedModules}/{wasmStats.totalModules}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Cache: {((wasmStats.cacheSize || 0) / 1024 / 1024).toFixed(1)}MB
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  SIMD Support
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: wasmStats.capabilities?.simdSupported ? '#4ade80' : '#f87171' }}>
+                  {wasmStats.capabilities?.simdSupported ? 'Enabled' : 'Disabled'}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Streaming: {wasmStats.capabilities?.streamingSupported ? 'Yes' : 'No'}
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Avg Load Time
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {wasmStats.modules ? 
+                    (wasmStats.modules.reduce((sum: number, m: any) => sum + (m.loadTime || 0), 0) / wasmStats.modules.length).toFixed(2) 
+                    : '0'}ms
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Target: <100ms
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Regression Details */}
+        {showRegressionDetails && regressionStats && (
+          <div style={{
+            backgroundColor: '#111827',
+            borderRadius: '6px',
+            padding: '12px',
+            marginBottom: '12px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#f3f4f6' }}>
+              📈 Performance Regression
+            </h4>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Pass Rate
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {regressionStats.summary?.passRate?.toFixed(1) || 0}%
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Tests: {regressionStats.summary?.enabledTests || 0}
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Regressions
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: regressionStats.summary?.regressions > 0 ? '#f87171' : '#4ade80' }}>
+                  {regressionStats.summary?.regressions || 0}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Critical: {regressionStats.severity?.critical || 0}
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Baselines
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  {regressionStats.baselines?.length || 0}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Latest trends available
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Benchmark Details */}
+        {showBenchmarkDetails && (
+          <div style={{
+            backgroundColor: '#111827',
+            borderRadius: '6px',
+            padding: '12px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#f3f4f6' }}>
+              🔍 Benchmark Status
+            </h4>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Benchmark Suites
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
+                  4 Available
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Neural, WASM, Memory, Cache
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Auto-Run Status
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4ade80' }}>
+                  Enabled
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                  Daily execution
+                </div>
+              </div>
+              
+              <div>
+                <button
+                  onClick={async () => {
+                    if (advancedSystems.benchmarkSuite) {
+                      try {
+                        const results = await advancedSystems.benchmarkSuite.runAllBenchmarks()
+                        setBenchmarkResults(results)
+                        setShowBenchmarks(true)
+                      } catch (error) {
+                        console.error('Benchmark failed:', error)
+                      }
+                    }
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#0891b2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    width: '100%'
+                  }}
+                >
+                  🚀 Run All Benchmarks
+                </button>
+              </div>
+            </div>
+            
+            {advancedSystems.integrationSystem && (
+              <div style={{ marginTop: '12px' }}>
+                <button
+                  onClick={async () => {
+                    try {
+                      const report = await advancedSystems.integrationSystem!.generatePerformanceReport()
+                      setPerformanceReport(report)
+                      console.log('Performance Report:', report)
+                    } catch (error) {
+                      console.error('Report generation failed:', error)
+                    }
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#7c3aed',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    width: '100%'
+                  }}
+                >
+                  📊 Generate Comprehensive Report
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Configuration Panel */}

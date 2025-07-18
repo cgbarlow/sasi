@@ -7,12 +7,13 @@ import ControlPanel from './ControlPanel'
 import AgentList from './AgentList'
 import RepositoryList from './RepositoryList'
 import PerformanceDashboard from './PerformanceDashboard'
+import McpToolsDashboard from './McpToolsDashboard'
 import '../styles/Dashboard.css'
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useUser()
   const { stats, agents, repositories, isSwarmActive, startSwarm, stopSwarm } = useSwarm()
-  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'projects' | 'performance'>('swarm')
+  const [selectedView, setSelectedView] = useState<'swarm' | 'statistics' | 'agents' | 'projects' | 'performance' | 'mcp-tools'>('swarm')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -94,6 +95,12 @@ const Dashboard: React.FC = () => {
             >
               Performance
             </button>
+            <button 
+              className={`view-btn ${selectedView === 'mcp-tools' ? 'active' : ''}`}
+              onClick={() => setSelectedView('mcp-tools')}
+            >
+              MCP Tools
+            </button>
           </div>
         </div>
         
@@ -123,13 +130,13 @@ const Dashboard: React.FC = () => {
       </header>
 
       <div className="dashboard-body">
-        {selectedView !== 'statistics' && selectedView !== 'performance' && (
+        {selectedView !== 'statistics' && selectedView !== 'performance' && selectedView !== 'mcp-tools' && (
           <aside className="sidebar">
             <ControlPanel />
           </aside>
         )}
 
-        <main className={`main-content ${selectedView === 'statistics' || selectedView === 'performance' ? 'full-width' : ''}`}>
+        <main className={`main-content ${selectedView === 'statistics' || selectedView === 'performance' || selectedView === 'mcp-tools' ? 'full-width' : ''}`}>
           {selectedView === 'swarm' && (
             <div className="visualization-container">
               <SwarmVisualization 
@@ -165,6 +172,12 @@ const Dashboard: React.FC = () => {
           {selectedView === 'performance' && (
             <div className="content-panel">
               <PerformanceDashboard />
+            </div>
+          )}
+          
+          {selectedView === 'mcp-tools' && (
+            <div className="content-panel">
+              <McpToolsDashboard />
             </div>
           )}
         </main>

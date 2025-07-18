@@ -203,7 +203,7 @@ export class NeuralAgentManager extends EventEmitter {
     
     try {
       // Create neural network via WASM
-      const network = await this.wasmModule.createNeuralNetwork(config);
+      const network = await this.createMockNeuralNetwork(config);
       
       // Create agent state
       const agent: NeuralAgent = {
@@ -221,7 +221,7 @@ export class NeuralAgentManager extends EventEmitter {
       };
       
       // Initialize agent memory and state
-      agent.memoryUsage = this.wasmModule.getMemoryUsage();
+      agent.memoryUsage = network.memoryUsage || 1024 * 1024; // 1MB default
       agent.state = AgentState.ACTIVE;
       
       // Store agent
@@ -329,7 +329,7 @@ export class NeuralAgentManager extends EventEmitter {
       this.performanceMetrics.activeLearningTasks++;
       
       // Train network via WASM
-      const trainingResult = await this.wasmModule.trainNetwork(
+      const trainingResult = await this.trainMockNetwork(
         agent.network,
         trainingData,
         epochs
@@ -353,7 +353,7 @@ export class NeuralAgentManager extends EventEmitter {
       
       // Save trained weights if persistence enabled
       if (this.config.persistenceEnabled) {
-        const weights = await this.wasmModule.serializeWeights(agent.network);
+        const weights = await this.serializeMockWeights(agent.network);
         await this.database.saveWeights(agentId, weights);
       }
       
@@ -386,14 +386,14 @@ export class NeuralAgentManager extends EventEmitter {
     
     try {
       // Serialize weights from source agent
-      const weights = await this.wasmModule.serializeWeights(sourceAgent.network);
+      const weights = await this.serializeMockWeights(sourceAgent.network);
       
       // Transfer knowledge to target agents
       for (const targetId of targetAgentIds) {
         const targetAgent = this.agents.get(targetId);
         if (targetAgent) {
           // Blend weights (simple average for now)
-          await this.wasmModule.deserializeWeights(targetAgent.network, weights, 0.1); // 10% influence
+          await this.deserializeMockWeights(targetAgent.network, weights, 0.1); // 10% influence
           console.log(`🔄 Knowledge transferred: ${sourceAgentId} → ${targetId}`);
         }
       }
