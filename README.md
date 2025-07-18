@@ -6,7 +6,7 @@
 
 SASI (Search for Artificial Super Intelligence) is a cutting-edge neural mesh system that enables seamless coordination of AI agents across complex workflows. Originally inspired by SETI@home, SASI has evolved into a sophisticated production platform with exceptional performance metrics and enterprise-grade reliability.
 
-**Live Production System:** https://sasi-at-home.netlify.app/
+**Demo System (mock):** https://sasi-at-home.netlify.app/
 
 ## 🏆 Production Achievements
 
