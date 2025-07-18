@@ -3,7 +3,7 @@
  * Comprehensive test suite for peer-to-peer mesh networking functionality
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, beforeAll, jest } from '@jest/globals';
 import { P2PNetworkManager, getP2PNetworkManager, resetP2PNetworkManager } from '../../../src/services/P2PNetworkManager';
 import { MeshTopology, getMeshTopology, resetMeshTopology } from '../../../src/services/MeshTopology';
 import { ConsensusEngine, getConsensusEngine, resetConsensusEngine } from '../../../src/services/ConsensusEngine';
@@ -16,11 +16,11 @@ import {
 import { Agent } from '../../../src/types/agent';
 
 // Mock WebSocket and WebRTC
-global.WebSocket = vi.fn().mockImplementation(() => ({
-  send: vi.fn(),
-  close: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
+global.WebSocket = jest.fn().mockImplementation(() => ({
+  send: jest.fn(),
+  close: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
   onopen: null,
   onmessage: null,
   onerror: null,
@@ -32,17 +32,17 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
   CLOSED: 3
 }));
 
-global.RTCPeerConnection = vi.fn().mockImplementation(() => ({
-  createOffer: vi.fn().mockResolvedValue({}),
-  createAnswer: vi.fn().mockResolvedValue({}),
-  setLocalDescription: vi.fn().mockResolvedValue(undefined),
-  setRemoteDescription: vi.fn().mockResolvedValue(undefined),
-  addIceCandidate: vi.fn().mockResolvedValue(undefined),
-  close: vi.fn(),
-  createDataChannel: vi.fn().mockReturnValue({
-    send: vi.fn(),
-    close: vi.fn(),
-    addEventListener: vi.fn(),
+global.RTCPeerConnection = jest.fn().mockImplementation(() => ({
+  createOffer: jest.fn().mockResolvedValue({}),
+  createAnswer: jest.fn().mockResolvedValue({}),
+  setLocalDescription: jest.fn().mockResolvedValue(undefined),
+  setRemoteDescription: jest.fn().mockResolvedValue(undefined),
+  addIceCandidate: jest.fn().mockResolvedValue(undefined),
+  close: jest.fn(),
+  createDataChannel: jest.fn().mockReturnValue({
+    send: jest.fn(),
+    close: jest.fn(),
+    addEventListener: jest.fn(),
     onopen: null,
     onmessage: null,
     onerror: null,
@@ -63,7 +63,7 @@ describe('P2P Network Manager', () => {
 
   beforeAll(() => {
     // Mock process.env for Node.js environment
-    vi.stubGlobal('process', {
+    jest.stubGlobal('process', {
       env: {
         SIGNALING_SERVER_URL: 'ws://localhost:8080'
       },
@@ -92,7 +92,7 @@ describe('P2P Network Manager', () => {
       await networkManager.shutdown();
     }
     resetP2PNetworkManager();
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('Initialization', () => {
@@ -158,7 +158,7 @@ describe('P2P Network Manager', () => {
       
       // Mock RTCPeerConnection to throw error
       const originalRTCPeerConnection = global.RTCPeerConnection;
-      global.RTCPeerConnection = vi.fn().mockImplementation(() => {
+      global.RTCPeerConnection = jest.fn().mockImplementation(() => {
         throw new Error('Connection failed');
       });
       
@@ -203,7 +203,7 @@ describe('P2P Network Manager', () => {
       const mockConnection = {
         peerId,
         dataChannel: {
-          send: vi.fn(),
+          send: jest.fn(),
           readyState: 'open'
         }
       };
@@ -302,7 +302,7 @@ describe('P2P Network Manager', () => {
       const mockConnection = {
         peerId: targetNode,
         dataChannel: {
-          send: vi.fn(),
+          send: jest.fn(),
           readyState: 'open'
         }
       };
@@ -385,13 +385,13 @@ describe('P2P Network Manager', () => {
 
     it('should add and remove event listeners', () => {
       const mockListener = {
-        onPeerConnected: vi.fn(),
-        onPeerDisconnected: vi.fn(),
-        onMessageReceived: vi.fn(),
-        onConsensusReached: vi.fn(),
-        onFaultDetected: vi.fn(),
-        onRecoveryInitiated: vi.fn(),
-        onNetworkHealthChanged: vi.fn()
+        onPeerConnected: jest.fn(),
+        onPeerDisconnected: jest.fn(),
+        onMessageReceived: jest.fn(),
+        onConsensusReached: jest.fn(),
+        onFaultDetected: jest.fn(),
+        onRecoveryInitiated: jest.fn(),
+        onNetworkHealthChanged: jest.fn()
       };
 
       expect(() => networkManager.addEventListener(mockListener)).not.toThrow();
@@ -422,7 +422,7 @@ describe('P2P Network Manager', () => {
       
       // Mock WebSocket to throw error
       const originalWebSocket = global.WebSocket;
-      global.WebSocket = vi.fn().mockImplementation(() => {
+      global.WebSocket = jest.fn().mockImplementation(() => {
         throw new Error('WebSocket connection failed');
       });
       
@@ -663,7 +663,7 @@ describe('P2P Network Manager', () => {
       // Mock connection that fails
       const originalRTCPeerConnection = global.RTCPeerConnection;
       let callCount = 0;
-      global.RTCPeerConnection = vi.fn().mockImplementation(() => {
+      global.RTCPeerConnection = jest.fn().mockImplementation(() => {
         callCount++;
         if (callCount === 1) {
           throw new Error('Connection failed');

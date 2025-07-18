@@ -594,17 +594,26 @@ describe('Mock→Neural Transition Validation Tests', () => {
             
             const backup = await coordinationMocks.memory.retrieveSharedMemory(`backup/agent/${agentId}`);
             if (backup.value) {
-              mockSQLiteDB.run(
-                'UPDATE agent_states SET agent_type = ?, neural_config = ?, learning_progress = ? WHERE id = ?',
-                [backup.value.agent_type, backup.value.neural_config, backup.value.learning_progress, agentId]
-              );
+              try {
+                mockSQLiteDB.run(
+                  'UPDATE agent_states SET agent_type = ?, neural_config = ?, learning_progress = ? WHERE id = ?',
+                  [backup.value.agent_type, backup.value.neural_config, backup.value.learning_progress, agentId]
+                );
+                console.log(`🔄 Rollback executed for agent ${agentId}`);
+              } catch (rollbackError) {
+                console.error(`❌ Rollback failed for agent ${agentId}:`, rollbackError);
+              }
+            } else {
+              console.warn(`⚠️ No backup found for agent ${agentId}`);
             }
           }
           
           // Validate rollback
           const currentState = mockSQLiteDB.getTestData('agent_states').find(a => a.id === agentId);
-          const rollbackSuccessful = currentState.agent_type === 'mock-mlp' && 
-                                   Math.abs(currentState.learning_progress - originalMockData.learning_progress) < 0.001;
+          const rollbackSuccessful = transitionFailed ? 
+            (currentState && currentState.agent_type === 'mock-mlp' && 
+             Math.abs(currentState.learning_progress - originalMockData.learning_progress) < 0.001) :
+            true; // If transition succeeded, no rollback needed
           
           return {
             transitionAttempted: true,

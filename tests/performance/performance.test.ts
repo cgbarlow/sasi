@@ -3,7 +3,7 @@
  * Comprehensive performance testing for SASI/Synaptic-mesh integration
  */
 
-import PerformanceOptimizer from '../performance/performanceOptimizer'
+import PerformanceOptimizer from '../../src/performance/performanceOptimizer'
 
 describe('Performance Regression Tests', () => {
   let optimizer: PerformanceOptimizer

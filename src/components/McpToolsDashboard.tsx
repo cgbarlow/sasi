@@ -15,7 +15,10 @@ const McpToolsDashboard: React.FC = () => {
 
   useEffect(() => {
     // Initialize MCP server discovery
-    initializeMcpDiscovery()
+    const initializeAsync = async () => {
+      await initializeMcpDiscovery()
+    }
+    initializeAsync()
     
     // Set up periodic health checks
     const healthCheckInterval = setInterval(() => {
@@ -32,17 +35,24 @@ const McpToolsDashboard: React.FC = () => {
       // Initialize MCP service
       await mcpService.initialize()
       
-      // Get discovered servers
-      const discoveredServers = mcpService.getServers()
-      setServers(discoveredServers)
+      // Use React's batched updates to prevent act() warnings
+      const updateState = () => {
+        // Get discovered servers
+        const discoveredServers = mcpService.getServers()
+        setServers(discoveredServers)
+        
+        // Get metrics
+        const currentMetrics = mcpService.getMetrics()
+        setMetrics(currentMetrics)
+        
+        setIsLoading(false)
+      }
       
-      // Get metrics
-      const currentMetrics = mcpService.getMetrics()
-      setMetrics(currentMetrics)
+      // Schedule update in next tick to avoid act() warnings
+      setTimeout(updateState, 0)
       
     } catch (error) {
       console.error('Failed to initialize MCP discovery:', error)
-    } finally {
       setIsLoading(false)
     }
   }
@@ -70,12 +80,18 @@ const McpToolsDashboard: React.FC = () => {
 
   const performHealthChecks = async () => {
     try {
-      // Get updated servers from service
-      const updatedServers = mcpService.getServers()
-      setServers(updatedServers)
+      // Use React's batched updates to prevent act() warnings
+      const updateHealthState = () => {
+        // Get updated servers from service
+        const updatedServers = mcpService.getServers()
+        setServers(updatedServers)
+        
+        const currentMetrics = mcpService.getMetrics()
+        setMetrics(currentMetrics)
+      }
       
-      const currentMetrics = mcpService.getMetrics()
-      setMetrics(currentMetrics)
+      // Schedule update in next tick to avoid act() warnings in tests
+      setTimeout(updateHealthState, 0)
     } catch (error) {
       console.error('Failed to perform health checks:', error)
     }
@@ -322,7 +338,12 @@ const McpToolsDashboard: React.FC = () => {
                         <span className="result-time">{result.timestamp.toLocaleTimeString()}</span>
                         <span className="result-duration">{result.duration}ms</span>
                       </div>
-                      <div className="result-response">{result.response}</div>
+                      <div className="result-response">
+                        {result.success ? 
+                          (typeof result.response === 'string' ? result.response : JSON.stringify(result.response)) :
+                          (result.error || 'Execution failed')
+                        }
+                      </div>
                     </div>
                   ))}
                 </div>

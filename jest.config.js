@@ -1,6 +1,6 @@
 module.exports = {
   // Test Environment Configuration for Phase 2A
-  testEnvironment: 'node', // Changed to node for SQLite testing
+  testEnvironment: 'jsdom', // Use jsdom for component testing with DOM matchers
   testEnvironmentOptions: {
     url: 'http://localhost:3000',
     resources: 'usable',

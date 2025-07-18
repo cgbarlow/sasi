@@ -1,6 +1,9 @@
 // Global test setup for SASI/Synaptic-mesh integration
 const path = require('path');
 
+// Import Jest DOM matchers for React component testing
+require('@testing-library/jest-dom');
+
 // Set global timeout for all tests
 jest.setTimeout(60000);
 

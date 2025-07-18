@@ -3,7 +3,7 @@
  * End-to-end tests for P2P mesh networking integration with neural agents
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, beforeAll } from '@jest/globals';
 import { NeuralMeshService } from '../../src/services/NeuralMeshService';
 import { P2PNetworkManager } from '../../src/services/P2PNetworkManager';
 import { MeshTopology } from '../../src/services/MeshTopology';
@@ -11,12 +11,12 @@ import { ConsensusEngine } from '../../src/services/ConsensusEngine';
 import { Agent } from '../../src/types/agent';
 import { AgentCoordinationMessage } from '../../src/types/network';
 
-// Mock WebRTC and WebSocket for testing
-global.WebSocket = vi.fn().mockImplementation(() => ({
-  send: vi.fn(),
-  close: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
+// Mock WebRTC and WebSocket for testing  
+global.WebSocket = jest.fn().mockImplementation(() => ({
+  send: jest.fn(),
+  close: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
   onopen: null,
   onmessage: null,
   onerror: null,
@@ -28,17 +28,17 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
   CLOSED: 3
 }));
 
-global.RTCPeerConnection = vi.fn().mockImplementation(() => ({
-  createOffer: vi.fn().mockResolvedValue({}),
-  createAnswer: vi.fn().mockResolvedValue({}),
-  setLocalDescription: vi.fn().mockResolvedValue(undefined),
-  setRemoteDescription: vi.fn().mockResolvedValue(undefined),
-  addIceCandidate: vi.fn().mockResolvedValue(undefined),
-  close: vi.fn(),
-  createDataChannel: vi.fn().mockReturnValue({
-    send: vi.fn(),
-    close: vi.fn(),
-    addEventListener: vi.fn(),
+global.RTCPeerConnection = jest.fn().mockImplementation(() => ({
+  createOffer: jest.fn().mockResolvedValue({}),
+  createAnswer: jest.fn().mockResolvedValue({}),
+  setLocalDescription: jest.fn().mockResolvedValue(undefined),
+  setRemoteDescription: jest.fn().mockResolvedValue(undefined),
+  addIceCandidate: jest.fn().mockResolvedValue(undefined),
+  close: jest.fn(),
+  createDataChannel: jest.fn().mockReturnValue({
+    send: jest.fn(),
+    close: jest.fn(),
+    addEventListener: jest.fn(),
     onopen: null,
     onmessage: null,
     onerror: null,
