@@ -45,6 +45,7 @@ pids/
 
 # Coverage directory used by tools like istanbul
 coverage/
+coverage-*/
 *.lcov
 
 # nyc test coverage
@@ -112,6 +113,11 @@ temp/
 # Claude-specific files (local data/cache)
 memory/
 claude-flow
+.swarm/
+
+# ESLint and analysis results
+eslint-results.json
+*.results.json
 
 # Test artifacts
 test-results/

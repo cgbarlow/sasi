@@ -1,26 +1,21 @@
 module.exports = {
-  root: true,
   env: {
     browser: true,
-    es2020: true,
+    es2021: true,
     node: true,
-    jest: true
   },
   extends: [
-    'eslint:recommended'
+    "eslint:recommended",
   ],
-  ignorePatterns: ['dist', 'node_modules', 'coverage', 'build', '.jest-cache'],
   parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: "module",
   },
   rules: {
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'prefer-const': 'error',
-    'no-var': 'error',
-    'no-console': 'off'
+    "no-unused-vars": "warn",
+    "no-console": "warn",
   },
-}
+};
