@@ -156,7 +156,9 @@ export const useNeuralMesh = (props: UseNeuralMeshProps = {}) => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
       }
-      service.disconnect()
+      if (service && typeof service.disconnect === 'function') {
+        service.disconnect()
+      }
     }
   }, [props.serverUrl, props.enableWasm, props.enableRealtime, props.debugMode])
 
@@ -270,7 +272,7 @@ export const useNeuralMesh = (props: UseNeuralMeshProps = {}) => {
     // Computed values
     neuralAgentCount: state.agents.length,
     activeNeuralAgents: state.agents.filter(a => a.status === 'active' || a.status === 'processing').length,
-    isWasmEnabled: serviceRef.current?.isWasmEnabled() || false,
+    isWasmEnabled: (serviceRef.current && typeof serviceRef.current.isWasmEnabled === 'function') ? serviceRef.current.isWasmEnabled() : false,
     
     // Service reference (for advanced usage)
     service: serviceRef.current
