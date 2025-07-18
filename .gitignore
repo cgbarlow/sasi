@@ -166,3 +166,4 @@ screenshots/
 
 # Local Netlify folder
 .netlify/
+.jest-cache/
