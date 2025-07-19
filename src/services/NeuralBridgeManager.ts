@@ -214,7 +214,8 @@ export class NeuralBridgeManager extends EventEmitter {
       // Initialize WASM Bridge
       const wasmInitialized = await this.wasmBridge.initialize()
       if (!wasmInitialized) {
-        throw new Error('Failed to initialize WASM bridge')
+        this.log('error', '❌ WASM bridge initialization failed')
+        return false
       }
       
       // Initialize Agent Manager

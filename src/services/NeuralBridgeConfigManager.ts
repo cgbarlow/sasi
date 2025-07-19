@@ -99,8 +99,6 @@ export class NeuralBridgeConfigManager {
         wasmModuleVariant: 'simd',
         simdAcceleration: true,
         enableOptimizations: true,
-        maxAgents: 100,
-        memoryLimitPerAgent: 5 * 1024 * 1024,
         performanceCheckInterval: 15000,
         healthCheckInterval: 60000,
         alertThresholds: {
@@ -124,12 +122,13 @@ export class NeuralBridgeConfigManager {
         enableFallback: true,
         wasmModuleVariant: 'standard',
         simdAcceleration: false,
-        maxAgents: 20,
-        memoryLimitPerAgent: 3 * 1024 * 1024,
+        enableOptimizations: true,
+        maxAgents: 10,
+        memoryLimitPerAgent: 2 * 1024 * 1024,
         performanceCheckInterval: 5000,
         healthCheckInterval: 15000,
         alertThresholds: {
-          spawnTime: 25,
+          spawnTime: 15,
           inferenceTime: 80,
           memoryUsage: 3 * 1024 * 1024,
           errorRate: 0.05
@@ -138,40 +137,6 @@ export class NeuralBridgeConfigManager {
       useCase: 'Memory-constrained environments',
       performanceProfile: 'memory'
     })
-    
-    // Quality-focused template
-    this.templates.set('quality-focused', {
-      name: 'Quality Focused',
-      description: 'Optimized for best neural network quality',
-      config: {
-        enableDebugging: false,
-        logLevel: 'info',
-        enableFallback: true,
-        wasmModuleVariant: 'neuro-divergent',
-        simdAcceleration: true,
-        enableOptimizations: true,
-        maxAgents: 30,
-        memoryLimitPerAgent: 12 * 1024 * 1024,
-        inferenceTimeout: 100,
-        performanceCheckInterval: 8000,
-        healthCheckInterval: 20000,
-        alertThresholds: {
-          spawnTime: 18,
-          inferenceTime: 100,
-          memoryUsage: 12 * 1024 * 1024,
-          errorRate: 0.001
-        }
-      },
-      useCase: 'High-quality neural processing',
-      performanceProfile: 'quality'
-    })
-  }
-  
-  /**
-   * Get configuration template by name
-   */
-  getTemplate(name: string): ConfigurationTemplate | null {
-    return this.templates.get(name) || null
   }
   
   /**
@@ -182,7 +147,14 @@ export class NeuralBridgeConfigManager {
   }
   
   /**
-   * Create custom configuration from template
+   * Get template by name
+   */
+  getTemplate(name: string): ConfigurationTemplate | null {
+    return this.templates.get(name.toLowerCase()) || null
+  }
+  
+  /**
+   * Create configuration from template
    */
   createFromTemplate(templateName: string, overrides: Partial<NeuralBridgeConfig> = {}): NeuralBridgeConfig {
     const template = this.getTemplate(templateName)
@@ -190,8 +162,9 @@ export class NeuralBridgeConfigManager {
       throw new Error(`Template '${templateName}' not found`)
     }
     
-    // Default configuration
-    const defaultConfig: NeuralBridgeConfig = {
+    // Merge template config with overrides
+    const config: NeuralBridgeConfig = {
+      // Default values
       enableRuvFann: true,
       wasmModulePath: '/assets/ruv-fann-neural-bridge.wasm',
       simdAcceleration: true,
@@ -216,15 +189,16 @@ export class NeuralBridgeConfigManager {
       enableNeuralBridgeExamples: true,
       enableDocumentation: true,
       enableDebugging: false,
-      logLevel: 'info'
-    }
-    
-    // Merge template config with overrides
-    return {
-      ...defaultConfig,
+      logLevel: 'info',
+      
+      // Apply template config
       ...template.config,
+      
+      // Apply overrides
       ...overrides
     }
+    
+    return config
   }
   
   /**
@@ -235,7 +209,7 @@ export class NeuralBridgeConfigManager {
     const warnings: string[] = []
     const recommendations: string[] = []
     
-    // Required fields validation
+    // Validate required fields
     if (!config.wasmModulePath) {
       errors.push('wasmModulePath is required')
     }
@@ -248,55 +222,42 @@ export class NeuralBridgeConfigManager {
       errors.push('memoryLimitPerAgent must be greater than 0')
     }
     
-    // Performance validation
+    if (config.inferenceTimeout <= 0) {
+      errors.push('inferenceTimeout must be greater than 0')
+    }
+    
+    if (config.spawnTimeout <= 0) {
+      errors.push('spawnTimeout must be greater than 0')
+    }
+    
+    // Check for warnings
     if (config.inferenceTimeout < 10) {
-      warnings.push('inferenceTimeout is very low, may cause timeouts')
+      warnings.push('Very low inference timeout may cause frequent timeouts')
     }
     
     if (config.spawnTimeout < 5) {
-      warnings.push('spawnTimeout is very low, may cause agent spawn failures')
+      warnings.push('Very low spawn timeout may cause frequent timeouts')
     }
     
     if (config.maxAgents > 100) {
-      warnings.push('maxAgents is very high, may cause memory issues')
+      warnings.push('High agent count may impact performance')
     }
     
     if (config.memoryLimitPerAgent > 50 * 1024 * 1024) {
-      warnings.push('memoryLimitPerAgent is very high, may cause system instability')
+      warnings.push('High memory limit per agent may cause memory pressure')
     }
     
-    // Configuration recommendations
-    if (config.simdAcceleration && config.wasmModuleVariant !== 'simd') {
-      recommendations.push('Consider using SIMD WASM variant for better performance')
-    }
-    
-    if (!config.enableOptimizations && config.maxAgents > 20) {
-      recommendations.push('Enable optimizations for better performance with many agents')
+    // Generate recommendations
+    if (!config.simdAcceleration && config.wasmModuleVariant === 'simd') {
+      recommendations.push('Enable SIMD acceleration for better performance with SIMD variant')
     }
     
     if (config.enableDebugging && config.logLevel === 'error') {
-      recommendations.push('Set log level to debug when debugging is enabled')
+      recommendations.push('Consider using debug or info log level when debugging is enabled')
     }
     
     if (config.performanceCheckInterval < 1000) {
-      recommendations.push('Performance check interval is very frequent, may impact performance')
-    }
-    
-    if (config.healthCheckInterval < 5000) {
-      recommendations.push('Health check interval is very frequent, may impact performance')
-    }
-    
-    // Alert threshold validation
-    if (config.alertThresholds.spawnTime < 5) {
-      warnings.push('Spawn time alert threshold is very low')
-    }
-    
-    if (config.alertThresholds.inferenceTime < 10) {
-      warnings.push('Inference time alert threshold is very low')
-    }
-    
-    if (config.alertThresholds.errorRate > 0.1) {
-      warnings.push('Error rate alert threshold is very high')
+      recommendations.push('Consider increasing performance check interval to reduce overhead')
     }
     
     return {
@@ -308,119 +269,42 @@ export class NeuralBridgeConfigManager {
   }
   
   /**
-   * Optimize configuration based on environment
+   * Optimize configuration for specific environment
    */
-  optimizeForEnvironment(config: NeuralBridgeConfig, environment: 'development' | 'production' | 'testing'): NeuralBridgeConfig {
-    const optimized = { ...config }
+  optimizeForEnvironment(baseConfig: NeuralBridgeConfig, environment: 'development' | 'production' | 'testing'): NeuralBridgeConfig {
+    const optimizations: Partial<NeuralBridgeConfig> = {}
     
     switch (environment) {
       case 'development':
-        optimized.enableDebugging = true
-        optimized.logLevel = 'debug'
-        optimized.enableFallback = true
-        optimized.performanceCheckInterval = 2000
-        optimized.healthCheckInterval = 5000
-        optimized.alertThresholds.spawnTime = Math.max(20, optimized.alertThresholds.spawnTime)
-        optimized.alertThresholds.inferenceTime = Math.max(100, optimized.alertThresholds.inferenceTime)
+        optimizations.enableDebugging = true
+        optimizations.logLevel = 'debug'
+        optimizations.enableFallback = true
+        optimizations.performanceCheckInterval = 2000
+        optimizations.healthCheckInterval = 5000
         break
         
       case 'production':
-        optimized.enableDebugging = false
-        optimized.logLevel = 'warn'
-        optimized.enableOptimizations = true
-        optimized.simdAcceleration = true
-        optimized.performanceCheckInterval = 10000
-        optimized.healthCheckInterval = 30000
-        optimized.alertThresholds.spawnTime = Math.min(12, optimized.alertThresholds.spawnTime)
-        optimized.alertThresholds.inferenceTime = Math.min(50, optimized.alertThresholds.inferenceTime)
+        optimizations.enableDebugging = false
+        optimizations.logLevel = 'warn'
+        optimizations.enableOptimizations = true
+        optimizations.simdAcceleration = true
+        optimizations.wasmModuleVariant = 'simd'
+        optimizations.performanceCheckInterval = 10000
+        optimizations.healthCheckInterval = 30000
         break
         
       case 'testing':
-        optimized.enableDebugging = false
-        optimized.logLevel = 'error'
-        optimized.enableFallback = true
-        optimized.performanceCheckInterval = 1000
-        optimized.healthCheckInterval = 2000
-        optimized.maxAgents = Math.min(10, optimized.maxAgents)
+        optimizations.enableDebugging = false
+        optimizations.logLevel = 'error'
+        optimizations.enablePerformanceMonitoring = false
+        optimizations.enableHealthChecks = false
+        optimizations.maxAgents = 5
+        optimizations.inferenceTimeout = 100
+        optimizations.spawnTimeout = 20
         break
     }
     
-    return optimized
-  }
-  
-  /**
-   * Get configuration recommendations based on usage patterns
-   */
-  getRecommendations(config: NeuralBridgeConfig, usageStats: {
-    averageAgents: number
-    averageOperationsPerSecond: number
-    averageMemoryUsage: number
-    errorRate: number
-  }): string[] {
-    const recommendations: string[] = []
-    
-    // Agent count recommendations
-    if (usageStats.averageAgents > config.maxAgents * 0.8) {
-      recommendations.push('Consider increasing maxAgents to handle peak usage')
-    }
-    
-    if (usageStats.averageAgents < config.maxAgents * 0.2) {
-      recommendations.push('Consider decreasing maxAgents to save memory')
-    }
-    
-    // Performance recommendations
-    if (usageStats.averageOperationsPerSecond > 1000 && !config.simdAcceleration) {
-      recommendations.push('Enable SIMD acceleration for high-throughput workloads')
-    }
-    
-    if (usageStats.averageOperationsPerSecond > 2000 && config.wasmModuleVariant !== 'simd') {
-      recommendations.push('Consider using SIMD WASM variant for better performance')
-    }
-    
-    // Memory recommendations
-    if (usageStats.averageMemoryUsage > config.memoryLimitPerAgent * 0.9) {
-      recommendations.push('Consider increasing memoryLimitPerAgent')
-    }
-    
-    if (usageStats.averageMemoryUsage < config.memoryLimitPerAgent * 0.3) {
-      recommendations.push('Consider decreasing memoryLimitPerAgent to save memory')
-    }
-    
-    // Error rate recommendations
-    if (usageStats.errorRate > config.alertThresholds.errorRate * 2) {
-      recommendations.push('High error rate detected - consider reviewing configuration')
-    }
-    
-    if (usageStats.errorRate > 0.05 && config.enableFallback === false) {
-      recommendations.push('Enable fallback mode to improve reliability')
-    }
-    
-    return recommendations
-  }
-  
-  /**
-   * Export configuration to JSON
-   */
-  exportConfiguration(config: NeuralBridgeConfig): string {
-    return JSON.stringify(config, null, 2)
-  }
-  
-  /**
-   * Import configuration from JSON
-   */
-  importConfiguration(json: string): NeuralBridgeConfig {
-    try {
-      const config = JSON.parse(json) as NeuralBridgeConfig
-      const validation = this.validateConfiguration(config)
-      
-      if (!validation.valid) {
-        throw new Error(`Invalid configuration: ${validation.errors.join(', ')}`)
-      }
-      
-      return config
-    } catch (error) {
-      throw new Error(`Failed to import configuration: ${error.message}`)
-    }
+    return { ...baseConfig, ...optimizations }
   }
   
   /**
@@ -429,59 +313,55 @@ export class NeuralBridgeConfigManager {
   generateDocumentation(): string {
     const templates = this.getAllTemplates()
     
-    let doc = `# Neural Bridge Configuration Guide\n\n`
-    
-    doc += `## Available Templates\n\n`
+    let doc = `# Neural Bridge Configuration Guide
+
+## Available Templates
+
+`
     
     templates.forEach(template => {
-      doc += `### ${template.name}\n`
-      doc += `${template.description}\n\n`
-      doc += `- **Use Case**: ${template.useCase}\n`
-      doc += `- **Performance Profile**: ${template.performanceProfile}\n`
-      doc += `- **Configuration**:\n`
-      doc += `\`\`\`json\n${JSON.stringify(template.config, null, 2)}\n\`\`\`\n\n`
+      doc += `### ${template.name}
+- **Description**: ${template.description}
+- **Use Case**: ${template.useCase}
+- **Performance Profile**: ${template.performanceProfile}
+
+`
     })
     
-    doc += `## Configuration Options\n\n`
-    
-    const configOptions = [
-      { name: 'enableRuvFann', description: 'Enable ruv-fann-neural-bridge integration', type: 'boolean' },
-      { name: 'wasmModulePath', description: 'Path to WASM module', type: 'string' },
-      { name: 'simdAcceleration', description: 'Enable SIMD acceleration', type: 'boolean' },
-      { name: 'enableOptimizations', description: 'Enable performance optimizations', type: 'boolean' },
-      { name: 'maxAgents', description: 'Maximum number of agents', type: 'number' },
-      { name: 'memoryLimitPerAgent', description: 'Memory limit per agent (bytes)', type: 'number' },
-      { name: 'inferenceTimeout', description: 'Inference timeout (ms)', type: 'number' },
-      { name: 'spawnTimeout', description: 'Agent spawn timeout (ms)', type: 'number' },
-      { name: 'wasmModuleVariant', description: 'WASM module variant', type: 'string' },
-      { name: 'alertThresholds', description: 'Performance alert thresholds', type: 'object' }
-    ]
-    
-    configOptions.forEach(option => {
-      doc += `- **${option.name}** (${option.type}): ${option.description}\n`
-    })
-    
-    doc += `\n## Usage Examples\n\n`
-    
-    doc += `### Creating from Template\n`
-    doc += `\`\`\`typescript\n`
-    doc += `const configManager = NeuralBridgeConfigManager.getInstance()\n`
-    doc += `const config = configManager.createFromTemplate('production', {\n`
-    doc += `  maxAgents: 100,\n`
-    doc += `  simdAcceleration: true\n`
-    doc += `})\n`
-    doc += `\`\`\`\n\n`
-    
-    doc += `### Validating Configuration\n`
-    doc += `\`\`\`typescript\n`
-    doc += `const validation = configManager.validateConfiguration(config)\n`
-    doc += `if (!validation.valid) {\n`
-    doc += `  console.error('Configuration errors:', validation.errors)\n`
-    doc += `}\n`
-    doc += `\`\`\`\n\n`
+    doc += `## Configuration Options
+
+| Option | Type | Description | Default |
+|--------|------|-------------|---------|
+| enableRuvFann | boolean | Enable ruv-fann integration | true |
+| wasmModulePath | string | Path to WASM module | /assets/ruv-fann-neural-bridge.wasm |
+| simdAcceleration | boolean | Enable SIMD acceleration | true |
+| enableOptimizations | boolean | Enable performance optimizations | true |
+| maxAgents | number | Maximum number of agents | 50 |
+| memoryLimitPerAgent | number | Memory limit per agent (bytes) | 10MB |
+| inferenceTimeout | number | Inference timeout (ms) | 50 |
+| spawnTimeout | number | Agent spawn timeout (ms) | 12 |
+| logLevel | string | Logging level | info |
+
+## Usage Examples
+
+\`\`\`typescript
+// Create from template
+const config = configManager.createFromTemplate('production', {
+  maxAgents: 100,
+  enableDebugging: false
+})
+
+// Validate configuration
+const validation = configManager.validateConfiguration(config)
+if (!validation.valid) {
+  console.error('Configuration errors:', validation.errors)
+}
+
+// Optimize for environment
+const optimized = configManager.optimizeForEnvironment(config, 'production')
+\`\`\`
+`
     
     return doc
   }
 }
-
-export default NeuralBridgeConfigManager
