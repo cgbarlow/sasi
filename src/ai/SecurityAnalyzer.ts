@@ -484,12 +484,12 @@ export class SecurityAnalyzer {
 
     // OWASP Top 10 compliance checks
     if (this.config.complianceStandards.includes('OWASP-Top10')) {
-      checks.push(...this.checkOWASPCompliance(files));
+      checks.push(...this.checkOWASPCompliance(_files));
     }
 
     // CWE Top 25 compliance checks
     if (this.config.complianceStandards.includes('CWE-Top25')) {
-      checks.push(...this.checkCWECompliance(files));
+      checks.push(...this.checkCWECompliance(_files));
     }
 
     return checks;

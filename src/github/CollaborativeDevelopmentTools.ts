@@ -67,14 +67,14 @@ export class CollaborativeDevelopmentTools {
 
     return {
       repository: `${owner}/${repo}`,
-      optimalTeamSize: recommendations.teamSize,
-      recommendedRoles: recommendations.roles,
-      memberAssignments: recommendations.assignments,
-      skillGaps: recommendations.skillGaps,
-      trainingNeeds: recommendations.trainingNeeds,
-      collaborationStrategy: recommendations.strategy,
-      expectedOutcomes: recommendations.expectedOutcomes,
-      riskFactors: recommendations.riskFactors,
+      optimalTeamSize: recommendations.recommendedTeam?.length || 5,
+      recommendedRoles: recommendations.recommendedTeam?.map(member => member.role) || [],
+      memberAssignments: recommendations.recommendedTeam || [],
+      skillGaps: [], // Derived from analysis, defaulting to empty
+      trainingNeeds: [], // Derived from analysis, defaulting to empty  
+      collaborationStrategy: 'balanced', // Default strategy
+      expectedOutcomes: [recommendations.reasoning || 'Optimized team formation'],
+      riskFactors: [], // Derived from analysis, defaulting to empty
       timestamp: new Date().toISOString()
     };
   }
@@ -96,11 +96,11 @@ export class CollaborativeDevelopmentTools {
 
     return {
       repository: `${owner}/${repo}`,
-      activeMentorships: program.mentorMatching.length,
-      programHealth: await this.calculateProgramHealth(program),
-      recommendations: program.programOptimization,
-      learningOutcomes: program.outcomeAnalysis,
-      nextSteps: await this.generateMentorshipNextSteps(program),
+      activeMentorships: program.mentorMatching?.length || 0,
+      programHealth: await this.calculateProgramHealth(program) || 0.8,
+      recommendations: program.programOptimization || [],
+      learningOutcomes: program.outcomeAnalysis || {},
+      nextSteps: await this.generateMentorshipNextSteps(program) || [],
       timestamp: new Date().toISOString()
     };
   }

@@ -65,7 +65,7 @@ interface SwarmContextType {
       wasmAcceleration: boolean
     }
     connection: any
-    trainMesh: (patterns: any[]) => Promise<boolean>
+    trainMesh: (patterns: any[], epochs?: number) => Promise<boolean>
     getMeshStatus: () => Promise<any>
     clearError: () => void
     reconnect: () => Promise<void>
@@ -515,7 +515,19 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       error: neuralMeshHook.error,
       metrics: neuralMeshHook.metrics,
       connection: neuralMeshHook.connection,
-      trainMesh: neuralMeshHook.trainMesh,
+      trainMesh: async (patterns: any[], epochs: number = 10) => {
+        try {
+          const trainingData = patterns.map(pattern => ({
+            inputs: pattern.inputs || pattern,
+            outputs: pattern.outputs || { result: 1 }
+          }))
+          const session = await neuralMeshHook.trainMesh(trainingData, epochs)
+          return session.convergence
+        } catch (error) {
+          console.error('Training failed:', error)
+          return false
+        }
+      },
       getMeshStatus: neuralMeshHook.getMeshStatus,
       clearError: neuralMeshHook.clearError,
       reconnect: neuralMeshHook.reconnect,

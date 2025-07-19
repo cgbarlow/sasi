@@ -27,7 +27,10 @@ export interface Agent {
     memoryUsage: number
     networkLatency: number
     wasmPerformance: number
+    isProcessing?: boolean
+    throughput?: number
   }
+  layer?: number
 }
 
 // Phase 2A Persistence Types

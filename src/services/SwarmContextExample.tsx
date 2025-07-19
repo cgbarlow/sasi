@@ -508,7 +508,15 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       error: neuralMeshHook.error,
       metrics: neuralMeshHook.metrics,
       connection: neuralMeshHook.connection,
-      trainMesh: neuralMeshHook.trainMesh,
+      trainMesh: async (patterns: any[]) => {
+        try {
+          const result = await neuralMeshHook.trainMesh(patterns, 10)
+          return result.convergence
+        } catch (error) {
+          console.error('Training failed:', error)
+          return false
+        }
+      },
       getMeshStatus: neuralMeshHook.getMeshStatus,
       clearError: neuralMeshHook.clearError,
       reconnect: neuralMeshHook.reconnect,

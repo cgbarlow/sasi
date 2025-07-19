@@ -55,6 +55,7 @@ export interface CommunicationInsight {
 export class CommunicationAnalyzer {
   private messages: CommunicationMessage[] = [];
   private analysisCache: Map<string, CommunicationMetrics | CommunicationPattern[] | CommunicationInsight[]> = new Map();
+  private cacheExpiries: Map<string, number> = new Map();
   private cacheExpiry: number = 300000; // 5 minutes
   private config: CommunicationConfig;
 
@@ -76,7 +77,7 @@ export class CommunicationAnalyzer {
     const cacheKey = `metrics_${timeframe?.start.getTime() || 0}_${timeframe?.end.getTime() || Date.now()}`;
     
     if (this.hasValidCache(cacheKey)) {
-      return this.analysisCache.get(cacheKey);
+      return this.analysisCache.get(cacheKey) as CommunicationMetrics;
     }
 
     const filteredMessages = this.filterMessagesByTimeframe(this.messages, timeframe);
@@ -279,17 +280,18 @@ export class CommunicationAnalyzer {
 
   private hasValidCache(key: string): boolean {
     return this.analysisCache.has(key) && 
-           this.analysisCache.has(key + '_expiry') && 
-           Date.now() < this.analysisCache.get(key + '_expiry');
+           this.cacheExpiries.has(key) && 
+           Date.now() < this.cacheExpiries.get(key)!;
   }
 
   private setCacheWithExpiry(key: string, value: CommunicationMetrics | CommunicationPattern[] | CommunicationInsight[]): void {
     this.analysisCache.set(key, value);
-    this.analysisCache.set(key + '_expiry', Date.now() + this.cacheExpiry);
+    this.cacheExpiries.set(key, Date.now() + this.cacheExpiry);
   }
 
   private invalidateCache(): void {
     this.analysisCache.clear();
+    this.cacheExpiries.clear();
   }
 
   getMessageCount(): number {

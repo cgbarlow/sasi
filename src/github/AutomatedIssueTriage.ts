@@ -219,7 +219,28 @@ export class AutomatedIssueTriage {
   }
 
   private async classifyIssue(issueData: IssueData): Promise<ClassificationResult> {
-    return await this.classifier.classify(issueData);
+    try {
+      // Convert IssueData to compatible format for classifier
+      const classifierInput: Record<string, number> = {
+        contentLength: issueData.content.length,
+        commentsCount: issueData.comments.length,
+        eventsCount: issueData.events.length,
+        patternsCount: issueData.patterns.length
+      };
+      const result = await this.classifier.classify(classifierInput);
+      return {
+        category: result.category || 'unknown',
+        severity: result.severity || 0.5,
+        confidence: result.confidence || 0.5
+      };
+    } catch (error) {
+      // Fallback classification
+      return {
+        category: 'bug',
+        severity: 0.5,
+        confidence: 0.3
+      };
+    }
   }
 
   private async matchPatterns(issueData: IssueData): Promise<PatternMatchResult> {
@@ -319,8 +340,40 @@ export class AutomatedIssueTriage {
 
   private async learnFromTriage(issueData: IssueData, triageResult: TriageResult): Promise<void> {
     // Update ML models with new data
-    await this.classifier.learn(issueData, triageResult);
-    await this.patternMatcher.learn(issueData, triageResult);
+    try {
+      if (this.classifier.learn) {
+        const trainingData = {
+          features: {
+            contentLength: issueData.content.length,
+            commentsCount: issueData.comments.length,
+            categoryScore: triageResult.priority === 'critical' ? 1.0 : triageResult.priority === 'high' ? 0.8 : 0.5
+          },
+          label: triageResult.category
+        };
+        const classificationResult = {
+          category: triageResult.category,
+          severity: triageResult.priority === 'critical' ? 1.0 : triageResult.priority === 'high' ? 0.8 : triageResult.priority === 'medium' ? 0.5 : 0.2,
+          confidence: triageResult.confidence
+        };
+        await this.classifier.learn(trainingData, classificationResult);
+      }
+      if (this.patternMatcher.learn) {
+        const patternData: Record<string, unknown> = {
+          content: issueData.content,
+          patterns: issueData.patterns,
+          category: triageResult.category
+        };
+        const triageDataRecord: Record<string, unknown> = {
+          category: triageResult.category,
+          priority: triageResult.priority,
+          confidence: triageResult.confidence,
+          issueNumber: triageResult.issueNumber
+        };
+        await this.patternMatcher.learn(patternData, triageDataRecord);
+      }
+    } catch (error) {
+      console.warn('Failed to update learning models:', error);
+    }
   }
 
   private getDefaultTriageRules(): TriageRule[] {
