@@ -729,7 +729,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                   {((cacheStats.metrics?.hitRatio || 0) * 100).toFixed(1)}%
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                  Target: >80%
+                  Target: {'>'} 80%
                 </div>
               </div>
               
@@ -753,7 +753,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                   {(cacheStats.metrics?.averageAccessTime || 0).toFixed(2)}ms
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                  Target: <5ms
+                  Target: {'<'} 5ms
                 </div>
               </div>
             </div>
@@ -824,7 +824,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                     : '0'}ms
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                  Target: <100ms
+                  Target: {'<'} 100ms
                 </div>
               </div>
             </div>
