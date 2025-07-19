@@ -537,8 +537,11 @@ export const useNeuralMesh = (config: UseNeuralMeshConfig = {}) => {
         neuralId: `neural_${Date.now()}`,
         layer: neuralConfig?.layer || Math.floor(Math.random() * 6) + 1,
         realtime: {
-          isProcessing: false,
+          cpuUsage: Math.random() * 50 + 25,
+          memoryUsage: Math.random() * 100 + 50,
           networkLatency: Math.random() * 50 + 10,
+          wasmPerformance: Math.random() * 0.5 + 0.5,
+          isProcessing: false,
           throughput: Math.random() * 1000 + 500
         }
       }

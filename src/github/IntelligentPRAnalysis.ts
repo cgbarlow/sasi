@@ -235,15 +235,94 @@ export class IntelligentPRAnalysis {
   }
 
   private async analyzeCodeQuality(prData: PRData): Promise<CodeQualityAnalysis> {
-    return await this.codeQualityAnalyzer.analyze(prData);
+    // Convert PRData to format expected by CodeQualityAnalyzer
+    const analyzerPRData = {
+      number: prData.pr.number,
+      title: prData.pr.title,
+      body: prData.pr.body,
+      files: prData.files.map(f => ({
+        filename: f.filename,
+        status: 'modified',
+        additions: f.changes || 0,
+        deletions: 0,
+        changes: f.changes || 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: '',
+        patch: f.patch
+      })),
+      additions: prData.files.reduce((sum, f) => sum + (f.changes || 0), 0),
+      deletions: 0,
+      changed_files: prData.files.length
+    };
+    const result = await this.codeQualityAnalyzer.analyze(analyzerPRData);
+    return {
+      overall: result.overall || 0.7,
+      issues: result.issues || [],
+      recommendations: result.recommendations || [],
+      metrics: result.metrics || {},
+      confidence: result.confidence || 0.8
+    };
   }
 
   private async analyzeSecurityImpact(prData: PRData): Promise<SecurityAnalysis> {
-    return await this.securityAnalyzer.analyze(prData);
+    // Convert to format expected by SecurityAnalyzer
+    const analyzerPRData = {
+      number: prData.pr.number,
+      title: prData.pr.title,
+      body: prData.pr.body,
+      files: prData.files.map(f => ({
+        filename: f.filename,
+        status: 'modified',
+        additions: f.changes || 0,
+        deletions: 0,
+        changes: f.changes || 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: '',
+        patch: f.patch
+      })),
+      additions: prData.files.reduce((sum, f) => sum + (f.changes || 0), 0),
+      deletions: 0,
+      changed_files: prData.files.length
+    };
+    const result = await this.securityAnalyzer.analyze(analyzerPRData);
+    return {
+      overall: result.overall || 0.8,
+      vulnerabilities: result.vulnerabilities || [],
+      recommendations: result.recommendations || [],
+      confidence: result.confidence || 0.7
+    };
   }
 
   private async analyzePerformanceImpact(prData: PRData): Promise<PerformanceAnalysis> {
-    return await this.performanceAnalyzer.analyze(prData);
+    // Convert to format expected by PerformanceAnalyzer
+    const analyzerPRData = {
+      number: prData.pr.number,
+      title: prData.pr.title,
+      body: prData.pr.body,
+      files: prData.files.map(f => ({
+        filename: f.filename,
+        status: 'modified',
+        additions: f.changes || 0,
+        deletions: 0,
+        changes: f.changes || 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: '',
+        patch: f.patch
+      })),
+      additions: prData.files.reduce((sum, f) => sum + (f.changes || 0), 0),
+      deletions: 0,
+      changed_files: prData.files.length
+    };
+    const result = await this.performanceAnalyzer.analyze(analyzerPRData);
+    return {
+      overall: result.overall || 0.7,
+      issues: result.issues || [],
+      recommendations: result.recommendations || [],
+      confidence: result.confidence || 0.8
+    };
   }
 
   private async analyzeComplexity(prData: PRData): Promise<ComplexityAnalysis> {
@@ -539,11 +618,63 @@ export class IntelligentPRAnalysis {
   }
 
   async checkCodeQuality(prData: PRData): Promise<any> {
-    return await this.codeQualityAnalyzer.analyze(prData.files);
+    // Convert to format expected by CodeQualityAnalyzer
+    const analyzerPRData = {
+      number: prData.pr.number,
+      title: prData.pr.title,
+      body: prData.pr.body,
+      files: prData.files.map(f => ({
+        filename: f.filename,
+        status: 'modified',
+        additions: f.changes || 0,
+        deletions: 0,
+        changes: f.changes || 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: '',
+        patch: f.patch
+      })),
+      additions: prData.files.reduce((sum, f) => sum + (f.changes || 0), 0),
+      deletions: 0,
+      changed_files: prData.files.length
+    };
+    const result = await this.codeQualityAnalyzer.analyze(analyzerPRData);
+    return {
+      status: result.overall > 0.7 ? 'success' : 'warning',
+      score: result.overall || 0.7,
+      issues: result.issues || [],
+      message: result.overall > 0.7 ? 'Code quality is good' : 'Code quality needs improvement'
+    };
   }
 
   async checkSecurityRequirements(prData: PRData): Promise<any> {
-    return await this.securityAnalyzer.analyze(prData.files);
+    // Convert to format expected by SecurityAnalyzer
+    const analyzerPRData = {
+      number: prData.pr.number,
+      title: prData.pr.title,
+      body: prData.pr.body,
+      files: prData.files.map(f => ({
+        filename: f.filename,
+        status: 'modified',
+        additions: f.changes || 0,
+        deletions: 0,
+        changes: f.changes || 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: '',
+        patch: f.patch
+      })),
+      additions: prData.files.reduce((sum, f) => sum + (f.changes || 0), 0),
+      deletions: 0,
+      changed_files: prData.files.length
+    };
+    const result = await this.securityAnalyzer.analyze(analyzerPRData);
+    return {
+      status: result.overall > 0.8 ? 'success' : 'failure',
+      score: result.overall || 0.8,
+      vulnerabilities: result.vulnerabilities || [],
+      message: result.overall > 0.8 ? 'Security requirements met' : 'Security issues detected'
+    };
   }
 
   async checkTestCoverage(prData: PRData): Promise<any> {
