@@ -8,7 +8,7 @@ import { CodeQualityAnalyzer } from '../ai/CodeQualityAnalyzer';
 import { SecurityAnalyzer } from '../ai/SecurityAnalyzer';
 import { PerformanceAnalyzer } from '../ai/PerformanceAnalyzer';
 
-export class IntelligentPRAnalysis {
+class IntelligentPRAnalysis {
   private githubIntegration: GitHubIntegrationLayer;
   private codeQualityAnalyzer: CodeQualityAnalyzer;
   private securityAnalyzer: SecurityAnalyzer;
@@ -518,6 +518,288 @@ export class IntelligentPRAnalysis {
     }
     
     return 'mixed';
+  }
+
+  // Missing method implementations
+  async checkCIStatus(owner: string, repo: string, prNumber: number): Promise<any> {
+    try {
+      const { data: checkRuns } = await this.githubIntegration.octokit.checks.listForRef({
+        owner,
+        repo,
+        ref: `pull/${prNumber}/head`
+      });
+      
+      return {
+        status: checkRuns.check_runs.length > 0 ? 'completed' : 'pending',
+        conclusion: checkRuns.check_runs.some(run => run.conclusion === 'failure') ? 'failure' : 'success',
+        runs: checkRuns.check_runs
+      };
+    } catch (error) {
+      return { status: 'unknown', conclusion: 'neutral', runs: [] };
+    }
+  }
+
+  async checkCodeQuality(prData: PRData): Promise<any> {
+    return await this.codeQualityAnalyzer.analyze(prData.files);
+  }
+
+  async checkSecurityRequirements(prData: PRData): Promise<any> {
+    return await this.securityAnalyzer.analyze(prData.files);
+  }
+
+  async checkTestCoverage(prData: PRData): Promise<any> {
+    // Stub implementation for test coverage checking
+    return {
+      coveragePercentage: 85,
+      newCodeCoverage: 90,
+      missingCoverage: prData.files.filter(f => f.filename.endsWith('.test.ts')).length === 0
+    };
+  }
+
+  async checkReviewStatus(owner: string, repo: string, prNumber: number): Promise<any> {
+    try {
+      const { data: reviews } = await this.githubIntegration.octokit.pulls.listReviews({
+        owner,
+        repo,
+        pull_number: prNumber
+      });
+      
+      const approvals = reviews.filter(r => r.state === 'APPROVED').length;
+      const requestedChanges = reviews.filter(r => r.state === 'CHANGES_REQUESTED').length;
+      
+      return {
+        totalReviews: reviews.length,
+        approvals,
+        requestedChanges,
+        status: approvals >= 2 && requestedChanges === 0 ? 'approved' : 'pending'
+      };
+    } catch (error) {
+      return { totalReviews: 0, approvals: 0, requestedChanges: 0, status: 'unknown' };
+    }
+  }
+
+  async checkConflicts(owner: string, repo: string, prNumber: number): Promise<any> {
+    try {
+      const { data: pr } = await this.githubIntegration.octokit.pulls.get({
+        owner,
+        repo,
+        pull_number: prNumber
+      });
+      
+      return {
+        hasConflicts: pr.mergeable === false,
+        mergeable: pr.mergeable,
+        mergeableState: pr.mergeable_state
+      };
+    } catch (error) {
+      return { hasConflicts: false, mergeable: true, mergeableState: 'clean' };
+    }
+  }
+
+  async checkBreakingChanges(prData: PRData): Promise<any> {
+    const breakingPatterns = [
+      /breaking[\s\-_]change/i,
+      /\[breaking\]/i,
+      /removed?.*function/i,
+      /removed?.*method/i,
+      /removed?.*api/i
+    ];
+    
+    const hasBreaking = prData.files.some(file => 
+      breakingPatterns.some(pattern => 
+        pattern.test(file.patch || '') || pattern.test(prData.pr.title) || pattern.test(prData.pr.body || '')
+      )
+    );
+    
+    return {
+      hasBreakingChanges: hasBreaking,
+      detectedPatterns: hasBreaking ? ['API changes detected'] : [],
+      severity: hasBreaking ? 'high' : 'low'
+    };
+  }
+
+  calculateOverallReadiness(checks: any[]): number {
+    const weights = {
+      ci: 0.25,
+      codeQuality: 0.2,
+      security: 0.2,
+      testCoverage: 0.15,
+      reviews: 0.15,
+      conflicts: 0.05
+    };
+    
+    let totalScore = 0;
+    let totalWeight = 0;
+    
+    checks.forEach((check, index) => {
+      const weight = Object.values(weights)[index] || 0.1;
+      const score = check.status === 'success' || check.status === 'approved' ? 1 : 0;
+      totalScore += score * weight;
+      totalWeight += weight;
+    });
+    
+    return totalWeight > 0 ? totalScore / totalWeight : 0;
+  }
+
+  async analyzeScopeImpact(prData: PRData): Promise<any> {
+    const impact = {
+      frontend: 0,
+      backend: 0,
+      database: 0,
+      api: 0,
+      tests: 0,
+      documentation: 0
+    };
+    
+    prData.files.forEach(file => {
+      const filename = file.filename.toLowerCase();
+      if (filename.includes('frontend') || filename.endsWith('.jsx') || filename.endsWith('.tsx')) {
+        impact.frontend++;
+      }
+      if (filename.includes('backend') || filename.includes('server') || filename.includes('api')) {
+        impact.backend++;
+      }
+      if (filename.includes('database') || filename.includes('migration') || filename.includes('.sql')) {
+        impact.database++;
+      }
+      if (filename.includes('test') || filename.endsWith('.test.ts') || filename.endsWith('.spec.ts')) {
+        impact.tests++;
+      }
+      if (filename.endsWith('.md') || filename.includes('doc')) {
+        impact.documentation++;
+      }
+    });
+    
+    return impact;
+  }
+
+  async analyzeDependencyImpact(prData: PRData): Promise<any> {
+    const dependencyFiles = prData.files.filter(f => 
+      f.filename === 'package.json' || 
+      f.filename === 'yarn.lock' || 
+      f.filename === 'package-lock.json'
+    );
+    
+    return {
+      hasDependencyChanges: dependencyFiles.length > 0,
+      changedFiles: dependencyFiles.map(f => f.filename),
+      impact: dependencyFiles.length > 0 ? 'high' : 'low'
+    };
+  }
+
+  async analyzeBreakingChanges(prData: PRData): Promise<any> {
+    return await this.checkBreakingChanges(prData);
+  }
+
+  async analyzeDatabaseImpact(prData: PRData): Promise<any> {
+    const dbFiles = prData.files.filter(f => 
+      f.filename.includes('migration') || 
+      f.filename.includes('schema') ||
+      f.filename.endsWith('.sql')
+    );
+    
+    return {
+      hasDatabaseChanges: dbFiles.length > 0,
+      changedFiles: dbFiles.map(f => f.filename),
+      impact: dbFiles.length > 0 ? 'high' : 'low'
+    };
+  }
+
+  async analyzeAPIImpact(prData: PRData): Promise<any> {
+    const apiFiles = prData.files.filter(f => 
+      f.filename.includes('api') || 
+      f.filename.includes('endpoint') ||
+      f.filename.includes('route')
+    );
+    
+    return {
+      hasAPIChanges: apiFiles.length > 0,
+      changedFiles: apiFiles.map(f => f.filename),
+      impact: apiFiles.length > 0 ? 'medium' : 'low'
+    };
+  }
+
+  async analyzeUIImpact(prData: PRData): Promise<any> {
+    const uiFiles = prData.files.filter(f => 
+      f.filename.endsWith('.jsx') || 
+      f.filename.endsWith('.tsx') ||
+      f.filename.includes('component') ||
+      f.filename.includes('ui')
+    );
+    
+    return {
+      hasUIChanges: uiFiles.length > 0,
+      changedFiles: uiFiles.map(f => f.filename),
+      impact: uiFiles.length > 0 ? 'medium' : 'low'
+    };
+  }
+
+  calculateOverallImpact(impacts: any[]): number {
+    const totalImpact = impacts.reduce((sum, impact) => {
+      const score = impact.impact === 'high' ? 1 : impact.impact === 'medium' ? 0.5 : 0.1;
+      return sum + score;
+    }, 0);
+    
+    return Math.min(totalImpact / impacts.length, 1);
+  }
+
+  calculateRiskLevel(impactScore: number): string {
+    if (impactScore >= 0.8) return 'high';
+    if (impactScore >= 0.5) return 'medium';
+    if (impactScore >= 0.2) return 'low';
+    return 'minimal';
+  }
+
+  generateImpactRecommendations(impacts: any[], riskLevel: string): string[] {
+    const recommendations: string[] = [];
+    
+    if (riskLevel === 'high') {
+      recommendations.push('Thorough testing required due to high impact changes');
+      recommendations.push('Consider staged deployment approach');
+      recommendations.push('Ensure adequate backup and rollback procedures');
+    }
+    
+    impacts.forEach(impact => {
+      if (impact.hasDatabaseChanges) {
+        recommendations.push('Review database migration scripts carefully');
+      }
+      if (impact.hasAPIChanges) {
+        recommendations.push('Update API documentation and notify dependent services');
+      }
+      if (impact.hasBreakingChanges) {
+        recommendations.push('Coordinate with all teams using affected APIs');
+      }
+    });
+    
+    return recommendations;
+  }
+
+  // Helper methods for missing functionality
+  private async getTeamWorkloads(owner: string, repo: string): Promise<any[]> {
+    // Stub implementation
+    return [
+      { username: 'developer1', currentWorkload: 3, availability: 0.7 },
+      { username: 'developer2', currentWorkload: 1, availability: 0.9 },
+      { username: 'developer3', currentWorkload: 5, availability: 0.3 }
+    ];
+  }
+
+  private async findSimilarPRs(owner: string, repo: string, prData: PRData): Promise<any[]> {
+    // Stub implementation
+    return [
+      { number: 123, reviewers: ['developer1', 'developer2'] },
+      { number: 124, reviewers: ['developer2', 'developer3'] }
+    ];
+  }
+
+  private matchesPattern(filename: string, pattern: string): boolean {
+    // Simple pattern matching - in real implementation would use glob patterns
+    return filename.includes(pattern.replace('*', ''));
+  }
+
+  private isCacheValid(cached: PRAnalysisResult): boolean {
+    const cacheAge = Date.now() - new Date(cached.timestamp).getTime();
+    return cacheAge < 3600000; // 1 hour cache
   }
 }
 

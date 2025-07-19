@@ -7,7 +7,7 @@ import { Octokit } from '@octokit/rest';
 import { GitHubIssue, GitHubPullRequest, GitHubRepository, GitHubWorkflow } from '../types/github';
 import { AIAnalysisResult, IssueTriage, PRAnalysis } from '../types/analysis';
 
-export class GitHubIntegrationLayer {
+class GitHubIntegrationLayer {
   private octokit: Octokit;
   private aiAnalyzer: AIAnalyzer;
   private repositoryCache: Map<string, GitHubRepository> = new Map();
@@ -294,7 +294,7 @@ export class GitHubIntegrationLayer {
     return commits;
   }
 
-  private async getWorkflowRuns(owner: string, repo: string, workflowId: number) {
+  async getWorkflowRuns(owner: string, repo: string, workflowId: number) {
     const { data: runs } = await this.octokit.actions.listWorkflowRuns({
       owner,
       repo,
@@ -485,61 +485,7 @@ export class GitHubIntegrationLayer {
     return data;
   }
 
-}
-
-// AI Analyzer class for intelligent analysis
-class AIAnalyzer {
-  constructor(private config: any) {}
-
-  async analyzeIssue(issue: any): Promise<AIAnalysisResult> {
-    // AI-powered issue analysis
-    return {
-      severity: 0.6,
-      confidence: 0.8,
-      category: 'bug',
-      estimatedEffort: 'medium',
-      suggestedLabels: ['bug', 'medium-priority'],
-      suggestedAssignees: []
-    };
-  }
-
-  async analyzeCodeChanges(changes: any): Promise<any> {
-    // AI-powered code change analysis
-    return {
-      quality: 0.8,
-      securityRisk: 0.2,
-      performance: 0.9,
-      maintainability: 0.7,
-      issues: [],
-      recommendations: []
-    };
-  }
-
-  async analyzeWorkflow(workflow: any): Promise<any> {
-    // AI-powered workflow analysis
-    return {
-      performance: 0.7,
-      opportunities: [],
-      suggestions: [],
-      estimatedImprovement: 0.2,
-      priority: 'medium'
-    };
-  }
-
-  async analyzeCollaborationPatterns(data: any): Promise<any> {
-    // AI-powered collaboration analysis
-    return {
-      teamInsights: {},
-      communicationPatterns: {},
-      bottlenecks: [],
-      recommendations: [],
-      automationOpportunities: [],
-      trainingNeeds: [],
-      toolSuggestions: []
-    };
-  }
-
-  // Missing methods for CollaborativeDevelopmentTools integration
+  // Methods for CollaborativeDevelopmentTools integration
   async getRecentPullRequests(owner: string, repo: string, count: number = 100): Promise<any[]> {
     try {
       const { data } = await this.octokit.pulls.list({
@@ -637,6 +583,117 @@ class AIAnalyzer {
       throw new GitHubIntegrationError(`Failed to fetch repository contributors: ${error.message}`, error);
     }
   }
+
+  // Missing methods for WorkflowOptimizer
+  async getWorkflows(owner: string, repo: string): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.actions.listRepoWorkflows({
+        owner,
+        repo
+      });
+      return data.workflows;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch workflows: ${error.message}`, error);
+    }
+  }
+
+  async getWorkflow(owner: string, repo: string, workflowId: number): Promise<any> {
+    try {
+      const { data } = await this.octokit.actions.getWorkflow({
+        owner,
+        repo,
+        workflow_id: workflowId
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch workflow: ${error.message}`, error);
+    }
+  }
+
+  async getWorkflowContent(owner: string, repo: string, workflowId: number): Promise<any> {
+    try {
+      // First get the workflow to get its path
+      const workflow = await this.getWorkflow(owner, repo, workflowId);
+      
+      // For now, return a placeholder YAML structure
+      return {
+        name: workflow.name,
+        on: ['push', 'pull_request'],
+        jobs: {
+          build: {
+            'runs-on': 'ubuntu-latest',
+            steps: [
+              { name: 'Checkout', uses: 'actions/checkout@v3' },
+              { name: 'Setup Node', uses: 'actions/setup-node@v3' },
+              { name: 'Install', run: 'npm install' },
+              { name: 'Test', run: 'npm test' }
+            ]
+          }
+        }
+      };
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch workflow content: ${error.message}`, error);
+    }
+  }
+
+}
+
+// AI Analyzer class for intelligent analysis
+class AIAnalyzer {
+  private octokit: any;
+
+  constructor(private config: any) {
+    // Initialize with empty octokit - will be set from parent class
+  }
+
+  async analyzeIssue(issue: any): Promise<AIAnalysisResult> {
+    // AI-powered issue analysis
+    return {
+      severity: 0.6,
+      confidence: 0.8,
+      category: 'bug',
+      estimatedEffort: 'medium',
+      suggestedLabels: ['bug', 'medium-priority'],
+      suggestedAssignees: []
+    };
+  }
+
+  async analyzeCodeChanges(changes: any): Promise<any> {
+    // AI-powered code change analysis
+    return {
+      quality: 0.8,
+      securityRisk: 0.2,
+      performance: 0.9,
+      maintainability: 0.7,
+      issues: [],
+      recommendations: []
+    };
+  }
+
+  async analyzeWorkflow(workflow: any): Promise<any> {
+    // AI-powered workflow analysis
+    return {
+      performance: 0.7,
+      opportunities: [],
+      suggestions: [],
+      estimatedImprovement: 0.2,
+      priority: 'medium'
+    };
+  }
+
+  async analyzeCollaborationPatterns(data: any): Promise<any> {
+    // AI-powered collaboration analysis
+    return {
+      teamInsights: {},
+      communicationPatterns: {},
+      bottlenecks: [],
+      recommendations: [],
+      automationOpportunities: [],
+      trainingNeeds: [],
+      toolSuggestions: []
+    };
+  }
+
 }
 
 // Rate limit handler

@@ -1,0 +1,79 @@
+{
+  "buildRuns": [
+    {
+      "runId": 1,
+      "timestamp": "2025-07-19T18:05:45Z",
+      "totalErrors": 249,
+      "buildTime": "120s+",
+      "status": "timeout",
+      "errorsByType": {
+        "TS2339": 141,
+        "TS2304": 28,
+        "TS2551": 20,
+        "TS2459": 8,
+        "TS2345": 7,
+        "TS2341": 7,
+        "TS2322": 5,
+        "TS2307": 5,
+        "TS2305": 5,
+        "TS2554": 4
+      },
+      "topProblematicFiles": [
+        "src/github/GitHubIntegrationLayer.ts",
+        "src/github/CollaborativeDevelopmentTools.ts",
+        "src/github/IntelligentPRAnalysis.ts",
+        "src/services/NeuralMeshService.ts",
+        "src/performance/MemoryOptimizationManager.ts"
+      ],
+      "criticalIssues": [
+        "Missing method definitions in GitHub classes",
+        "Type import/export conflicts",
+        "Service layer type mismatches",
+        "WeakRef not available in current environment"
+      ]
+    }
+  ],
+  "monitoringActive": true,
+  "targetErrorCount": 0,
+  "errorReductionRate": 0,
+  "alertsSent": [
+    {
+      "timestamp": "2025-07-19T18:05:38Z",
+      "level": "info",
+      "message": "BUILD BASELINE ESTABLISHED: 249 errors, dominated by missing properties"
+    },
+    {
+      "timestamp": "2025-07-19T18:07:05Z", 
+      "level": "warning",
+      "message": "MONITORING UPDATE: Same 249 errors after 30s. No agent fixes applied yet"
+    }
+  ],
+  "detailedIssues": {
+    "intelligentPRAnalysis": {
+      "file": "src/github/IntelligentPRAnalysis.ts",
+      "missingMethods": [
+        "generateSizeLabels", "generateTypeLabels", "generateImpactLabels",
+        "generatePriorityLabels", "generateComponentLabels", "rankLabelSuggestions",
+        "calculateChangeSize", "calculateReviewability", "calculateCyclomaticComplexity",
+        "calculateCognitiveComplexity", "calculateStructuralComplexity"
+      ],
+      "errorCount": 15
+    },
+    "gitHubIntegrationLayer": {
+      "file": "src/github/GitHubIntegrationLayer.ts", 
+      "missingMethods": [
+        "getPullRequest", "getPRReviews", "getRecentPullRequests",
+        "getRecentIssues", "getRecentCommits", "getRecentComments",
+        "getRecentReviews", "getRepositoryContributors"
+      ],
+      "accessIssues": ["getPRFiles", "getPRCommits"],
+      "errorCount": 10
+    },
+    "typeSystemIssues": {
+      "files": ["src/types/github.ts", "src/types/analysis.ts"],
+      "missingExports": ["GitHubWorkflow", "IssueTriage", "PRAnalysis"],
+      "incorrectExports": ["AIAnalysisResult should be AnalysisResult"],
+      "errorCount": 8
+    }
+  }
+}

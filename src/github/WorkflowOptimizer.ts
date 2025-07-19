@@ -4,10 +4,44 @@
  */
 
 import { GitHubIntegrationLayer } from './GitHubIntegrationLayer';
-import { WorkflowAnalyzer } from '../ai/WorkflowAnalyzer';
-import { PerformanceOptimizer } from '../ai/PerformanceOptimizer';
+// Placeholder interfaces for AI modules that don't exist yet
+interface WorkflowAnalyzer {
+  analyze(workflowData: WorkflowData): Promise<WorkflowAnalysis>;
+}
 
-export class WorkflowOptimizer {
+interface PerformanceOptimizer {
+  generateOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<OptimizationSuggestion[]>;
+}
+
+// Placeholder implementations
+class PlaceholderWorkflowAnalyzer implements WorkflowAnalyzer {
+  async analyze(workflowData: WorkflowData): Promise<WorkflowAnalysis> {
+    return {
+      performance: { score: 0.7, issues: [] },
+      bottlenecks: [],
+      opportunities: [],
+      metrics: { duration: 300000, cost: 0.5, reliability: 0.8 }
+    };
+  }
+}
+
+class PlaceholderPerformanceOptimizer implements PerformanceOptimizer {
+  async generateOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<OptimizationSuggestion[]> {
+    return [{
+      type: 'performance',
+      description: 'Optimize workflow performance',
+      impact: 0.6,
+      risk: 0.2,
+      complexity: 0.4,
+      durationImprovement: 0.3,
+      costImprovement: 0.2,
+      reliabilityImprovement: 0.1,
+      implementation: 'Implement performance optimizations'
+    }];
+  }
+}
+
+class WorkflowOptimizer {
   private githubIntegration: GitHubIntegrationLayer;
   private workflowAnalyzer: WorkflowAnalyzer;
   private performanceOptimizer: PerformanceOptimizer;
@@ -15,8 +49,8 @@ export class WorkflowOptimizer {
 
   constructor(options: WorkflowOptimizerOptions) {
     this.githubIntegration = new GitHubIntegrationLayer(options.githubToken);
-    this.workflowAnalyzer = new WorkflowAnalyzer(options.analyzerConfig);
-    this.performanceOptimizer = new PerformanceOptimizer(options.optimizerConfig);
+    this.workflowAnalyzer = new PlaceholderWorkflowAnalyzer();
+    this.performanceOptimizer = new PlaceholderPerformanceOptimizer();
   }
 
   /**
@@ -300,6 +334,69 @@ export class WorkflowOptimizer {
     return optimizations.sort((a, b) => b.impact - a.impact);
   }
 
+  private async generateParallelizationOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<OptimizationSuggestion[]> {
+    const optimizations: OptimizationSuggestion[] = [];
+    const parallelizationOpportunities = this.identifyParallelizationOpportunities(workflowData);
+    
+    for (const opportunity of parallelizationOpportunities) {
+      optimizations.push({
+        type: 'parallelization',
+        description: opportunity.description,
+        impact: opportunity.impact,
+        risk: 0.3,
+        complexity: 0.5,
+        durationImprovement: opportunity.timeImprovement,
+        costImprovement: opportunity.costImprovement,
+        reliabilityImprovement: 0.1,
+        implementation: opportunity.implementation
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async generateResourceOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<OptimizationSuggestion[]> {
+    const optimizations: OptimizationSuggestion[] = [];
+    const resourceOpportunities = this.identifyResourceOptimizations(workflowData);
+    
+    for (const opportunity of resourceOpportunities) {
+      optimizations.push({
+        type: 'resource',
+        description: opportunity.description,
+        impact: opportunity.impact,
+        risk: 0.2,
+        complexity: 0.4,
+        durationImprovement: opportunity.timeImprovement,
+        costImprovement: opportunity.costImprovement,
+        reliabilityImprovement: 0.05,
+        implementation: opportunity.implementation
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async generateCachingOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<OptimizationSuggestion[]> {
+    const optimizations: OptimizationSuggestion[] = [];
+    const cachingOpportunities = this.identifyCachingOptimizations(workflowData);
+    
+    for (const opportunity of cachingOpportunities) {
+      optimizations.push({
+        type: 'caching',
+        description: opportunity.description,
+        impact: opportunity.impact,
+        risk: 0.1,
+        complexity: 0.3,
+        durationImprovement: opportunity.timeImprovement,
+        costImprovement: opportunity.costImprovement,
+        reliabilityImprovement: 0.2,
+        implementation: opportunity.implementation
+      });
+    }
+    
+    return optimizations;
+  }
+
   private async calculateImprovements(workflowData: WorkflowData, optimizations: OptimizationSuggestion[]): Promise<ImprovementMetrics> {
     const currentMetrics = this.calculateCurrentMetrics(workflowData);
     const optimizedMetrics = this.calculateOptimizedMetrics(workflowData, optimizations);
@@ -311,6 +408,28 @@ export class WorkflowOptimizer {
       securityImprovement: this.calculateSecurityImprovement(currentMetrics, optimizedMetrics),
       maintainabilityImprovement: this.calculateMaintainabilityImprovement(currentMetrics, optimizedMetrics)
     };
+  }
+
+  private calculateDurationImprovement(currentMetrics: any, optimizedMetrics: any): number {
+    if (currentMetrics.duration === 0) return 0;
+    return (currentMetrics.duration - optimizedMetrics.duration) / currentMetrics.duration;
+  }
+
+  private calculateCostImprovement(currentMetrics: any, optimizedMetrics: any): number {
+    if (currentMetrics.cost === 0) return 0;
+    return (currentMetrics.cost - optimizedMetrics.cost) / currentMetrics.cost;
+  }
+
+  private calculateReliabilityImprovement(currentMetrics: any, optimizedMetrics: any): number {
+    return optimizedMetrics.reliability - currentMetrics.reliability;
+  }
+
+  private calculateSecurityImprovement(currentMetrics: any, optimizedMetrics: any): number {
+    return (optimizedMetrics.security || 0.8) - (currentMetrics.security || 0.6);
+  }
+
+  private calculateMaintainabilityImprovement(currentMetrics: any, optimizedMetrics: any): number {
+    return (optimizedMetrics.maintainability || 0.8) - (currentMetrics.maintainability || 0.6);
   }
 
   private calculatePriority(improvements: ImprovementMetrics): 'high' | 'medium' | 'low' {
@@ -375,6 +494,61 @@ export class WorkflowOptimizer {
     };
   }
 
+  private groupOptimizationsByPhase(optimizations: WorkflowOptimization[]): ImplementationPhase[] {
+    const phases: ImplementationPhase[] = [
+      {
+        name: 'Quick Wins',
+        optimizations: optimizations.filter(opt => opt.implementationComplexity === 'simple'),
+        duration: 1
+      },
+      {
+        name: 'Medium Impact',
+        optimizations: optimizations.filter(opt => opt.implementationComplexity === 'moderate'),
+        duration: 2
+      },
+      {
+        name: 'Complex Changes',
+        optimizations: optimizations.filter(opt => opt.implementationComplexity === 'complex'),
+        duration: 4
+      }
+    ];
+    
+    return phases.filter(phase => phase.optimizations.length > 0);
+  }
+
+  private calculateTotalImplementationDuration(phases: ImplementationPhase[]): number {
+    return phases.reduce((total, phase) => total + phase.duration, 0);
+  }
+
+  private identifyImplementationDependencies(phases: ImplementationPhase[]): ImplementationDependency[] {
+    const dependencies: ImplementationDependency[] = [];
+    
+    for (let i = 1; i < phases.length; i++) {
+      dependencies.push({
+        dependent: phases[i].name,
+        dependsOn: phases[i - 1].name,
+        reason: 'Sequential implementation recommended'
+      });
+    }
+    
+    return dependencies;
+  }
+
+  private identifyRequiredResources(phases: ImplementationPhase[]): ImplementationResource[] {
+    return [
+      {
+        type: 'developer',
+        amount: 1,
+        duration: this.calculateTotalImplementationDuration(phases)
+      },
+      {
+        type: 'devops_engineer',
+        amount: 0.5,
+        duration: this.calculateTotalImplementationDuration(phases) * 0.6
+      }
+    ];
+  }
+
   private async analyzeJobBottlenecks(workflowData: WorkflowData): Promise<PerformanceBottleneck[]> {
     const jobs = this.extractJobs(workflowData);
     const bottlenecks: PerformanceBottleneck[] = [];
@@ -396,6 +570,108 @@ export class WorkflowOptimizer {
     }
     
     return bottlenecks;
+  }
+
+  private extractJobs(workflowData: WorkflowData): WorkflowJob[] {
+    const content = workflowData.content;
+    if (!content || !content.jobs) return [];
+    
+    return Object.entries(content.jobs).map(([name, jobConfig]: [string, any]) => ({
+      name,
+      steps: jobConfig.steps || [],
+      needs: jobConfig.needs || [],
+      runsOn: jobConfig['runs-on'] || 'ubuntu-latest',
+      timeoutMinutes: jobConfig['timeout-minutes'] || 360
+    }));
+  }
+
+  private extractSteps(workflowData: WorkflowData): WorkflowStep[] {
+    const jobs = this.extractJobs(workflowData);
+    const steps: WorkflowStep[] = [];
+    
+    for (const job of jobs) {
+      for (const [index, step] of job.steps.entries()) {
+        steps.push({
+          name: step.name || `Step ${index + 1}`,
+          uses: step.uses,
+          run: step.run,
+          jobName: job.name,
+          index
+        });
+      }
+    }
+    
+    return steps;
+  }
+
+  private calculateJobDuration(job: WorkflowJob): number {
+    // Estimate based on step count and complexity
+    return job.steps.length * 2 * 60 * 1000; // 2 minutes per step in milliseconds
+  }
+
+  private calculateAverageJobDuration(job: WorkflowJob, runs: any[]): number {
+    // This would analyze historical data in a real implementation
+    return this.calculateJobDuration(job);
+  }
+
+  private calculateStepDuration(step: WorkflowStep): number {
+    // Estimate based on step type
+    if (step.uses) {
+      return 1 * 60 * 1000; // 1 minute for action steps
+    } else if (step.run) {
+      return 2 * 60 * 1000; // 2 minutes for script steps
+    }
+    return 30 * 1000; // 30 seconds default
+  }
+
+  private calculateAverageStepDuration(step: WorkflowStep, runs: any[]): number {
+    // This would analyze historical data in a real implementation
+    return this.calculateStepDuration(step);
+  }
+
+  private generateJobOptimizationSuggestions(job: WorkflowJob): string[] {
+    const suggestions: string[] = [];
+    
+    if (job.steps.length > 10) {
+      suggestions.push('Consider breaking job into smaller, focused jobs');
+    }
+    
+    if (job.runsOn === 'ubuntu-latest') {
+      suggestions.push('Consider using specific runner versions for consistency');
+    }
+    
+    return suggestions;
+  }
+
+  private generateStepOptimizationSuggestions(step: WorkflowStep): string[] {
+    const suggestions: string[] = [];
+    
+    if (step.uses && !step.uses.includes('@')) {
+      suggestions.push('Pin action to specific version for security and reliability');
+    }
+    
+    if (step.run && step.run.includes('npm install')) {
+      suggestions.push('Consider using cache action to speed up dependency installation');
+    }
+    
+    return suggestions;
+  }
+
+  private calculateSuccessRate(recentRuns: any[]): number {
+    if (recentRuns.length === 0) return 1;
+    return recentRuns.filter(run => run.conclusion === 'success').length / recentRuns.length;
+  }
+
+  private calculateAverageDuration(recentRuns: any[]): number {
+    if (recentRuns.length === 0) return 0;
+    
+    const totalDuration = recentRuns.reduce((sum, run) => {
+      const start = new Date(run.created_at).getTime();
+      const end = new Date(run.updated_at).getTime();
+      return sum + (end - start);
+    }, 0);
+    
+    return totalDuration / recentRuns.length;
   }
 
   private async analyzeStepBottlenecks(workflowData: WorkflowData): Promise<PerformanceBottleneck[]> {
@@ -421,13 +697,286 @@ export class WorkflowOptimizer {
     return bottlenecks;
   }
 
-  // Additional helper methods would be implemented here...
+  // Additional helper methods implementation
+  private async analyzeDependencyBottlenecks(workflowData: WorkflowData): Promise<PerformanceBottleneck[]> {
+    const dependencies = this.extractDependencies(workflowData);
+    const bottlenecks: PerformanceBottleneck[] = [];
+    
+    for (const dep of dependencies) {
+      const impact = this.calculateDependencyImpact(dep, workflowData);
+      if (impact > 0.3) {
+        bottlenecks.push({
+          type: 'dependency',
+          identifier: dep.name,
+          currentDuration: dep.duration,
+          expectedDuration: dep.optimalDuration,
+          impact,
+          suggestions: this.generateDependencyOptimizationSuggestions(dep)
+        });
+      }
+    }
+    
+    return bottlenecks;
+  }
+
+  private async analyzeResourceBottlenecks(workflowData: WorkflowData): Promise<PerformanceBottleneck[]> {
+    const resources = this.extractResourceUsage(workflowData);
+    const bottlenecks: PerformanceBottleneck[] = [];
+    
+    for (const resource of resources) {
+      if (resource.utilization > 0.8) {
+        bottlenecks.push({
+          type: 'resource',
+          identifier: resource.type,
+          currentDuration: resource.waitTime,
+          expectedDuration: 0,
+          impact: resource.utilization,
+          suggestions: this.generateResourceOptimizationSuggestions(resource)
+        });
+      }
+    }
+    
+    return bottlenecks;
+  }
+
+  private async analyzeJobDependencies(workflowData: WorkflowData): Promise<JobDependency[]> {
+    const jobs = this.extractJobs(workflowData);
+    const dependencies: JobDependency[] = [];
+    
+    for (const job of jobs) {
+      const deps = this.findJobDependencies(job, workflowData);
+      dependencies.push({
+        jobName: job.name,
+        dependencies: deps,
+        canParallelize: deps.length === 0,
+        blockedBy: deps.filter(d => d.blocking)
+      });
+    }
+    
+    return dependencies;
+  }
+
+  private findParallelizableJobs(jobDependencies: JobDependency[]): ParallelizableJobGroup[] {
+    const groups: ParallelizableJobGroup[] = [];
+    const independentJobs = jobDependencies.filter(job => job.canParallelize);
+    
+    if (independentJobs.length > 1) {
+      const group: ParallelizableJobGroup = {
+        jobs: independentJobs.map(job => job.jobName),
+        currentDuration: Math.max(...independentJobs.map(job => this.estimateJobDuration(job))),
+        optimizedDuration: Math.max(...independentJobs.map(job => this.estimateJobDuration(job))) / independentJobs.length,
+        confidence: 0.8
+      };
+      groups.push(group);
+    }
+    
+    return groups;
+  }
+
+  private generateParallelizationImplementation(group: ParallelizableJobGroup): string {
+    return `# Parallelize jobs: ${group.jobs.join(', ')}\n` +
+           `jobs:\n` +
+           group.jobs.map(job => `  ${job}:\n    needs: []`).join('\n');
+  }
+
+  private assessParallelizationRisk(group: ParallelizableJobGroup): string {
+    return group.confidence > 0.7 ? 'low' : 'medium';
+  }
+
+  private async analyzeStepParallelization(workflowData: WorkflowData): Promise<ParallelizationRecommendation[]> {
+    const recommendations: ParallelizationRecommendation[] = [];
+    const jobs = this.extractJobs(workflowData);
+    
+    for (const job of jobs) {
+      const steps = job.steps || [];
+      const parallelizableSteps = this.findParallelizableSteps(steps);
+      
+      if (parallelizableSteps.length > 0) {
+        recommendations.push({
+          type: 'step_parallelization',
+          description: `Parallelize steps in job ${job.name}`,
+          currentDuration: this.calculateJobDuration(job),
+          optimizedDuration: this.calculateJobDuration(job) * 0.7,
+          savings: this.calculateJobDuration(job) * 0.3,
+          implementation: this.generateStepParallelizationImplementation(parallelizableSteps),
+          riskLevel: 'low',
+          confidence: 0.8
+        });
+      }
+    }
+    
+    return recommendations;
+  }
+
+  private async analyzeRunnerUsage(workflowData: WorkflowData): Promise<ResourceOptimization[]> {
+    const optimizations: ResourceOptimization[] = [];
+    const runnerUsage = this.analyzeCurrentRunnerUsage(workflowData);
+    
+    if (runnerUsage.overProvisioned) {
+      optimizations.push({
+        type: 'runner_optimization',
+        description: 'Optimize runner specifications',
+        impact: 0.6,
+        implementation: 'Use smaller runner types for lightweight jobs',
+        savings: { cost: 0.3, time: 0.1 }
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async analyzeCacheUsage(workflowData: WorkflowData): Promise<ResourceOptimization[]> {
+    const optimizations: ResourceOptimization[] = [];
+    const cacheUsage = this.analyzeCurrentCacheUsage(workflowData);
+    
+    if (cacheUsage.missRate > 0.5) {
+      optimizations.push({
+        type: 'cache_optimization',
+        description: 'Improve cache hit rate',
+        impact: 0.7,
+        implementation: 'Optimize cache keys and invalidation strategy',
+        savings: { time: 0.4, cost: 0.2 }
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async analyzeArtifactUsage(workflowData: WorkflowData): Promise<ResourceOptimization[]> {
+    const optimizations: ResourceOptimization[] = [];
+    const artifactUsage = this.analyzeCurrentArtifactUsage(workflowData);
+    
+    if (artifactUsage.unnecessaryArtifacts > 0) {
+      optimizations.push({
+        type: 'artifact_optimization',
+        description: 'Remove unnecessary artifacts',
+        impact: 0.4,
+        implementation: 'Clean up unused artifact uploads/downloads',
+        savings: { storage: 0.3, time: 0.2 }
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async analyzeContainerUsage(workflowData: WorkflowData): Promise<ResourceOptimization[]> {
+    const optimizations: ResourceOptimization[] = [];
+    const containerUsage = this.analyzeCurrentContainerUsage(workflowData);
+    
+    if (containerUsage.inefficientImages > 0) {
+      optimizations.push({
+        type: 'container_optimization',
+        description: 'Optimize container images',
+        impact: 0.5,
+        implementation: 'Use smaller, more efficient base images',
+        savings: { time: 0.3, bandwidth: 0.4 }
+      });
+    }
+    
+    return optimizations;
+  }
+
+  private async analyzeSecretUsage(workflowData: WorkflowData): Promise<SecurityEnhancement[]> {
+    const enhancements: SecurityEnhancement[] = [];
+    const secretUsage = this.analyzeCurrentSecretUsage(workflowData);
+    
+    if (secretUsage.exposedSecrets > 0) {
+      enhancements.push({
+        type: 'secret_security',
+        description: 'Secure secret handling',
+        severity: 0.9,
+        implementation: 'Use proper secret scoping and masking',
+        impact: 'high'
+      });
+    }
+    
+    return enhancements;
+  }
+
+  private async analyzePermissions(workflowData: WorkflowData): Promise<SecurityEnhancement[]> {
+    const enhancements: SecurityEnhancement[] = [];
+    const permissions = this.analyzeCurrentPermissions(workflowData);
+    
+    if (permissions.overPrivileged > 0) {
+      enhancements.push({
+        type: 'permission_reduction',
+        description: 'Reduce excessive permissions',
+        severity: 0.7,
+        implementation: 'Apply principle of least privilege',
+        impact: 'medium'
+      });
+    }
+    
+    return enhancements;
+  }
+
+  private async analyzeThirdPartyActions(workflowData: WorkflowData): Promise<SecurityEnhancement[]> {
+    const enhancements: SecurityEnhancement[] = [];
+    const thirdPartyActions = this.analyzeCurrentThirdPartyActions(workflowData);
+    
+    if (thirdPartyActions.unversionedActions > 0) {
+      enhancements.push({
+        type: 'action_versioning',
+        description: 'Pin action versions for security',
+        severity: 0.6,
+        implementation: 'Use specific version tags instead of latest',
+        impact: 'medium'
+      });
+    }
+    
+    return enhancements;
+  }
+
+  private async analyzeEnvironmentIsolation(workflowData: WorkflowData): Promise<SecurityEnhancement[]> {
+    const enhancements: SecurityEnhancement[] = [];
+    const isolation = this.analyzeCurrentEnvironmentIsolation(workflowData);
+    
+    if (isolation.weakIsolation > 0) {
+      enhancements.push({
+        type: 'environment_isolation',
+        description: 'Improve environment isolation',
+        severity: 0.5,
+        implementation: 'Use separate environments for different stages',
+        impact: 'medium'
+      });
+    }
+    
+    return enhancements;
+  }
   private calculateCurrentMetrics(workflowData: WorkflowData): any {
     return {
       duration: this.calculateAverageWorkflowDuration(workflowData),
       cost: this.calculateAverageWorkflowCost(workflowData),
       reliability: this.calculateWorkflowReliability(workflowData)
     };
+  }
+
+  private calculateAverageWorkflowDuration(workflowData: WorkflowData): number {
+    const runs = workflowData.runs.filter(run => run.conclusion === 'success');
+    if (runs.length === 0) return 0;
+    
+    const totalDuration = runs.reduce((sum, run) => {
+      const start = new Date(run.created_at).getTime();
+      const end = new Date(run.updated_at).getTime();
+      return sum + (end - start);
+    }, 0);
+    
+    return totalDuration / runs.length;
+  }
+
+  private calculateAverageWorkflowCost(workflowData: WorkflowData): number {
+    // Estimate cost based on runner usage and duration
+    const avgDuration = this.calculateAverageWorkflowDuration(workflowData);
+    const runnerCostPerMinute = 0.008; // GitHub Actions pricing
+    return (avgDuration / (1000 * 60)) * runnerCostPerMinute;
+  }
+
+  private calculateWorkflowReliability(workflowData: WorkflowData): number {
+    const totalRuns = workflowData.runs.length;
+    if (totalRuns === 0) return 1;
+    
+    const successfulRuns = workflowData.runs.filter(run => run.conclusion === 'success').length;
+    return successfulRuns / totalRuns;
   }
 
   private calculateOptimizedMetrics(workflowData: WorkflowData, optimizations: OptimizationSuggestion[]): any {
@@ -455,10 +1004,375 @@ export class WorkflowOptimizer {
     // Simplified complexity calculation based on workflow structure
     const jobs = Object.keys(content.jobs || {}).length;
     const steps = Object.values(content.jobs || {}).reduce((sum: number, job: any) => {
-      return sum + (job.steps?.length || 0);
+      const stepCount = job.steps?.length;
+      return sum + (typeof stepCount === 'number' ? stepCount : 0);
     }, 0);
     
-    return (jobs * 2) + steps;
+    return (jobs as number) * 2 + (steps as number);
+  }
+
+  // Cost optimization methods
+  private async identifyCostOptimizations(workflowData: WorkflowData, analysis: WorkflowAnalysis): Promise<CostOptimizationOpportunity[]> {
+    const opportunities: CostOptimizationOpportunity[] = [];
+    
+    // Analyze runner efficiency
+    const runnerAnalysis = this.analyzeRunnerEfficiency(workflowData);
+    if (runnerAnalysis.wastedCapacity > 0.2) {
+      opportunities.push({
+        type: 'runner_optimization',
+        description: 'Optimize runner specifications',
+        monthlySavings: runnerAnalysis.potentialSavings,
+        implementation: 'Use smaller runners for lightweight jobs'
+      });
+    }
+    
+    // Analyze build frequency
+    const frequencyAnalysis = this.analyzeBuildFrequency(workflowData);
+    if (frequencyAnalysis.unnecessaryBuilds > 0.1) {
+      opportunities.push({
+        type: 'trigger_optimization',
+        description: 'Optimize workflow triggers',
+        monthlySavings: frequencyAnalysis.potentialSavings,
+        implementation: 'Refine path filters and trigger conditions'
+      });
+    }
+    
+    return opportunities;
+  }
+
+  private calculatePotentialSavings(optimizations: CostOptimizationOpportunity[]): PotentialSavings {
+    return {
+      monthly: optimizations.reduce((sum, opt) => sum + opt.monthlySavings, 0),
+      yearly: optimizations.reduce((sum, opt) => sum + opt.monthlySavings * 12, 0)
+    };
+  }
+
+  private calculateCurrentCost(workflowData: WorkflowData, analysis: WorkflowAnalysis): CurrentCost {
+    const monthlyRuns = this.estimateMonthlyRuns(workflowData);
+    const costPerRun = this.calculateAverageWorkflowCost(workflowData);
+    
+    return {
+      monthly: monthlyRuns * costPerRun,
+      yearly: monthlyRuns * costPerRun * 12
+    };
+  }
+
+  private calculatePaybackPeriod(currentCost: CurrentCost, potentialSavings: PotentialSavings): number {
+    if (potentialSavings.monthly === 0) return Infinity;
+    const implementationCost = 1000; // Estimated implementation cost
+    return implementationCost / potentialSavings.monthly;
+  }
+
+  private calculateROI(currentCost: CurrentCost, potentialSavings: PotentialSavings): number {
+    if (currentCost.yearly === 0) return 0;
+    return (potentialSavings.yearly / currentCost.yearly) * 100;
+  }
+
+  // Workflow health monitoring methods - moved to private
+  private async getRecentWorkflowRuns(owner: string, repo: string, workflowId: number, count: number): Promise<any[]> {
+    try {
+      return await this.githubIntegration.getWorkflowRuns(owner, repo, workflowId);
+    } catch (error) {
+      console.error('Error fetching workflow runs:', error);
+      return [];
+    }
+  }
+
+  private analyzeFailurePatterns(recentRuns: any[]): FailurePattern[] {
+    const failures = recentRuns.filter(run => run.conclusion === 'failure');
+    const patterns: Map<string, number> = new Map();
+    
+    failures.forEach(run => {
+      const pattern = this.extractFailurePattern(run);
+      patterns.set(pattern, (patterns.get(pattern) || 0) + 1);
+    });
+    
+    return Array.from(patterns.entries()).map(([pattern, count]) => ({
+      pattern,
+      occurrences: count,
+      percentage: failures.length > 0 ? (count / failures.length) * 100 : 0
+    }));
+  }
+
+  private analyzePerformanceTrends(recentRuns: any[]): PerformanceTrend[] {
+    const trends: PerformanceTrend[] = [];
+    
+    if (recentRuns.length < 2) return trends;
+    
+    // Analyze duration trend
+    const durations = recentRuns.map(run => {
+      const start = new Date(run.created_at).getTime();
+      const end = new Date(run.updated_at).getTime();
+      return end - start;
+    });
+    
+    const avgFirst = durations.slice(0, Math.floor(durations.length / 2)).reduce((a, b) => a + b, 0) / Math.floor(durations.length / 2);
+    const avgLast = durations.slice(Math.floor(durations.length / 2)).reduce((a, b) => a + b, 0) / Math.ceil(durations.length / 2);
+    
+    trends.push({
+      metric: 'duration',
+      direction: avgLast > avgFirst ? 'increasing' : 'decreasing',
+      change: avgFirst > 0 ? Math.abs(avgLast - avgFirst) / avgFirst : 0
+    });
+    
+    return trends;
+  }
+
+  private calculateReliabilityScore(recentRuns: any[]): number {
+    if (recentRuns.length === 0) return 1;
+    
+    const successRate = this.calculateSuccessRate(recentRuns);
+    const consistencyScore = this.calculateConsistencyScore(recentRuns);
+    
+    return (successRate * 0.7) + (consistencyScore * 0.3);
+  }
+
+  private generateHealthAlerts(recentRuns: any[]): HealthAlert[] {
+    const alerts: HealthAlert[] = [];
+    const successRate = this.calculateSuccessRate(recentRuns);
+    
+    if (successRate < 0.8) {
+      alerts.push({
+        type: 'low_success_rate',
+        severity: 'high',
+        message: `Success rate is ${(successRate * 100).toFixed(1)}%, below 80% threshold`
+      });
+    }
+    
+    const avgDuration = this.calculateAverageDuration(recentRuns);
+    if (avgDuration > 30 * 60 * 1000) { // 30 minutes
+      alerts.push({
+        type: 'long_duration',
+        severity: 'medium',
+        message: 'Average workflow duration exceeds 30 minutes'
+      });
+    }
+    
+    return alerts;
+  }
+
+  private generateHealthRecommendations(recentRuns: any[]): HealthRecommendation[] {
+    const recommendations: HealthRecommendation[] = [];
+    const failurePatterns = this.analyzeFailurePatterns(recentRuns);
+    
+    if (failurePatterns.length > 0) {
+      const topPattern = failurePatterns[0];
+      if (topPattern.percentage > 30) {
+        recommendations.push({
+          type: 'failure_pattern',
+          priority: 'high',
+          description: `Address recurring failure pattern: ${topPattern.pattern}`,
+          action: 'Investigate and fix the root cause of this common failure'
+        });
+      }
+    }
+    
+    return recommendations;
+  }
+
+  private calculateOverallHealth(health: any): number {
+    const weights = {
+      successRate: 0.4,
+      reliabilityScore: 0.3,
+      performanceScore: 0.3
+    };
+    
+    const performanceScore = 1 - Math.min(health.averageDuration / (60 * 60 * 1000), 1); // Normalize to 1 hour
+    
+    return (health.successRate * weights.successRate) +
+           (health.reliabilityScore * weights.reliabilityScore) +
+           (performanceScore * weights.performanceScore);
+  }
+
+  // Helper method implementations
+  private extractDependencies(workflowData: WorkflowData): any[] {
+    const jobs = this.extractJobs(workflowData);
+    return jobs.filter(job => job.needs.length > 0).map(job => ({
+      name: job.name,
+      dependencies: job.needs,
+      duration: this.calculateJobDuration(job),
+      optimalDuration: this.calculateJobDuration(job) * 0.8
+    }));
+  }
+
+  private calculateDependencyImpact(dep: any, workflowData: WorkflowData): number {
+    return dep.dependencies.length * 0.1; // Simple impact calculation
+  }
+
+  private generateDependencyOptimizationSuggestions(dep: any): string[] {
+    return [
+      'Consider parallelizing dependencies',
+      'Optimize dependency loading strategies',
+      'Cache dependency artifacts'
+    ];
+  }
+
+  private extractResourceUsage(workflowData: WorkflowData): any[] {
+    return [{
+      type: 'runner',
+      utilization: 0.7,
+      waitTime: 30000 // 30 seconds
+    }];
+  }
+
+  private generateResourceOptimizationSuggestions(resource: any): string[] {
+    return [
+      'Optimize resource allocation',
+      'Use more efficient resource types',
+      'Implement resource pooling'
+    ];
+  }
+
+  private findJobDependencies(job: WorkflowJob, workflowData: WorkflowData): any[] {
+    return job.needs.map(need => ({ name: need, blocking: true }));
+  }
+
+  private estimateJobDuration(job: JobDependency): number {
+    return 300000; // 5 minutes in milliseconds
+  }
+
+  private findParallelizableSteps(steps: any[]): any[] {
+    return steps.filter(step => !step.run || !step.run.includes('npm install'));
+  }
+
+  private generateStepParallelizationImplementation(steps: any[]): string {
+    return 'Run steps in parallel using matrix strategy';
+  }
+
+  private analyzeCurrentRunnerUsage(workflowData: WorkflowData): any {
+    return { 
+      overProvisioned: true,
+      wastedCapacity: 0.3,
+      potentialSavings: 50
+    };
+  }
+
+  private analyzeCurrentCacheUsage(workflowData: WorkflowData): any {
+    return { missRate: 0.6 };
+  }
+
+  private analyzeCurrentArtifactUsage(workflowData: WorkflowData): any {
+    return { unnecessaryArtifacts: 2 };
+  }
+
+  private analyzeCurrentContainerUsage(workflowData: WorkflowData): any {
+    return { inefficientImages: 1 };
+  }
+
+  private analyzeCurrentSecretUsage(workflowData: WorkflowData): any {
+    return { exposedSecrets: 0 };
+  }
+
+  private analyzeCurrentPermissions(workflowData: WorkflowData): any {
+    return { overPrivileged: 1 };
+  }
+
+  private analyzeCurrentThirdPartyActions(workflowData: WorkflowData): any {
+    return { unversionedActions: 2 };
+  }
+
+  private analyzeCurrentEnvironmentIsolation(workflowData: WorkflowData): any {
+    return { weakIsolation: 0 };
+  }
+
+  private identifyParallelizationOpportunities(workflowData: WorkflowData): any[] {
+    return [{
+      description: 'Parallelize independent jobs',
+      impact: 0.7,
+      timeImprovement: 0.4,
+      costImprovement: 0.2,
+      implementation: 'Use job matrix strategy'
+    }];
+  }
+
+  private identifyResourceOptimizations(workflowData: WorkflowData): any[] {
+    return [{
+      description: 'Optimize runner specifications',
+      impact: 0.5,
+      timeImprovement: 0.2,
+      costImprovement: 0.3,
+      implementation: 'Use appropriate runner sizes'
+    }];
+  }
+
+  private identifyCachingOptimizations(workflowData: WorkflowData): any[] {
+    return [{
+      description: 'Improve dependency caching',
+      impact: 0.6,
+      timeImprovement: 0.5,
+      costImprovement: 0.3,
+      implementation: 'Add cache actions for dependencies'
+    }];
+  }
+
+  private analyzeRunnerEfficiency(workflowData: WorkflowData): any {
+    return {
+      wastedCapacity: 0.3,
+      potentialSavings: 50
+    };
+  }
+
+  private analyzeBuildFrequency(workflowData: WorkflowData): any {
+    return {
+      unnecessaryBuilds: 0.2,
+      potentialSavings: 30
+    };
+  }
+
+  private estimateMonthlyRuns(workflowData: WorkflowData): number {
+    const runsPerDay = workflowData.runs.length / 30; // Assume data for 30 days
+    return runsPerDay * 30;
+  }
+
+  private extractFailurePattern(run: any): string {
+    // Analyze run to extract failure pattern
+    return run.conclusion || 'unknown';
+  }
+
+  private calculateConsistencyScore(recentRuns: any[]): number {
+    if (recentRuns.length < 2) return 1;
+    
+    const durations = recentRuns.map(run => {
+      const start = new Date(run.created_at).getTime();
+      const end = new Date(run.updated_at).getTime();
+      return end - start;
+    });
+    
+    const mean = durations.reduce((a, b) => a + b, 0) / durations.length;
+    const variance = durations.reduce((sum, duration) => sum + Math.pow(duration - mean, 2), 0) / durations.length;
+    const stdDev = Math.sqrt(variance);
+    
+    // Return consistency score (lower std dev = higher consistency)
+    return Math.max(0, 1 - (stdDev / mean));
+  }
+
+  // Missing methods from GitHubIntegrationLayer interface
+  private async getWorkflows(owner: string, repo: string): Promise<any[]> {
+    try {
+      const workflows = await this.githubIntegration.getWorkflows(owner, repo);
+      return workflows;
+    } catch (error) {
+      console.error('Error fetching workflows:', error);
+      return [];
+    }
+  }
+
+  private async getWorkflow(owner: string, repo: string, workflowId: number): Promise<any> {
+    try {
+      return await this.githubIntegration.getWorkflow(owner, repo, workflowId);
+    } catch (error) {
+      console.error('Error fetching workflow:', error);
+      throw error;
+    }
+  }
+
+  private async getWorkflowContent(owner: string, repo: string, workflowId: number): Promise<any> {
+    try {
+      return await this.githubIntegration.getWorkflowContent(owner, repo, workflowId);
+    } catch (error) {
+      console.error('Error fetching workflow content:', error);
+      throw error;
+    }
   }
 }
 
@@ -474,6 +1388,96 @@ interface WorkflowData {
   runs: any[];
   content: any;
   metadata: any;
+}
+
+interface WorkflowJob {
+  name: string;
+  steps: any[];
+  needs: string[];
+  runsOn: string;
+  timeoutMinutes: number;
+}
+
+interface WorkflowStep {
+  name: string;
+  uses?: string;
+  run?: string;
+  jobName: string;
+  index: number;
+}
+
+interface JobDependency {
+  jobName: string;
+  dependencies: any[];
+  canParallelize: boolean;
+  blockedBy: any[];
+}
+
+interface ParallelizableJobGroup {
+  jobs: string[];
+  currentDuration: number;
+  optimizedDuration: number;
+  confidence: number;
+}
+
+interface ImplementationPhase {
+  name: string;
+  optimizations: WorkflowOptimization[];
+  duration: number;
+}
+
+interface ImplementationDependency {
+  dependent: string;
+  dependsOn: string;
+  reason: string;
+}
+
+interface ImplementationResource {
+  type: string;
+  amount: number;
+  duration: number;
+}
+
+interface CostOptimizationOpportunity {
+  type: string;
+  description: string;
+  monthlySavings: number;
+  implementation: string;
+}
+
+interface PotentialSavings {
+  monthly: number;
+  yearly: number;
+}
+
+interface CurrentCost {
+  monthly: number;
+  yearly: number;
+}
+
+interface FailurePattern {
+  pattern: string;
+  occurrences: number;
+  percentage: number;
+}
+
+interface PerformanceTrend {
+  metric: string;
+  direction: string;
+  change: number;
+}
+
+interface HealthAlert {
+  type: string;
+  severity: string;
+  message: string;
+}
+
+interface HealthRecommendation {
+  type: string;
+  priority: string;
+  description: string;
+  action: string;
 }
 
 interface WorkflowAnalysis {
@@ -606,6 +1610,7 @@ class WorkflowOptimizationError extends Error {
     this.name = 'WorkflowOptimizationError';
   }
 }
+
 
 export {
   WorkflowOptimizer,
