@@ -8,7 +8,7 @@ import { TeamAnalyzer } from '../ai/TeamAnalyzer';
 import { CommunicationAnalyzer } from '../ai/CommunicationAnalyzer';
 import { MentorshipEngine } from '../ai/MentorshipEngine';
 
-export class CollaborativeDevelopmentTools {
+class CollaborativeDevelopmentTools {
   private githubIntegration: GitHubIntegrationLayer;
   private teamAnalyzer: TeamAnalyzer;
   private communicationAnalyzer: CommunicationAnalyzer;
@@ -148,7 +148,7 @@ export class CollaborativeDevelopmentTools {
 
     return {
       repository: `${owner}/${repo}`,
-      knowledgeScore: await this.calculateKnowledgeScore(knowledgeData),
+      knowledgeScore: this.calculateKnowledgeScore(knowledgeData),
       documentationCoverage: enhancement.documentationAudit.coverage,
       expertiseDistribution: enhancement.expertiseMapping,
       improvementPlan: enhancement.documentationStrategy,
@@ -174,7 +174,7 @@ export class CollaborativeDevelopmentTools {
 
     return {
       repository: `${owner}/${repo}`,
-      communicationHealth: await this.calculateCommunicationHealth(communicationData),
+      communicationHealth: this.calculateCommunicationHealth(communicationData),
       optimizations: optimization,
       implementationRoadmap: await this.createCommunicationRoadmap(optimization),
       expectedImprovements: await this.calculateCommunicationImprovements(optimization),
@@ -199,7 +199,7 @@ export class CollaborativeDevelopmentTools {
 
     return {
       repository: `${owner}/${repo}`,
-      conflictLevel: this.assessConflictLevel(conflictData),
+      conflictLevel: await this.assessConflictLevel(conflictData),
       resolutionPlan: resolution.resolutionStrategies,
       mediationNeeds: resolution.mediationSupport,
       preventionStrategy: resolution.preventionMeasures,
@@ -352,11 +352,11 @@ export class CollaborativeDevelopmentTools {
   private async calculateTeamHealthMetrics(data: CollaborationData): Promise<TeamHealthMetrics> {
     return {
       overallHealth: this.calculateOverallTeamHealth(data),
-      collaborationScore: this.calculateCollaborationScore(data.interactions),
+      collaborationScore: this.calculateCollaborationLevel(data),
       communicationHealth: this.calculateCommunicationHealth(data.interactions),
-      knowledgeSharingHealth: this.calculateKnowledgeSharingHealth(data.interactions),
-      mentorshipHealth: this.calculateMentorshipHealth(data.interactions),
-      diversityHealth: this.calculateDiversityHealth(data.contributors),
+      knowledgeSharingHealth: this.calculateKnowledgeTransferRate(data.interactions),
+      mentorshipHealth: this.calculateKnowledgeTransferRate(data.interactions),
+      diversityHealth: this.calculateDiversityIndex(data.contributors),
       inclusionHealth: this.calculateInclusionHealth(data.interactions),
       productivityHealth: this.calculateProductivityHealth(data.commits),
       satisfactionIndex: this.calculateSatisfactionIndex(data.interactions),
@@ -1038,7 +1038,7 @@ export class CollaborativeDevelopmentTools {
     };
   }
 
-  private async calculateKnowledgeScore(data: any): Promise<number> {
+  private calculateKnowledgeScore(data: any): number {
     // Stub implementation - would calculate knowledge score
     return 0.8;
   }
@@ -1100,12 +1100,9 @@ export class CollaborativeDevelopmentTools {
     };
   }
 
-  private async calculateCommunicationHealth(data: any): Promise<any> {
+  private calculateCommunicationHealth(data: any): number {
     // Stub implementation - would calculate communication health
-    return {
-      health: 0.8,
-      indicators: []
-    };
+    return 0.8;
   }
 
   private async createCommunicationRoadmap(data: any): Promise<any> {
@@ -1180,12 +1177,9 @@ export class CollaborativeDevelopmentTools {
     };
   }
 
-  private async assessConflictLevel(data: any): Promise<any> {
+  private assessConflictLevel(data: any): number {
     // Stub implementation - would assess conflict level
-    return {
-      level: 'low',
-      severity: 0.3
-    };
+    return 0.3;
   }
 
   private async gatherProductivityData(owner: string, repo: string): Promise<any> {
@@ -1226,29 +1220,1388 @@ export class CollaborativeDevelopmentTools {
     return { balance: 0.8, recommendations: [] };
   }
 
-  private async calculateProductivityScore(data: any): Promise<number> {
+  private calculateProductivityScore(data: any): number {
     return 0.8;
   }
 
-  private async calculateOptimizedProductivity(data: any): Promise<any> {
+  private calculateOptimizedProductivity(data: any): any {
     return { score: 0.9, improvements: [] };
   }
 
   // Additional missing methods to resolve remaining errors
-  private async calculateInclusionHealth(data: any): Promise<any> {
+  private calculateInclusionHealth(data: any): any {
     return { health: 0.8, indicators: [] };
   }
 
-  private async calculateProductivityHealth(data: any): Promise<any> {
+  private calculateProductivityHealth(data: any): any {
     return { health: 0.8, metrics: {} };
   }
 
-  private async calculateSatisfactionIndex(data: any): Promise<any> {
+  private calculateSatisfactionIndex(data: any): any {
     return { index: 0.8, factors: [] };
   }
 
-  private async calculateRetentionRisk(data: any): Promise<any> {
+  private calculateRetentionRisk(data: any): any {
     return { risk: 0.2, factors: [] };
+  }
+
+  // Missing methods implementation
+  private analyzeFeedbackPatterns(reviews: any[]): any {
+    const patterns = {
+      positiveCount: 0,
+      negativeCount: 0,
+      constructiveCount: 0,
+      averageLength: 0,
+      topicDistribution: {},
+      sentimentTrends: [],
+      reviewerConsistency: {},
+      feedbackQuality: 0
+    };
+
+    if (reviews.length === 0) return patterns;
+
+    let totalLength = 0;
+    const reviewerFeedback: { [key: string]: any[] } = {};
+    const topics: { [key: string]: number } = {};
+
+    reviews.forEach(review => {
+      const body = review.body || '';
+      totalLength += body.length;
+
+      // Analyze sentiment (simplified)
+      const positiveWords = ['good', 'great', 'excellent', 'nice', 'well', 'perfect'];
+      const negativeWords = ['bad', 'wrong', 'issue', 'problem', 'fix', 'error'];
+      const constructiveWords = ['suggest', 'consider', 'improve', 'recommend', 'could', 'might'];
+
+      const wordCount = body.toLowerCase().split(' ').length;
+      const positiveMatches = positiveWords.filter(word => body.toLowerCase().includes(word)).length;
+      const negativeMatches = negativeWords.filter(word => body.toLowerCase().includes(word)).length;
+      const constructiveMatches = constructiveWords.filter(word => body.toLowerCase().includes(word)).length;
+
+      if (constructiveMatches > 0) patterns.constructiveCount++;
+      else if (positiveMatches > negativeMatches) patterns.positiveCount++;
+      else if (negativeMatches > 0) patterns.negativeCount++;
+
+      // Track reviewer consistency
+      const reviewer = review.user?.login || 'unknown';
+      if (!reviewerFeedback[reviewer]) reviewerFeedback[reviewer] = [];
+      reviewerFeedback[reviewer].push({
+        sentiment: constructiveMatches > 0 ? 'constructive' : positiveMatches > negativeMatches ? 'positive' : 'negative',
+        length: body.length,
+        date: review.submitted_at
+      });
+
+      // Extract topics (simplified)
+      const codeWords = ['code', 'function', 'variable', 'class', 'method'];
+      const styleWords = ['style', 'format', 'indent', 'naming', 'convention'];
+      const logicWords = ['logic', 'algorithm', 'performance', 'efficiency', 'optimization'];
+
+      codeWords.forEach(word => {
+        if (body.toLowerCase().includes(word)) {
+          topics['code_quality'] = (topics['code_quality'] || 0) + 1;
+        }
+      });
+      styleWords.forEach(word => {
+        if (body.toLowerCase().includes(word)) {
+          topics['style'] = (topics['style'] || 0) + 1;
+        }
+      });
+      logicWords.forEach(word => {
+        if (body.toLowerCase().includes(word)) {
+          topics['logic'] = (topics['logic'] || 0) + 1;
+        }
+      });
+    });
+
+    patterns.averageLength = totalLength / reviews.length;
+    patterns.topicDistribution = topics;
+
+    // Calculate reviewer consistency
+    Object.keys(reviewerFeedback).forEach(reviewer => {
+      const feedback = reviewerFeedback[reviewer];
+      const sentiments = feedback.map(f => f.sentiment);
+      const uniqueSentiments = new Set(sentiments);
+      patterns.reviewerConsistency[reviewer] = {
+        consistency: 1 - (uniqueSentiments.size - 1) / 2, // Scale 0-1
+        reviewCount: feedback.length,
+        averageLength: feedback.reduce((sum, f) => sum + f.length, 0) / feedback.length
+      };
+    });
+
+    // Calculate overall feedback quality
+    const constructiveRatio = patterns.constructiveCount / reviews.length;
+    const engagementRatio = Math.min(patterns.averageLength / 100, 1); // Normalize to 100 chars
+    patterns.feedbackQuality = (constructiveRatio * 0.7) + (engagementRatio * 0.3);
+
+    return patterns;
+  }
+
+  private calculateClarityIndex(comments: any[]): number {
+    if (comments.length === 0) return 0;
+
+    let totalClarityScore = 0;
+    const clarityIndicators = {
+      avgSentenceLength: 0,
+      questionRatio: 0,
+      technicalTermRatio: 0,
+      readabilityScore: 0
+    };
+
+    let totalSentences = 0;
+    let totalWords = 0;
+    let questionCount = 0;
+    let technicalTermCount = 0;
+
+    const technicalTerms = ['api', 'function', 'variable', 'class', 'method', 'algorithm', 'database', 'query', 'server', 'client'];
+
+    comments.forEach(comment => {
+      const body = comment.body || '';
+      const sentences = body.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      const words = body.split(/\s+/).filter(w => w.length > 0);
+      const questions = (body.match(/\?/g) || []).length;
+
+      totalSentences += sentences.length;
+      totalWords += words.length;
+      questionCount += questions;
+
+      // Count technical terms
+      const lowerBody = body.toLowerCase();
+      technicalTerms.forEach(term => {
+        if (lowerBody.includes(term)) {
+          technicalTermCount++;
+        }
+      });
+    });
+
+    if (totalSentences > 0) {
+      clarityIndicators.avgSentenceLength = totalWords / totalSentences;
+      clarityIndicators.questionRatio = questionCount / comments.length;
+      clarityIndicators.technicalTermRatio = technicalTermCount / totalWords;
+
+      // Calculate readability (simplified Flesch-like score)
+      const avgWordsPerSentence = totalWords / totalSentences;
+      const avgSyllablesPerWord = 1.5; // Simplified assumption
+      clarityIndicators.readabilityScore = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * avgSyllablesPerWord);
+      clarityIndicators.readabilityScore = Math.max(0, Math.min(100, clarityIndicators.readabilityScore)) / 100;
+
+      // Combine factors for overall clarity index
+      const optimalSentenceLength = 15; // words
+      const sentenceLengthScore = 1 - Math.abs(clarityIndicators.avgSentenceLength - optimalSentenceLength) / optimalSentenceLength;
+      const questionScore = Math.min(clarityIndicators.questionRatio * 2, 1); // Questions help clarity
+      const technicalBalance = 1 - Math.abs(clarityIndicators.technicalTermRatio - 0.1) / 0.1; // ~10% technical terms is good
+
+      totalClarityScore = (
+        sentenceLengthScore * 0.3 +
+        questionScore * 0.2 +
+        technicalBalance * 0.2 +
+        clarityIndicators.readabilityScore * 0.3
+      );
+    }
+
+    return Math.max(0, Math.min(1, totalClarityScore));
+  }
+
+  private analyzeEmotionalTone(comments: any[]): any {
+    const toneAnalysis = {
+      overall: 'neutral',
+      positiveScore: 0,
+      negativeScore: 0,
+      neutralScore: 0,
+      emotions: {
+        enthusiasm: 0,
+        frustration: 0,
+        satisfaction: 0,
+        concern: 0,
+        curiosity: 0
+      },
+      trends: [],
+      volatility: 0
+    };
+
+    if (comments.length === 0) return toneAnalysis;
+
+    const emotionPatterns = {
+      enthusiasm: ['excited', 'awesome', 'amazing', 'great job', 'excellent', 'fantastic'],
+      frustration: ['frustrated', 'annoying', 'broken', 'hate', 'terrible', 'awful'],
+      satisfaction: ['satisfied', 'happy', 'pleased', 'content', 'good', 'nice'],
+      concern: ['worried', 'concerned', 'issue', 'problem', 'careful', 'warning'],
+      curiosity: ['curious', 'wondering', 'question', 'why', 'how', 'what if']
+    };
+
+    const sentimentWords = {
+      positive: ['good', 'great', 'excellent', 'awesome', 'perfect', 'love', 'like', 'happy', 'satisfied'],
+      negative: ['bad', 'terrible', 'hate', 'dislike', 'awful', 'wrong', 'broken', 'frustrated', 'annoying'],
+      neutral: ['okay', 'fine', 'average', 'normal', 'standard', 'typical']
+    };
+
+    let totalPositive = 0;
+    let totalNegative = 0;
+    let totalNeutral = 0;
+    const timeSeriesData = [];
+
+    comments.forEach((comment, index) => {
+      const body = (comment.body || '').toLowerCase();
+      let commentPositive = 0;
+      let commentNegative = 0;
+      let commentNeutral = 0;
+
+      // Count sentiment words
+      sentimentWords.positive.forEach(word => {
+        if (body.includes(word)) commentPositive++;
+      });
+      sentimentWords.negative.forEach(word => {
+        if (body.includes(word)) commentNegative++;
+      });
+      sentimentWords.neutral.forEach(word => {
+        if (body.includes(word)) commentNeutral++;
+      });
+
+      // Count emotions
+      Object.keys(emotionPatterns).forEach(emotion => {
+        emotionPatterns[emotion].forEach(pattern => {
+          if (body.includes(pattern)) {
+            toneAnalysis.emotions[emotion]++;
+          }
+        });
+      });
+
+      totalPositive += commentPositive;
+      totalNegative += commentNegative;
+      totalNeutral += commentNeutral;
+
+      // Track sentiment over time
+      const sentiment = commentPositive > commentNegative ? 'positive' : 
+                       commentNegative > commentPositive ? 'negative' : 'neutral';
+      timeSeriesData.push({
+        index,
+        sentiment,
+        score: commentPositive - commentNegative,
+        timestamp: comment.created_at
+      });
+    });
+
+    const totalSentiment = totalPositive + totalNegative + totalNeutral;
+    if (totalSentiment > 0) {
+      toneAnalysis.positiveScore = totalPositive / totalSentiment;
+      toneAnalysis.negativeScore = totalNegative / totalSentiment;
+      toneAnalysis.neutralScore = totalNeutral / totalSentiment;
+
+      // Determine overall tone
+      if (toneAnalysis.positiveScore > 0.4) toneAnalysis.overall = 'positive';
+      else if (toneAnalysis.negativeScore > 0.3) toneAnalysis.overall = 'negative';
+      else toneAnalysis.overall = 'neutral';
+    }
+
+    // Normalize emotion scores
+    const maxEmotion = Math.max(...Object.values(toneAnalysis.emotions));
+    if (maxEmotion > 0) {
+      Object.keys(toneAnalysis.emotions).forEach(emotion => {
+        toneAnalysis.emotions[emotion] = toneAnalysis.emotions[emotion] / maxEmotion;
+      });
+    }
+
+    // Calculate volatility (sentiment change frequency)
+    let changes = 0;
+    for (let i = 1; i < timeSeriesData.length; i++) {
+      if (timeSeriesData[i].sentiment !== timeSeriesData[i-1].sentiment) {
+        changes++;
+      }
+    }
+    toneAnalysis.volatility = timeSeriesData.length > 1 ? changes / (timeSeriesData.length - 1) : 0;
+
+    toneAnalysis.trends = timeSeriesData;
+
+    return toneAnalysis;
+  }
+
+  private identifyCommunicationBarriers(interactions: any[]): any[] {
+    const barriers = [];
+
+    // Analyze response time barriers
+    const responseTimes = this.calculateResponseTimes(interactions);
+    if (responseTimes.average > 48) { // More than 48 hours
+      barriers.push({
+        type: 'response_time',
+        severity: 'high',
+        description: 'Slow response times are hindering communication flow',
+        impact: 0.8,
+        causes: ['High workload', 'Unclear expectations', 'Time zone differences'],
+        solutions: ['Set response time expectations', 'Use async communication tools', 'Implement escalation procedures']
+      });
+    }
+
+    // Analyze participation imbalance
+    const participationData = this.analyzeParticipationBalance(interactions);
+    if (participationData.giniCoefficient > 0.6) { // High inequality
+      barriers.push({
+        type: 'participation_imbalance',
+        severity: 'medium',
+        description: 'Uneven participation in team communications',
+        impact: 0.6,
+        causes: ['Dominant personalities', 'Lack of psychological safety', 'Process issues'],
+        solutions: ['Rotate meeting facilitation', 'Use structured communication formats', 'Encourage quieter members']
+      });
+    }
+
+    // Analyze language/clarity barriers
+    const clarityScores = interactions.map(i => this.assessMessageClarity(i));
+    const avgClarity = clarityScores.reduce((sum, score) => sum + score, 0) / clarityScores.length;
+    if (avgClarity < 0.6) {
+      barriers.push({
+        type: 'clarity',
+        severity: 'medium',
+        description: 'Messages lack clarity and are difficult to understand',
+        impact: 0.7,
+        causes: ['Technical jargon', 'Poor writing skills', 'Cultural differences'],
+        solutions: ['Provide communication training', 'Use plain language guidelines', 'Implement message templates']
+      });
+    }
+
+    // Analyze channel fragmentation
+    const channelUsage = this.analyzeChannelUsage(interactions);
+    if (channelUsage.fragmentationScore > 0.7) {
+      barriers.push({
+        type: 'channel_fragmentation',
+        severity: 'low',
+        description: 'Communication is scattered across too many channels',
+        impact: 0.4,
+        causes: ['Too many tools', 'Unclear channel purposes', 'Personal preferences'],
+        solutions: ['Consolidate communication channels', 'Define channel purposes', 'Establish communication protocols']
+      });
+    }
+
+    return barriers.sort((a, b) => b.impact - a.impact);
+  }
+
+  private analyzeExpertiseDistribution(contributors: any[]): any {
+    const distribution = {
+      expertiseLevels: {},
+      skillCoverage: {},
+      knowledgeConcentration: 0,
+      expertiseGaps: [],
+      mentorPotential: {},
+      diversityIndex: 0
+    };
+
+    if (contributors.length === 0) return distribution;
+
+    // Categorize contributors by expertise level based on contributions
+    contributors.forEach(contributor => {
+      const contributions = contributor.contributions || 0;
+      let level = 'junior';
+      
+      if (contributions > 100) level = 'senior';
+      else if (contributions > 50) level = 'mid';
+      else if (contributions > 20) level = 'junior';
+      else level = 'beginner';
+
+      distribution.expertiseLevels[level] = (distribution.expertiseLevels[level] || 0) + 1;
+
+      // Assess mentor potential
+      if (level === 'senior') {
+        distribution.mentorPotential[contributor.login || contributor.id] = {
+          experience: 'high',
+          contributions,
+          mentorScore: Math.min(contributions / 100, 1)
+        };
+      }
+    });
+
+    // Calculate knowledge concentration (Gini coefficient)
+    const contributionValues = contributors.map(c => c.contributions || 0).sort((a, b) => a - b);
+    distribution.knowledgeConcentration = this.calculateGiniCoefficient(contributionValues);
+
+    // Identify expertise gaps
+    const totalContributors = contributors.length;
+    const seniorCount = distribution.expertiseLevels['senior'] || 0;
+    const midCount = distribution.expertiseLevels['mid'] || 0;
+    
+    if (seniorCount / totalContributors < 0.2) {
+      distribution.expertiseGaps.push({
+        type: 'senior_shortage',
+        severity: 'high',
+        description: 'Insufficient senior expertise for mentoring and leadership'
+      });
+    }
+
+    if (midCount / totalContributors < 0.3) {
+      distribution.expertiseGaps.push({
+        type: 'mid_level_gap',
+        severity: 'medium',
+        description: 'Lack of mid-level contributors for knowledge transfer'
+      });
+    }
+
+    // Calculate diversity index
+    const levels = Object.values(distribution.expertiseLevels);
+    distribution.diversityIndex = this.calculateShannonDiversity(levels);
+
+    return distribution;
+  }
+
+  private analyzeMentoringActivity(interactions: any[]): any {
+    const mentoring = {
+      mentoringEvents: [],
+      mentorshipPairs: {},
+      knowledgeTransferScore: 0,
+      helpfulnessIndex: 0,
+      learningIndicators: {},
+      patterns: {}
+    };
+
+    const mentoringKeywords = [
+      'help', 'teach', 'explain', 'show', 'guide', 'mentor', 'learn',
+      'tutorial', 'example', 'demonstration', 'walkthrough', 'tip'
+    ];
+
+    const questionKeywords = [
+      'how', 'why', 'what', 'when', 'where', 'which', 'could you',
+      'can you', 'would you', 'help me', 'question'
+    ];
+
+    let mentoringCount = 0;
+    let helpfulResponses = 0;
+    let questionsAsked = 0;
+
+    interactions.forEach(interaction => {
+      const content = (interaction.data?.body || '').toLowerCase();
+      const author = interaction.participants[0];
+
+      // Detect mentoring/helping behavior
+      const mentoringScore = mentoringKeywords.reduce((score, keyword) => {
+        return score + (content.includes(keyword) ? 1 : 0);
+      }, 0);
+
+      if (mentoringScore > 0) {
+        mentoringCount++;
+        mentoring.mentoringEvents.push({
+          mentor: author,
+          timestamp: interaction.timestamp,
+          score: mentoringScore,
+          type: interaction.type
+        });
+
+        // Track mentor-mentee relationships
+        if (!mentoring.mentorshipPairs[author]) {
+          mentoring.mentorshipPairs[author] = {
+            helpCount: 0,
+            mentees: new Set()
+          };
+        }
+        mentoring.mentorshipPairs[author].helpCount++;
+      }
+
+      // Detect questions (learning indicators)
+      const questionScore = questionKeywords.reduce((score, keyword) => {
+        return score + (content.includes(keyword) ? 1 : 0);
+      }, 0);
+
+      if (questionScore > 0) {
+        questionsAsked++;
+        if (!mentoring.learningIndicators[author]) {
+          mentoring.learningIndicators[author] = {
+            questionsAsked: 0,
+            curiosityScore: 0
+          };
+        }
+        mentoring.learningIndicators[author].questionsAsked++;
+        mentoring.learningIndicators[author].curiosityScore += questionScore;
+      }
+
+      // Detect helpful responses (usually longer, contain examples)
+      if (content.length > 100 && (content.includes('example') || content.includes('like this'))) {
+        helpfulResponses++;
+      }
+    });
+
+    // Calculate scores
+    mentoring.knowledgeTransferScore = interactions.length > 0 ? mentoringCount / interactions.length : 0;
+    mentoring.helpfulnessIndex = interactions.length > 0 ? helpfulResponses / interactions.length : 0;
+
+    // Analyze patterns
+    mentoring.patterns = {
+      questionToAnswerRatio: mentoringCount > 0 ? questionsAsked / mentoringCount : 0,
+      activeMentors: Object.keys(mentoring.mentorshipPairs).length,
+      learningEngagement: Object.keys(mentoring.learningIndicators).length,
+      mentoringFrequency: mentoringCount
+    };
+
+    return mentoring;
+  }
+
+  private analyzeDocumentationContribution(commits: any[]): any {
+    const documentation = {
+      docCommitRatio: 0,
+      documentationTypes: {},
+      qualityScore: 0,
+      contributors: {},
+      trends: [],
+      coverage: {}
+    };
+
+    if (commits.length === 0) return documentation;
+
+    const docKeywords = [
+      'readme', 'doc', 'documentation', 'comment', 'javadoc', 'jsdoc',
+      'guide', 'tutorial', 'example', 'api', 'spec', 'specification'
+    ];
+
+    const docFileExtensions = ['.md', '.txt', '.rst', '.adoc', '.wiki'];
+    const docFiles = ['readme', 'changelog', 'contributing', 'license', 'install', 'setup'];
+
+    let docCommits = 0;
+    let totalDocLines = 0;
+
+    commits.forEach(commit => {
+      const message = (commit.commit?.message || '').toLowerCase();
+      const files = commit.files || [];
+      const author = commit.author?.login || commit.commit?.author?.name;
+
+      let isDocCommit = false;
+
+      // Check commit message for documentation keywords
+      if (docKeywords.some(keyword => message.includes(keyword))) {
+        isDocCommit = true;
+      }
+
+      // Check modified files
+      files.forEach(file => {
+        const filename = (file.filename || '').toLowerCase();
+        
+        // Check file extensions
+        if (docFileExtensions.some(ext => filename.endsWith(ext))) {
+          isDocCommit = true;
+          documentation.documentationTypes['markdown'] = (documentation.documentationTypes['markdown'] || 0) + 1;
+        }
+
+        // Check specific doc files
+        if (docFiles.some(docFile => filename.includes(docFile))) {
+          isDocCommit = true;
+          documentation.documentationTypes['core_docs'] = (documentation.documentationTypes['core_docs'] || 0) + 1;
+        }
+
+        // Check for inline documentation (comments in code)
+        if (filename.endsWith('.js') || filename.endsWith('.ts') || filename.endsWith('.py')) {
+          const additions = file.additions || 0;
+          const patch = file.patch || '';
+          const commentLines = (patch.match(/\/\*|\*\/|\/\/|#|"""|\'\'\'|\\\"/g) || []).length;
+          
+          if (commentLines > additions * 0.1) { // More than 10% comment lines
+            isDocCommit = true;
+            documentation.documentationTypes['inline_docs'] = (documentation.documentationTypes['inline_docs'] || 0) + 1;
+          }
+        }
+
+        totalDocLines += file.additions || 0;
+      });
+
+      if (isDocCommit) {
+        docCommits++;
+        
+        // Track contributors
+        if (author) {
+          if (!documentation.contributors[author]) {
+            documentation.contributors[author] = {
+              docCommits: 0,
+              docLines: 0,
+              lastContribution: null
+            };
+          }
+          documentation.contributors[author].docCommits++;
+          documentation.contributors[author].docLines += files.reduce((sum, f) => sum + (f.additions || 0), 0);
+          documentation.contributors[author].lastContribution = commit.commit?.author?.date;
+        }
+      }
+    });
+
+    documentation.docCommitRatio = docCommits / commits.length;
+
+    // Calculate quality score based on various factors
+    const diversityScore = Object.keys(documentation.documentationTypes).length / 4; // Max 4 types
+    const contributorDiversityScore = Object.keys(documentation.contributors).length / Math.max(commits.length * 0.1, 1);
+    const volumeScore = Math.min(totalDocLines / (commits.length * 10), 1); // Normalize
+
+    documentation.qualityScore = (
+      documentation.docCommitRatio * 0.4 +
+      Math.min(diversityScore, 1) * 0.3 +
+      Math.min(contributorDiversityScore, 1) * 0.3
+    );
+
+    return documentation;
+  }
+
+  private identifyLearningIndicators(interactions: any[]): any {
+    const learning = {
+      learningActivities: [],
+      skillDevelopment: {},
+      knowledgeAcquisition: {},
+      mentorshipEngagement: {},
+      learningPatterns: {},
+      progressIndicators: {}
+    };
+
+    const learningKeywords = {
+      questions: ['how', 'why', 'what', 'when', 'where', 'could you explain', 'help me understand'],
+      learning: ['learn', 'understand', 'figure out', 'study', 'practice', 'try', 'experiment'],
+      acknowledgment: ['thanks', 'got it', 'understand now', 'makes sense', 'learned', 'now i see'],
+      mistakes: ['mistake', 'error', 'wrong', 'incorrect', 'my bad', 'oops', 'fix']
+    };
+
+    const skillCategories = {
+      technical: ['code', 'programming', 'algorithm', 'database', 'api', 'framework'],
+      process: ['workflow', 'process', 'methodology', 'agile', 'scrum', 'review'],
+      tools: ['git', 'tool', 'editor', 'environment', 'setup', 'configuration'],
+      collaboration: ['team', 'communication', 'meeting', 'discussion', 'feedback']
+    };
+
+    interactions.forEach(interaction => {
+      const content = (interaction.data?.body || '').toLowerCase();
+      const author = interaction.participants[0];
+      const timestamp = interaction.timestamp;
+
+      // Initialize user learning data
+      if (!learning.skillDevelopment[author]) {
+        learning.skillDevelopment[author] = {
+          questionsAsked: 0,
+          learningAttempts: 0,
+          acknowledgments: 0,
+          mistakeRecovery: 0,
+          skillAreas: {},
+          progressScore: 0
+        };
+      }
+
+      const userLearning = learning.skillDevelopment[author];
+
+      // Detect learning activities
+      Object.keys(learningKeywords).forEach(category => {
+        const keywords = learningKeywords[category];
+        const matches = keywords.filter(keyword => content.includes(keyword)).length;
+        
+        if (matches > 0) {
+          learning.learningActivities.push({
+            author,
+            category,
+            timestamp,
+            intensity: matches,
+            context: interaction.type
+          });
+
+          // Update user stats
+          switch (category) {
+            case 'questions':
+              userLearning.questionsAsked += matches;
+              break;
+            case 'learning':
+              userLearning.learningAttempts += matches;
+              break;
+            case 'acknowledgment':
+              userLearning.acknowledgments += matches;
+              break;
+            case 'mistakes':
+              userLearning.mistakeRecovery += matches;
+              break;
+          }
+        }
+      });
+
+      // Identify skill areas being learned
+      Object.keys(skillCategories).forEach(skillArea => {
+        const skills = skillCategories[skillArea];
+        const matches = skills.filter(skill => content.includes(skill)).length;
+        
+        if (matches > 0) {
+          if (!userLearning.skillAreas[skillArea]) {
+            userLearning.skillAreas[skillArea] = 0;
+          }
+          userLearning.skillAreas[skillArea] += matches;
+        }
+      });
+    });
+
+    // Calculate progress scores for each user
+    Object.keys(learning.skillDevelopment).forEach(author => {
+      const user = learning.skillDevelopment[author];
+      const totalActivities = user.questionsAsked + user.learningAttempts + user.acknowledgments;
+      
+      if (totalActivities > 0) {
+        user.progressScore = (
+          (user.acknowledgments / totalActivities) * 0.4 +  // Understanding
+          (user.learningAttempts / totalActivities) * 0.3 +  // Active learning
+          (Math.min(user.mistakeRecovery / totalActivities, 0.2) * 5) * 0.3  // Learning from mistakes
+        );
+      }
+    });
+
+    // Analyze patterns
+    learning.learningPatterns = {
+      mostActivelearners: Object.entries(learning.skillDevelopment)
+        .sort(([,a], [,b]) => b.progressScore - a.progressScore)
+        .slice(0, 5)
+        .map(([author, data]) => ({ author, score: data.progressScore })),
+      learningFrequency: learning.learningActivities.length / Math.max(interactions.length, 1),
+      skillDiversityIndex: this.calculateSkillDiversity(learning.skillDevelopment)
+    };
+
+    return learning;
+  }
+
+  private assessKnowledgeHoardingRisk(contributors: any[]): number {
+    if (contributors.length === 0) return 0;
+
+    // Calculate contribution concentration
+    const contributions = contributors.map(c => c.contributions || 0);
+    const totalContributions = contributions.reduce((sum, c) => sum + c, 0);
+    
+    if (totalContributions === 0) return 0;
+
+    // Calculate Gini coefficient for contribution inequality
+    const giniCoefficient = this.calculateGiniCoefficient(contributions);
+    
+    // Calculate top contributor dominance
+    const maxContribution = Math.max(...contributions);
+    const topContributorShare = maxContribution / totalContributions;
+    
+    // Calculate bus factor (how many people need to leave to lose critical knowledge)
+    const sortedContributions = contributions.sort((a, b) => b - a);
+    let cumulativeContribution = 0;
+    let busFactor = 0;
+    
+    for (const contribution of sortedContributions) {
+      cumulativeContribution += contribution;
+      busFactor++;
+      if (cumulativeContribution >= totalContributions * 0.5) {
+        break;
+      }
+    }
+    
+    // Calculate risk factors
+    const concentrationRisk = giniCoefficient; // 0-1, higher = more concentrated
+    const dominanceRisk = topContributorShare > 0.5 ? topContributorShare : 0;
+    const busFactorRisk = busFactor <= 2 ? 1 - (busFactor / 3) : 0;
+    
+    // Combine risk factors
+    const overallRisk = (
+      concentrationRisk * 0.4 +
+      dominanceRisk * 0.3 +
+      busFactorRisk * 0.3
+    );
+    
+    return Math.max(0, Math.min(1, overallRisk));
+  }
+
+  private analyzeCrossTeamLearning(interactions: any[]): any {
+    const crossLearning = {
+      crossTeamInteractions: [],
+      knowledgeExchange: {},
+      learningNetworks: {},
+      skillTransfer: {},
+      collaborationIndex: 0
+    };
+
+    // This is a simplified implementation - would need team/department data
+    // For now, we'll analyze based on interaction patterns and assume diverse expertise
+    
+    const userInteractions: { [key: string]: Set<string> } = {};
+    const knowledgeDomains = {
+      frontend: ['ui', 'ux', 'react', 'vue', 'angular', 'css', 'html'],
+      backend: ['api', 'server', 'database', 'sql', 'node', 'python', 'java'],
+      devops: ['deploy', 'docker', 'kubernetes', 'ci', 'cd', 'infrastructure'],
+      mobile: ['mobile', 'ios', 'android', 'react native', 'flutter'],
+      testing: ['test', 'testing', 'qa', 'automation', 'selenium']
+    };
+
+    // Track interactions between users and identify knowledge domains
+    interactions.forEach(interaction => {
+      const participants = interaction.participants;
+      const content = (interaction.data?.body || '').toLowerCase();
+      
+      // Identify knowledge domain of interaction
+      let domain = 'general';
+      Object.keys(knowledgeDomains).forEach(domainName => {
+        const keywords = knowledgeDomains[domainName];
+        if (keywords.some(keyword => content.includes(keyword))) {
+          domain = domainName;
+        }
+      });
+
+      participants.forEach(participant => {
+        if (!userInteractions[participant]) {
+          userInteractions[participant] = new Set();
+        }
+        
+        if (!crossLearning.knowledgeExchange[participant]) {
+          crossLearning.knowledgeExchange[participant] = {
+            domains: {},
+            collaborators: new Set(),
+            learningEvents: 0
+          };
+        }
+        
+        // Track domain involvement
+        if (!crossLearning.knowledgeExchange[participant].domains[domain]) {
+          crossLearning.knowledgeExchange[participant].domains[domain] = 0;
+        }
+        crossLearning.knowledgeExchange[participant].domains[domain]++;
+        
+        // Track collaborators
+        participants.forEach(other => {
+          if (other !== participant) {
+            userInteractions[participant].add(other);
+            crossLearning.knowledgeExchange[participant].collaborators.add(other);
+          }
+        });
+      });
+      
+      // Identify cross-domain interactions
+      if (participants.length > 1) {
+        crossLearning.crossTeamInteractions.push({
+          participants,
+          domain,
+          timestamp: interaction.timestamp,
+          type: interaction.type
+        });
+      }
+    });
+
+    // Calculate collaboration index
+    const totalUsers = Object.keys(userInteractions).length;
+    if (totalUsers > 1) {
+      let totalConnections = 0;
+      let possibleConnections = 0;
+      
+      Object.values(userInteractions).forEach(connections => {
+        totalConnections += connections.size;
+        possibleConnections += totalUsers - 1;
+      });
+      
+      crossLearning.collaborationIndex = totalConnections / possibleConnections;
+    }
+
+    // Analyze skill transfer patterns
+    Object.keys(crossLearning.knowledgeExchange).forEach(user => {
+      const userExchange = crossLearning.knowledgeExchange[user];
+      const domainCount = Object.keys(userExchange.domains).length;
+      const collaboratorCount = userExchange.collaborators.size;
+      
+      crossLearning.skillTransfer[user] = {
+        domainDiversity: domainCount,
+        networkSize: collaboratorCount,
+        learningScore: Math.min((domainCount + collaboratorCount) / 10, 1)
+      };
+    });
+
+    return crossLearning;
+  }
+
+  private calculateKnowledgeRetention(contributors: any[]): number {
+    if (contributors.length === 0) return 0;
+
+    // This is a simplified calculation - would need historical data for accurate assessment
+    // For now, we'll estimate based on contributor activity patterns
+    
+    const now = new Date();
+    const sixMonthsAgo = new Date(now.getTime() - (6 * 30 * 24 * 60 * 60 * 1000));
+    const oneYearAgo = new Date(now.getTime() - (12 * 30 * 24 * 60 * 60 * 1000));
+    
+    let activeRecent = 0;
+    let activeSixMonths = 0;
+    let activeOneYear = 0;
+    let knowledgeScore = 0;
+    
+    contributors.forEach(contributor => {
+      // Estimate activity timeline (this would be more accurate with actual commit dates)
+      const contributions = contributor.contributions || 0;
+      const estimatedActivity = contributions > 0;
+      
+      if (estimatedActivity) {
+        activeOneYear++;
+        
+        // Higher contribution suggests more recent activity
+        if (contributions > 10) {
+          activeSixMonths++;
+          
+          if (contributions > 50) {
+            activeRecent++;
+          }
+        }
+        
+        // Weight knowledge by contribution level
+        knowledgeScore += Math.log(contributions + 1); // Logarithmic scaling
+      }
+    });
+    
+    // Calculate retention rates
+    const recentRetention = activeOneYear > 0 ? activeRecent / activeOneYear : 0;
+    const mediumTermRetention = activeOneYear > 0 ? activeSixMonths / activeOneYear : 0;
+    
+    // Calculate knowledge distribution risk
+    const knowledgeConcentration = this.calculateGiniCoefficient(
+      contributors.map(c => Math.log((c.contributions || 0) + 1))
+    );
+    
+    // Overall retention score
+    const retentionScore = (
+      recentRetention * 0.4 +
+      mediumTermRetention * 0.3 +
+      (1 - knowledgeConcentration) * 0.3  // Lower concentration = better retention
+    );
+    
+    return Math.max(0, Math.min(1, retentionScore));
+  }
+
+  private identifyJuniorDevelopers(contributors: any[]): any[] {
+    const juniorCriteria = {
+      maxContributions: 50,  // Less than 50 contributions
+      maxCommitSize: 20,     // Smaller commits on average
+      learningIndicators: ['question', 'help', 'how', 'why', 'learn']
+    };
+
+    return contributors.filter(contributor => {
+      const contributions = contributor.contributions || 0;
+      
+      // Basic contribution threshold
+      if (contributions > juniorCriteria.maxContributions) {
+        return false;
+      }
+      
+      // Additional indicators of junior status
+      const profile = contributor.profile || {};
+      const recentActivity = profile.recentActivity || [];
+      
+      // Look for learning patterns in recent activity
+      let learningScore = 0;
+      recentActivity.forEach((activity: any) => {
+        const text = (activity.text || '').toLowerCase();
+        juniorCriteria.learningIndicators.forEach(indicator => {
+          if (text.includes(indicator)) {
+            learningScore++;
+          }
+        });
+      });
+      
+      return {
+        ...contributor,
+        juniorScore: this.calculateJuniorScore(contributor),
+        learningActivity: learningScore,
+        contributionLevel: contributions,
+        growthPotential: this.assessGrowthPotential(contributor)
+      };
+    }).filter(Boolean);
+  }
+
+  private identifyQuickWins(optimization: any): any[] {
+    const quickWins = [];
+    
+    // Analyze bottlenecks for quick fixes
+    if (optimization.bottleneckIdentification?.bottlenecks) {
+      optimization.bottleneckIdentification.bottlenecks.forEach((bottleneck: any) => {
+        if (bottleneck.effort === 'low' && bottleneck.impact === 'high') {
+          quickWins.push({
+            type: 'bottleneck_fix',
+            title: `Fix ${bottleneck.type} bottleneck`,
+            description: bottleneck.description,
+            effort: 'low',
+            impact: 'high',
+            timeframe: '1-2 weeks',
+            actions: bottleneck.solutions || [],
+            expectedBenefit: 'Immediate productivity improvement'
+          });
+        }
+      });
+    }
+    
+    // Automation opportunities
+    if (optimization.automationOpportunities?.opportunities) {
+      optimization.automationOpportunities.opportunities.forEach((opportunity: any) => {
+        if (opportunity.complexity === 'low' && opportunity.savings > 4) { // 4+ hours saved
+          quickWins.push({
+            type: 'automation',
+            title: `Automate ${opportunity.task}`,
+            description: `Automate repetitive ${opportunity.task} tasks`,
+            effort: 'low',
+            impact: 'medium',
+            timeframe: '1-3 days',
+            actions: [`Set up automation for ${opportunity.task}`, 'Train team on new process'],
+            expectedBenefit: `Save ${opportunity.savings} hours per week`
+          });
+        }
+      });
+    }
+    
+    // Tool optimization
+    if (optimization.toolOptimization?.optimizations) {
+      optimization.toolOptimization.optimizations.forEach((tool: any) => {
+        if (tool.adoptionBarrier === 'low' && tool.impact > 0.6) {
+          quickWins.push({
+            type: 'tool_optimization',
+            title: `Optimize ${tool.name} usage`,
+            description: tool.recommendation,
+            effort: 'low',
+            impact: 'medium',
+            timeframe: '1 week',
+            actions: tool.implementationSteps || [`Implement ${tool.name} improvements`],
+            expectedBenefit: `${Math.round(tool.impact * 100)}% efficiency improvement`
+          });
+        }
+      });
+    }
+    
+    // Focus time improvements
+    if (optimization.focusTimeOptimization?.strategies) {
+      optimization.focusTimeOptimization.strategies.forEach((strategy: any) => {
+        if (strategy.implementationEffort === 'low') {
+          quickWins.push({
+            type: 'focus_improvement',
+            title: strategy.name,
+            description: strategy.description,
+            effort: 'low',
+            impact: 'medium',
+            timeframe: '1-2 days',
+            actions: strategy.steps || ['Implement focus strategy'],
+            expectedBenefit: 'Improved concentration and productivity'
+          });
+        }
+      });
+    }
+    
+    return quickWins.sort((a, b) => {
+      const impactScore = { 'high': 3, 'medium': 2, 'low': 1 };
+      return impactScore[b.impact] - impactScore[a.impact];
+    });
+  }
+
+  private developLongTermStrategy(optimization: any): any {
+    const strategy = {
+      vision: '',
+      goals: [],
+      phases: [],
+      timeline: '6-12 months',
+      keyInitiatives: [],
+      successMetrics: [],
+      riskMitigation: []
+    };
+    
+    // Define vision based on optimization findings
+    const productivityScore = optimization.workflowAnalysis?.efficiency || 0.7;
+    if (productivityScore < 0.6) {
+      strategy.vision = 'Transform team productivity through systematic workflow optimization and cultural change';
+    } else {
+      strategy.vision = 'Achieve excellence in collaborative development through continuous improvement and innovation';
+    }
+    
+    // Define strategic goals
+    strategy.goals = [
+      {
+        category: 'productivity',
+        target: 'Increase overall team productivity by 40%',
+        measurement: 'Velocity and cycle time metrics',
+        timeline: '6 months'
+      },
+      {
+        category: 'collaboration',
+        target: 'Improve cross-team collaboration score to 0.85',
+        measurement: 'Collaboration network analysis',
+        timeline: '4 months'
+      },
+      {
+        category: 'knowledge',
+        target: 'Reduce knowledge hoarding risk to below 0.3',
+        measurement: 'Knowledge distribution metrics',
+        timeline: '8 months'
+      },
+      {
+        category: 'satisfaction',
+        target: 'Achieve 90% developer satisfaction rating',
+        measurement: 'Regular team surveys',
+        timeline: '12 months'
+      }
+    ];
+    
+    // Define implementation phases
+    strategy.phases = [
+      {
+        name: 'Foundation (Months 1-2)',
+        focus: 'Infrastructure and quick wins',
+        deliverables: [
+          'Implement identified quick wins',
+          'Establish baseline metrics',
+          'Set up monitoring systems',
+          'Create communication guidelines'
+        ]
+      },
+      {
+        name: 'Optimization (Months 3-6)',
+        focus: 'Process improvements and automation',
+        deliverables: [
+          'Deploy automation solutions',
+          'Optimize review processes',
+          'Implement mentorship programs',
+          'Enhance knowledge sharing'
+        ]
+      },
+      {
+        name: 'Excellence (Months 7-12)',
+        focus: 'Cultural transformation and innovation',
+        deliverables: [
+          'Achieve target productivity metrics',
+          'Establish learning culture',
+          'Implement advanced collaboration tools',
+          'Create sustainable improvement processes'
+        ]
+      }
+    ];
+    
+    // Key initiatives
+    strategy.keyInitiatives = [
+      {
+        name: 'Workflow Automation Program',
+        description: 'Systematic automation of repetitive tasks and processes',
+        impact: 'high',
+        effort: 'high',
+        timeline: '3-6 months'
+      },
+      {
+        name: 'Knowledge Management System',
+        description: 'Comprehensive system for capturing and sharing team knowledge',
+        impact: 'high',
+        effort: 'medium',
+        timeline: '2-4 months'
+      },
+      {
+        name: 'Mentorship and Learning Program',
+        description: 'Structured program for skill development and knowledge transfer',
+        impact: 'medium',
+        effort: 'medium',
+        timeline: '4-8 months'
+      },
+      {
+        name: 'Collaboration Tool Optimization',
+        description: 'Streamline and optimize team collaboration tools and processes',
+        impact: 'medium',
+        effort: 'low',
+        timeline: '1-3 months'
+      }
+    ];
+    
+    // Success metrics
+    strategy.successMetrics = [
+      'Team velocity (story points per sprint)',
+      'Cycle time (feature to production)',
+      'Code review turnaround time',
+      'Knowledge sharing frequency',
+      'Cross-team collaboration index',
+      'Developer satisfaction score',
+      'Retention rate',
+      'Innovation metric (new ideas implemented)'
+    ];
+    
+    // Risk mitigation
+    strategy.riskMitigation = [
+      {
+        risk: 'Resistance to change',
+        mitigation: 'Involve team in planning, communicate benefits clearly, implement gradually'
+      },
+      {
+        risk: 'Resource constraints',
+        mitigation: 'Prioritize high-impact initiatives, seek stakeholder buy-in, phase implementation'
+      },
+      {
+        risk: 'Technology adoption issues',
+        mitigation: 'Provide adequate training, choose user-friendly tools, have technical support'
+      },
+      {
+        risk: 'Measurement difficulties',
+        mitigation: 'Establish baseline early, use multiple metrics, regular review and adjustment'
+      }
+    ];
+    
+    return strategy;
+  }
+
+  // Helper methods for the new functionality
+  private calculateResponseTimes(interactions: any[]): { average: number; median: number } {
+    const responseTimes: number[] = [];
+    
+    // Simplified response time calculation
+    for (let i = 1; i < interactions.length; i++) {
+      const current = new Date(interactions[i].timestamp);
+      const previous = new Date(interactions[i-1].timestamp);
+      const timeDiff = (current.getTime() - previous.getTime()) / (1000 * 60 * 60); // hours
+      
+      if (timeDiff < 168) { // Less than a week (reasonable response time)
+        responseTimes.push(timeDiff);
+      }
+    }
+    
+    if (responseTimes.length === 0) return { average: 0, median: 0 };
+    
+    const sorted = responseTimes.sort((a, b) => a - b);
+    const average = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+    const median = sorted[Math.floor(sorted.length / 2)];
+    
+    return { average, median };
+  }
+
+  private analyzeParticipationBalance(interactions: any[]): { giniCoefficient: number; dominanceIndex: number } {
+    const participationCounts: { [key: string]: number } = {};
+    
+    interactions.forEach(interaction => {
+      interaction.participants.forEach((participant: string) => {
+        participationCounts[participant] = (participationCounts[participant] || 0) + 1;
+      });
+    });
+    
+    const counts = Object.values(participationCounts);
+    return {
+      giniCoefficient: this.calculateGiniCoefficient(counts),
+      dominanceIndex: counts.length > 0 ? Math.max(...counts) / counts.reduce((sum, c) => sum + c, 0) : 0
+    };
+  }
+
+  private assessMessageClarity(interaction: any): number {
+    const content = interaction.data?.body || '';
+    if (content.length === 0) return 0;
+    
+    // Simplified clarity assessment
+    const wordCount = content.split(/\s+/).length;
+    const sentenceCount = content.split(/[.!?]+/).length;
+    const avgWordsPerSentence = wordCount / sentenceCount;
+    
+    // Optimal sentence length is around 15-20 words
+    const sentenceLengthScore = avgWordsPerSentence < 30 ? 1 : Math.max(0, 1 - (avgWordsPerSentence - 30) / 30);
+    
+    // Check for question marks (indicates seeking clarification)
+    const hasQuestions = content.includes('?');
+    const questionPenalty = hasQuestions ? -0.2 : 0;
+    
+    return Math.max(0, Math.min(1, sentenceLengthScore + questionPenalty));
+  }
+
+  private analyzeChannelUsage(interactions: any[]): { fragmentationScore: number; channelDistribution: any } {
+    const channelCounts: { [key: string]: number } = {};
+    
+    interactions.forEach(interaction => {
+      const channel = interaction.type || 'unknown';
+      channelCounts[channel] = (channelCounts[channel] || 0) + 1;
+    });
+    
+    const channels = Object.keys(channelCounts);
+    const totalInteractions = interactions.length;
+    
+    // Calculate fragmentation (more channels = higher fragmentation)
+    const fragmentationScore = Math.min(channels.length / 5, 1); // Normalize to 5 channels
+    
+    return {
+      fragmentationScore,
+      channelDistribution: channelCounts
+    };
+  }
+
+  private calculateGiniCoefficient(values: number[]): number {
+    if (values.length === 0) return 0;
+    
+    const sortedValues = values.sort((a, b) => a - b);
+    const n = sortedValues.length;
+    let sum = 0;
+    
+    for (let i = 0; i < n; i++) {
+      sum += (2 * (i + 1) - n - 1) * sortedValues[i];
+    }
+    
+    const mean = sortedValues.reduce((acc, val) => acc + val, 0) / n;
+    return sum / (n * n * mean);
+  }
+
+  private calculateShannonDiversity(values: number[]): number {
+    const total = values.reduce((sum, val) => sum + val, 0);
+    if (total === 0) return 0;
+    
+    const diversity = values.reduce((sum, val) => {
+      if (val === 0) return sum;
+      const proportion = val / total;
+      return sum - (proportion * Math.log(proportion));
+    }, 0);
+    
+    return diversity / Math.log(values.length);
+  }
+
+  private calculateSkillDiversity(skillDevelopment: any): number {
+    const allSkillAreas = new Set<string>();
+    
+    Object.values(skillDevelopment).forEach((user: any) => {
+      Object.keys(user.skillAreas || {}).forEach(skill => {
+        allSkillAreas.add(skill);
+      });
+    });
+    
+    return allSkillAreas.size / 5; // Normalize to 5 skill areas
+  }
+
+  private calculateJuniorScore(contributor: any): number {
+    const contributions = contributor.contributions || 0;
+    const maxContributions = 100; // Threshold for senior
+    
+    // Lower contributions = higher junior score
+    const contributionScore = 1 - Math.min(contributions / maxContributions, 1);
+    
+    // Additional factors could include:
+    // - Account age
+    // - Commit size patterns
+    // - Question/help-seeking frequency
+    
+    return contributionScore;
+  }
+
+  private assessGrowthPotential(contributor: any): string {
+    const score = this.calculateJuniorScore(contributor);
+    const contributions = contributor.contributions || 0;
+    
+    if (score > 0.8 && contributions > 5) return 'high';
+    if (score > 0.6 && contributions > 2) return 'medium';
+    if (contributions > 0) return 'developing';
+    return 'new';
+  }
+
+  // Additional missing stub methods
+  private identifySeniorDevelopers(contributors: any[]): any[] {
+    return contributors.filter(c => (c.contributions || 0) > 100);
+  }
+
+  private findSuitableMentors(junior: any, seniors: any[], interactions: any[]): any[] {
+    return seniors.slice(0, 2); // Return first 2 seniors as suitable mentors
+  }
+
+  private identifySkillGaps(junior: any, interactions: any[]): string[] {
+    return ['javascript', 'testing', 'code-review'];
+  }
+
+  private suggestLearningGoals(junior: any, interactions: any[]): string[] {
+    return ['Master JavaScript fundamentals', 'Learn testing frameworks', 'Improve code review skills'];
+  }
+
+  private recommendMentorshipType(junior: any, mentors: any[]): string {
+    return 'one-on-one';
+  }
+
+  private predictMentorshipOutcomes(junior: any, mentors: any[]): string[] {
+    return ['Improved coding skills', 'Better understanding of best practices', 'Increased confidence'];
+  }
+
+  private estimateMentorshipTimeline(junior: any, mentors: any[]): string {
+    return '3-6 months';
+  }
+
+  private identifyReviewBottlenecks(reviews: any[]): any[] {
+    return [];
+  }
+
+  private identifyDecisionBottlenecks(interactions: any[]): any[] {
+    return [];
+  }
+
+  private identifyKnowledgeBottlenecks(contributors: any[]): any[] {
+    return [];
   }
 }
 

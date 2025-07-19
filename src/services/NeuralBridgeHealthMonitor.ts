@@ -11,7 +11,8 @@ import type {
   ExtendedPerformanceAlert,
   WasmPerformanceMetrics,
   PerformanceMetrics,
-  SystemHealthMetrics
+  SystemHealthMetrics,
+  ComponentScores
 } from '../types/neural'
 import type { NeuralBridgeConfig } from './NeuralBridgeManager'
 
@@ -408,7 +409,7 @@ export class NeuralBridgeHealthMonitor extends EventEmitter {
     }
   }
   
-  private calculateComponentScores(snapshot: PerformanceSnapshot): any {
+  private calculateComponentScores(snapshot: PerformanceSnapshot): ComponentScores {
     return {
       neural: 100 - (snapshot.errorRate * 1000), // Scale error rate
       memory: 100 - snapshot.memoryUsage,

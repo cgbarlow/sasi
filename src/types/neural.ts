@@ -140,8 +140,8 @@ export interface PerformanceTarget {
 }
 
 export interface PerformanceAlert {
-  type: 'spawn_time' | 'inference_time' | 'memory_usage' | 'system_health';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: 'spawn_time' | 'inference_time' | 'memory_usage' | 'system_health' | 'error_rate';
+  severity: 'low' | 'medium' | 'high' | 'critical' | 'warning';
   message: string;
   value: number;
   threshold: number;
@@ -332,6 +332,32 @@ export class PerformanceError extends Error {
   }
 }
 
+// WASM Performance Metrics Type (exported for compatibility)
+export interface WasmPerformanceMetrics {
+  executionTime: number
+  memoryUsage: number
+  simdAcceleration: boolean
+  throughput: number
+  efficiency: number
+  loadTime?: number
+  operationsCount?: number
+  averageOperationTime?: number
+}
+
+// Neural Bridge Health Type (exported for monitoring services)
+export interface NeuralBridgeHealth {
+  status: 'healthy' | 'warning' | 'critical' | 'error'
+  moduleLoaded: boolean
+  ruvFannIntegration: boolean
+  wasmInitialized: boolean
+  simdSupported: boolean
+  performanceMetrics: WasmPerformanceMetrics
+  systemMetrics: SystemHealthMetrics
+  activeAlerts: ExtendedPerformanceAlert[]
+  lastHealthCheck: Date
+  uptime: number
+}
+
 // Additional missing types for PerformanceIntegration
 
 export interface NeuralPerformanceSnapshot {
@@ -353,15 +379,17 @@ export interface NeuralPerformanceSnapshot {
   memory?: number;
 }
 
+export interface ComponentScores {
+  neural: number;
+  memory: number;
+  performance: number;
+  network: number;
+  wasm: number;
+}
+
 export interface SystemHealthMetrics {
   overallScore: number;
-  componentScores: {
-    neural: number;
-    memory: number;
-    performance: number;
-    network: number;
-    wasm: number;
-  };
+  componentScores: ComponentScores;
   activeAlerts: any[];
   recommendations: string[];
   uptime: number;

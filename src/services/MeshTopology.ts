@@ -12,7 +12,8 @@ import {
   FaultDetection,
   RecoveryStrategy,
   NetworkVisualizationData,
-  P2PNetworkError
+  P2PNetworkError,
+  NetworkPartition
 } from '../types/network';
 
 /**
@@ -39,18 +40,7 @@ export enum RoutingStrategy {
   ADAPTIVE = 'adaptive'
 }
 
-/**
- * Network partition detection and recovery
- */
-export interface NetworkPartition {
-  id: string;
-  detectedAt: Date;
-  affectedNodes: string[];
-  isolatedNodes: string[];
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  recoveryStrategy: RecoveryStrategy;
-  resolved: boolean;
-}
+// NetworkPartition interface imported from types/network.ts
 
 /**
  * Mesh Topology Manager implementation
@@ -477,9 +467,9 @@ export class MeshTopology {
     
     const partition: NetworkPartition = {
       id: `partition_${Date.now()}`,
-      detectedAt: new Date(),
+      startTime: new Date(),
       affectedNodes: [],
-      isolatedNodes: [],
+      partitionType: 'complete',
       severity: 'high',
       recoveryStrategy: {
         type: 'automatic',
@@ -603,9 +593,9 @@ export class MeshTopology {
           // Create new partition record
           const partition: NetworkPartition = {
             id: `partition_${Date.now()}`,
-            detectedAt: new Date(),
+            startTime: new Date(),
             affectedNodes: [peerId],
-            isolatedNodes: [peerId],
+            partitionType: 'partial',
             severity: 'medium',
             recoveryStrategy: {
               type: 'automatic',

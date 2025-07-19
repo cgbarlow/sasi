@@ -538,6 +538,105 @@ class AIAnalyzer {
       toolSuggestions: []
     };
   }
+
+  // Missing methods for CollaborativeDevelopmentTools integration
+  async getRecentPullRequests(owner: string, repo: string, count: number = 100): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.pulls.list({
+        owner,
+        repo,
+        state: 'all',
+        sort: 'updated',
+        direction: 'desc',
+        per_page: Math.min(count, 100)
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch recent pull requests: ${error.message}`, error);
+    }
+  }
+
+  async getRecentIssues(owner: string, repo: string, count: number = 100): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.issues.list({
+        owner,
+        repo,
+        state: 'all',
+        sort: 'updated',
+        direction: 'desc',
+        per_page: Math.min(count, 100)
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch recent issues: ${error.message}`, error);
+    }
+  }
+
+  async getRecentCommits(owner: string, repo: string, count: number = 200): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.repos.listCommits({
+        owner,
+        repo,
+        per_page: Math.min(count, 100)
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch recent commits: ${error.message}`, error);
+    }
+  }
+
+  async getRecentComments(owner: string, repo: string, count: number = 200): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.issues.listCommentsForRepo({
+        owner,
+        repo,
+        sort: 'updated',
+        direction: 'desc',
+        per_page: Math.min(count, 100)
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch recent comments: ${error.message}`, error);
+    }
+  }
+
+  async getRecentReviews(owner: string, repo: string, count: number = 100): Promise<any[]> {
+    try {
+      // Get recent PRs first
+      const pullRequests = await this.getRecentPullRequests(owner, repo, Math.min(count, 50));
+      const reviews: any[] = [];
+      
+      for (const pr of pullRequests.slice(0, 20)) { // Limit to avoid rate limits
+        try {
+          const { data: prReviews } = await this.octokit.pulls.listReviews({
+            owner,
+            repo,
+            pull_number: pr.number
+          });
+          reviews.push(...prReviews);
+        } catch (error) {
+          console.warn(`Failed to fetch reviews for PR #${pr.number}: ${error.message}`);
+        }
+      }
+      
+      return reviews.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()).slice(0, count);
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch recent reviews: ${error.message}`, error);
+    }
+  }
+
+  async getRepositoryContributors(owner: string, repo: string): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.repos.listContributors({
+        owner,
+        repo,
+        per_page: 100
+      });
+      return data;
+    } catch (error) {
+      throw new GitHubIntegrationError(`Failed to fetch repository contributors: ${error.message}`, error);
+    }
+  }
 }
 
 // Rate limit handler

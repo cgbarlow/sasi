@@ -308,6 +308,18 @@ export type FaultType = FaultDetection['type'];
 export type RecoveryType = RecoveryStrategy['type'];
 export type NetworkEventType = NetworkEvent['type'];
 
+// Additional consensus types (imported from ConsensusEngine)
+export interface ConsensusTransaction {
+  id: string;
+  type: 'agent-spawn' | 'agent-terminate' | 'task-assign' | 'resource-allocate' | 'state-update';
+  proposer: string;
+  data: any;
+  signature: string;
+  timestamp: Date;
+  dependencies: string[]; // Transaction dependencies
+  priority: number;
+}
+
 // Utility Types
 export interface P2PNetworkStats {
   totalPeers: number;

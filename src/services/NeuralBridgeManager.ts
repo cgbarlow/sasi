@@ -268,7 +268,12 @@ export class NeuralBridgeManager extends EventEmitter {
     
     try {
       // Create agent using enhanced manager
-      const agent = await this.agentManager.spawnAgent(config)
+      const agentId = await this.agentManager.spawnAgent(config)
+      const agent = this.agentManager.getAgentState(agentId)
+      
+      if (!agent) {
+        throw new Error(`Failed to retrieve agent ${agentId} after spawning`)
+      }
       
       const spawnTime = Date.now() - startTime
       this.totalOperations++
@@ -282,15 +287,15 @@ export class NeuralBridgeManager extends EventEmitter {
       
       // Check performance thresholds
       if (spawnTime > this.config.alertThresholds.spawnTime) {
-        this.createAlert('spawn_time', 'warning', 
+        this.createAlert('spawn_time', 'medium', 
           `Agent spawn time ${spawnTime}ms exceeds threshold ${this.config.alertThresholds.spawnTime}ms`,
-          spawnTime, this.config.alertThresholds.spawnTime, agent.id)
+          spawnTime, this.config.alertThresholds.spawnTime, agentId)
       }
       
-      this.log('debug', `🤖 Agent created: ${agent.id} (${spawnTime}ms)`)
+      this.log('debug', `🤖 Agent created: ${agentId} (${spawnTime}ms)`)
       
       this.emit('agentCreated', {
-        agentId: agent.id,
+        agentId: agentId,
         spawnTime,
         config,
         timestamp: Date.now()
@@ -331,7 +336,7 @@ export class NeuralBridgeManager extends EventEmitter {
       
       // Check performance thresholds
       if (inferenceTime > this.config.alertThresholds.inferenceTime) {
-        this.createAlert('inference_time', 'warning',
+        this.createAlert('inference_time', 'medium',
           `Inference time ${inferenceTime}ms exceeds threshold ${this.config.alertThresholds.inferenceTime}ms`,
           inferenceTime, this.config.alertThresholds.inferenceTime, agentId)
       }
