@@ -215,10 +215,12 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
         advancedSystems.memoryManager.shutdown()
       }
       if (advancedSystems.wasmOptimizer) {
-        await advancedSystems.wasmOptimizer.cleanup()
+        // Use void to handle promise without await in non-async cleanup
+        void advancedSystems.wasmOptimizer.cleanup()
       }
       if (advancedSystems.integrationSystem) {
-        await advancedSystems.integrationSystem.stop()
+        // Use void to handle promise without await in non-async cleanup
+        void advancedSystems.integrationSystem.stop()
       }
     }
   }, [])
@@ -549,7 +551,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                   {component}
                 </div>
                 <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#f3f4f6' }}>
-                  {status}
+                  {String(status)}
                 </div>
               </div>
             ))}

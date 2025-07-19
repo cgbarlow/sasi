@@ -497,4 +497,5 @@ export const DEFAULT_COLLABORATIVE_TOOLS_CONFIG = {
 };
 
 // Export everything as a namespace for easier consumption
-export * as GitHubIntegration from './index';
+// Note: Commented out circular export to avoid redeclaration issues
+// export * as GitHubIntegration from './index';

@@ -261,6 +261,17 @@ export interface FaultDetection {
   recoveryAction: 'reconnect' | 'reroute' | 'isolate' | 'restart';
 }
 
+export interface NetworkPartition {
+  id: string;
+  affectedNodes: string[];
+  startTime: Date;
+  endTime?: Date;
+  partitionType: 'complete' | 'partial';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  recoveryStrategy: RecoveryStrategy;
+  resolved: boolean;
+}
+
 export interface RecoveryStrategy {
   type: 'automatic' | 'manual' | 'hybrid';
   timeout: number;

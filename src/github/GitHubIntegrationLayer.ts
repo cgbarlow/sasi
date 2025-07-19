@@ -267,7 +267,7 @@ export class GitHubIntegrationLayer {
     return repository;
   }
 
-  private async getIssueComments(owner: string, repo: string, issueNumber: number) {
+  async getIssueComments(owner: string, repo: string, issueNumber: number) {
     const { data: comments } = await this.octokit.issues.listComments({
       owner,
       repo,
@@ -445,6 +445,46 @@ export class GitHubIntegrationLayer {
       contributionPatterns: {}
     };
   }
+
+  // Missing methods required by AutomatedIssueTriage
+  async getIssue(owner: string, repo: string, issueNumber: number): Promise<GitHubIssue> {
+    const { data } = await this.octokit.issues.get({
+      owner,
+      repo,
+      issue_number: issueNumber
+    });
+    return data as GitHubIssue;
+  }
+
+  async getIssueEvents(owner: string, repo: string, issueNumber: number): Promise<any[]> {
+    const { data } = await this.octokit.issues.listEvents({
+      owner,
+      repo,
+      issue_number: issueNumber
+    });
+    return data;
+  }
+
+  async updateIssue(owner: string, repo: string, issueNumber: number, updates: any): Promise<GitHubIssue> {
+    const { data } = await this.octokit.issues.update({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      ...updates
+    });
+    return data as GitHubIssue;
+  }
+
+  async addComment(owner: string, repo: string, issueNumber: number, body: string): Promise<any> {
+    const { data } = await this.octokit.issues.createComment({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      body
+    });
+    return data;
+  }
+
 }
 
 // AI Analyzer class for intelligent analysis
