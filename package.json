@@ -145,6 +145,7 @@
     "jest-environment-node": "^30.0.4",
     "jest-junit": "^16.0.0",
     "puppeteer": "^24.11.2",
+    "terser": "^5.43.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   },

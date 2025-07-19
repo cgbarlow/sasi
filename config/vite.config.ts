@@ -11,7 +11,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(__dirname, '../src'),
     },
   },
   server: {
@@ -42,7 +42,7 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
+        main: resolve(__dirname, '../index.html'),
       },
       output: {
         // Optimize chunk splitting
@@ -79,7 +79,7 @@ export default defineConfig({
   // Enable worker support for performance
   worker: {
     format: 'es',
-    plugins: [react()],
+    plugins: () => [react()],
   },
   // Configure preview server
   preview: {
