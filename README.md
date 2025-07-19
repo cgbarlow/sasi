@@ -58,53 +58,51 @@ SASI (Search for Artificial Super Intelligence) is a cutting-edge neural mesh sy
 ### Production Installation
 
 ```bash
-# Clone the production repository
-git clone https://github.com/yourusername/sasi-neural-system.git
+# Clone the repository
+git clone https://github.com/cgbarlow/sasi.git
 cd sasi
 
-# Install production dependencies
-npm ci --production
+# Install dependencies
+npm install
 
-# Run production deployment script
-npm run deploy:production
+# Run development server
+npm run dev
 
-# Verify deployment health
-npm run health:check
+# Run tests
+npm test
 ```
 
-### Production Configuration
+### Environment Configuration
 
 ```bash
-# Environment Configuration
-cp .env.production.example .env.production
+# Optional: Customize the application
+VITE_APP_TITLE="SASI@home"
+VITE_API_BASE_URL="http://localhost:3000"
 
-# Required Production Variables:
-DATABASE_URL=sqlite:./production.db
-NEURAL_WEIGHTS_PATH=./data/neural-weights
-SECURITY_SECRET_KEY=your-256-bit-secret
-MONITORING_ENDPOINT=https://your-monitoring.service
-SSL_CERT_PATH=/path/to/ssl/cert
-SSL_KEY_PATH=/path/to/ssl/key
+# Create .env file for local development
+cp .env.example .env  # if .env.example exists
 ```
 
 ### Deployment Scripts
 
 ```bash
-# Production Deployment
-npm run deploy:production    # Full production deployment
-npm run deploy:staging       # Staging environment deployment
-npm run deploy:verify        # Verify deployment integrity
+# Development
+npm run dev                 # Start development server
+npm run dev:test           # Run tests and linting in watch mode
+npm run build               # Build for production
+npm run preview             # Preview production build
 
-# Operations & Monitoring
-npm run monitor:start        # Start monitoring dashboard
-npm run logs:production      # View production logs
-npm run backup:create        # Create system backup
-npm run health:deep         # Comprehensive health check
+# Testing
+npm run test                # Run all tests
+npm run test:unit           # Run unit tests
+npm run test:integration    # Run integration tests
+npm run test:performance    # Run performance tests
+npm run test:e2e            # Run end-to-end tests
+npm run test:coverage       # Generate test coverage report
 
-# Performance & Optimization
-npm run optimize:neural     # Optimize neural weights
-npm run benchmark:system    # Run performance benchmarks
-npm run security:audit      # Security vulnerability scan
+# Code Quality
+npm run lint                # Run ESLint
+npm run typecheck           # TypeScript type checking
 ```
 
 ## 🎮 Demo Usage
@@ -307,12 +305,13 @@ Both future features have complete technical roadmaps with:
 
 ### Comprehensive Test Suite - **96.7% Pass Rate**
 ```bash
-# Production Testing Commands
-npm run test:production     # Full production test suite
-npm run test:performance    # Performance benchmarking
-npm run test:security      # Security vulnerability testing
-npm run test:integration   # Neural mesh integration tests
-npm run test:regression    # Automated regression detection
+# Testing Commands
+npm run test                # Run all tests
+npm run test:unit           # Unit tests
+npm run test:integration    # Integration tests
+npm run test:performance    # Performance tests
+npm run test:e2e            # End-to-end tests
+npm run test:coverage       # Test coverage report
 ```
 
 ### Test Coverage Achievements
@@ -354,13 +353,13 @@ MIT License - See [LICENSE](LICENSE) for details.
 **Complete production-ready documentation available:**
 
 ### Technical Documentation
-- **[API Reference](docs/API_REFERENCE.md)**: Complete API endpoints and integration guides
-- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)**: Production deployment procedures
-- **[Troubleshooting Guide](docs/TROUBLESHOOTING_GUIDE.md)**: Common issues and solutions
-- **[User Guide](docs/USER_GUIDE.md)**: End-user operation manual
+- **[API Reference](documentation/api/API_REFERENCE.md)**: Complete API endpoints and integration guides
+- **[Deployment Guide](documentation/deployment/DEPLOYMENT_GUIDE.md)**: Production deployment procedures
+- **[Troubleshooting Guide](documentation/guides/TROUBLESHOOTING_GUIDE.md)**: Common issues and solutions
+- **[User Guide](documentation/guides/USER_GUIDE.md)**: End-user operation manual
 
 ### Development Resources
-- **[Technical Architecture](docs/COMPREHENSIVE_TECHNICAL_DOCUMENTATION.md)**: Detailed system design
+- **[Technical Architecture](documentation/technical/COMPREHENSIVE_TECHNICAL_DOCUMENTATION.md)**: Detailed system design
 - **[Performance Reports](reports/PERFORMANCE_OPTIMIZATION_COMPLETION_REPORT.md)**: Optimization methodologies
 - **[Security Audit](reports/SECURITY_AUDIT_REPORT.md)**: Complete security assessment
 - **[TDD Framework](reports/TDD_COMPREHENSIVE_COVERAGE_REPORT.md)**: Testing best practices
@@ -419,51 +418,53 @@ MIT License - See [LICENSE](LICENSE) for details.
 - **📈 System Uptime**: 98.5% with graceful error handling
 - **🏆 Mission Grade**: A+ (95% achievement) with production approval
 
-## 🚀 Quick Start with devpod.sh
+## 🚀 Quick Start
 
 ```bash
-devpod up https://github.com/jedarden/agentists-quickstart --branch workspace/basic
+# Clone and setup
+git clone https://github.com/cgbarlow/sasi.git
+cd sasi
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
 ## 📦 What's Included
 
-- **🖼️ Base Image**: Debian-based development container
-- **🐳 Docker-in-Docker**: Build and run containers within your development environment
-- **🟢 Node.js**: Full Node.js development environment
-- **🐍 Python**: Python development environment
-- **🛠️ Development Tools** (auto-installed on container creation):
-  - tmux: Terminal multiplexer for managing multiple sessions
-  - claude-code: Anthropic's official CLI for Claude
-  - GitHub CLI (gh): Command-line interface for GitHub
-- **🧬 VS Code Extensions**:
-  - Roo Cline: AI-powered coding assistant
-  - GistFS: Access GitHub Gists directly in VS Code
-  - GitHub Copilot: AI pair programming
-  - GitHub Copilot Chat: Conversational AI assistance
+- **🟢 Node.js 18+**: Full Node.js development environment
+- **⚛️ React 18**: Modern React with TypeScript
+- **🎭 Three.js**: 3D visualization with @react-three/fiber
+- **🤖 Neural Mesh**: AI agent coordination system
+- **🗄️ SQLite**: Persistent data storage with better-sqlite3
+- **🧪 Testing**: Comprehensive Jest test suite with 96%+ coverage
+- **🔄 Claude Flow**: Advanced swarm intelligence coordination
 
 ## ✨ Features
 
-- Runs with privileged access to support Docker operations
-- Configured for the `vscode` user
-- Persistent container (won't shutdown on disconnect)
-- Automatic tool installation with graceful fallback and detailed installation report
-- Installation report saved to `.devcontainer/installation-report.md` for troubleshooting
+- **Real-time 3D Visualization**: Interactive agent swarm visualization
+- **Neural Agent Coordination**: Advanced AI agent mesh networking
+- **Performance Monitoring**: Real-time metrics and analytics
+- **GitHub Integration**: Project management and coordination
+- **Persistent Memory**: Cross-session state management
+- **Comprehensive Testing**: 245 test cases with 96.7% pass rate
 
 ## 📋 Requirements
 
-- [DevPod CLI](https://devpod.sh/docs/getting-started/install)
-- Docker Desktop or Docker Engine
-- Active GitHub Copilot subscription (for Copilot features)
+- **Node.js**: 18+ LTS with npm/yarn
+- **Memory**: Minimum 4GB RAM (8GB recommended)
+- **Browser**: Modern browser with WebGL support
+- **GitHub**: Account for project integration features
 
-## 🔧 Manual VS Code Usage
+## 🔧 Development Setup
 
-If you prefer to use VS Code directly:
-
-1. Clone this branch: `git clone -b workspace/basic https://github.com/jedarden/agentists-quickstart`
-2. Open in VS Code
-3. Install the Dev Containers extension
-4. Click "Reopen in Container" when prompted
+1. Clone this repository: `git clone https://github.com/cgbarlow/sasi.git`
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. Open browser to `http://localhost:3000`
 
 ## 📚 Learn More
 
-For more information about the Agentists project, visit the [main branch](https://github.com/jedarden/agentists-quickstart).
+For more information about SASI, visit the [repository](https://github.com/cgbarlow/sasi).
