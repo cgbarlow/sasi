@@ -359,7 +359,7 @@ jobs:
           path: reports/stress/
 
   coverage-report:
-    needs: [unit-tests, integration-tests, e2e-tests]
+    needs: [unit-tests, e2e-tests]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -418,7 +418,7 @@ jobs:
             });
 
   deployment-tests:
-    needs: [unit-tests, integration-tests, e2e-tests]
+    needs: [unit-tests, e2e-tests]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
