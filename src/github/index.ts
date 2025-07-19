@@ -269,6 +269,7 @@ export interface GitHubIntegrationConfig {
   userAgent?: string;
   timeout?: number;
   retries?: number;
+  aiConfig?: AIAnalysisConfig;
   rateLimitHandling?: {
     enabled: boolean;
     maxRetries: number;
@@ -302,14 +303,19 @@ export interface AIAnalysisConfig {
   };
 }
 
+// Import necessary classes
+import { GitHubIntegrationLayer, GitHubIntegrationError } from './GitHubIntegrationLayer';
+import { AutomatedIssueTriage, TriageError } from './AutomatedIssueTriage';
+import { IntelligentPRAnalysis, PRAnalysisError } from './IntelligentPRAnalysis';
+import { WorkflowOptimizer, WorkflowOptimizationError } from './WorkflowOptimizer';
+import { RepositoryHealthMonitor, HealthMonitorError } from './RepositoryHealthMonitor';
+import { CollaborativeDevelopmentTools, CollaborativeToolsError } from './CollaborativeDevelopmentTools';
+
 // Utility functions
 export function createGitHubIntegration(config: GitHubIntegrationConfig): GitHubIntegrationLayer {
   return new GitHubIntegrationLayer(config.token, {
-    baseURL: config.baseURL,
-    userAgent: config.userAgent,
-    timeout: config.timeout,
-    retries: config.retries,
-    rateLimitHandling: config.rateLimitHandling
+    aiConfig: config.aiConfig,
+    rateLimitConfig: config.rateLimitHandling
   });
 }
 

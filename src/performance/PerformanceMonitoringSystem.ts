@@ -464,7 +464,7 @@ export class PerformanceMonitoringSystem {
     const alert: PerformanceAlert = {
       id: alertId,
       level,
-      message: `${metric.name} ${comparison} ${thresholdValue}${metric.unit} (current: ${metric.value.toFixed(2)}${metric.unit})`,
+      message: `${metric.name} ${threshold.comparison} ${thresholdValue}${metric.unit} (current: ${metric.value.toFixed(2)}${metric.unit})`,
       metric: metric.name,
       value: metric.value,
       threshold: thresholdValue,
@@ -572,6 +572,32 @@ export class PerformanceMonitoringSystem {
         isActive: this.isMonitoring,
         metricsCollected: Array.from(this.metrics.values()).reduce((sum, arr) => sum + arr.length, 0)
       }
+    }
+  }
+
+  /**
+   * Get active (unresolved) alerts
+   */
+  getActiveAlerts(): PerformanceAlert[] {
+    return Array.from(this.alerts.values()).filter(alert => !alert.resolved)
+  }
+
+  /**
+   * Get all alerts
+   */
+  getAllAlerts(): PerformanceAlert[] {
+    return Array.from(this.alerts.values())
+  }
+
+  /**
+   * Resolve an alert
+   */
+  resolveAlert(alertId: string): void {
+    const alert = this.alerts.get(alertId)
+    if (alert) {
+      alert.resolved = true
+      alert.resolvedAt = Date.now()
+      console.log(`✅ Alert resolved: ${alert.message}`)
     }
   }
 

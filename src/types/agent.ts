@@ -12,6 +12,7 @@ export interface Agent {
   position: { x: number; y: number; z: number }
   owner: string
   neuralId?: string
+  capabilities?: string[]
   meshConnection?: {
     connected: boolean
     meshId: string

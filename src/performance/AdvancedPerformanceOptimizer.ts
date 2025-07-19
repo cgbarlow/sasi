@@ -888,3 +888,5 @@ export class AdvancedPerformanceOptimizer extends PerformanceOptimizer {
     // Implementation would initialize vector optimization systems
   }
 }
+
+export default AdvancedPerformanceOptimizer

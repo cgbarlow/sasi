@@ -7,8 +7,8 @@ import { Octokit } from '@octokit/rest';
 import { GitHubIssue, GitHubPullRequest, GitHubRepository, GitHubWorkflow } from '../types/github';
 import { AIAnalysisResult, IssueTriage, PRAnalysis } from '../types/analysis';
 
-class GitHubIntegrationLayer {
-  private octokit: Octokit;
+export class GitHubIntegrationLayer {
+  public octokit: Octokit;
   private aiAnalyzer: AIAnalyzer;
   private repositoryCache: Map<string, GitHubRepository> = new Map();
   private rateLimitHandler: RateLimitHandler;
@@ -46,7 +46,7 @@ class GitHubIntegrationLayer {
       });
 
       // Analyze issue content with AI
-      const analysis = await this.aiAnalyzer.analyzeIssue({
+      const analysis: AIAnalysisResult = await this.aiAnalyzer.analyzeIssue({
         title: issue.title,
         body: issue.body || '',
         labels: issue.labels.map(l => typeof l === 'string' ? l : l.name),
@@ -67,7 +67,7 @@ class GitHubIntegrationLayer {
       };
 
       // Auto-apply triage if confidence is high enough
-      if (triage.aiConfidence > 0.8) {
+      if (analysis.confidence > 0.8) {
         await this.applyTriage(owner, repo, issueNumber, triage);
       }
 
@@ -189,7 +189,7 @@ class GitHubIntegrationLayer {
         repo
       });
 
-      const optimizations: WorkflowOptimization[] = [];
+      const optimizations: any[] = [];
 
       for (const workflow of workflows.workflows) {
         // Analyze workflow performance
@@ -200,7 +200,7 @@ class GitHubIntegrationLayer {
           repository: await this.getRepository(owner, repo)
         });
 
-        const optimization: WorkflowOptimization = {
+        const optimization = {
           workflowId: workflow.id,
           workflowName: workflow.name,
           currentPerformance: analysis.performance,
@@ -279,7 +279,7 @@ class GitHubIntegrationLayer {
     return comments;
   }
 
-  private async getPRFiles(owner: string, repo: string, prNumber: number) {
+  async getPRFiles(owner: string, repo: string, prNumber: number) {
     const { data: files } = await this.octokit.pulls.listFiles({
       owner,
       repo,
@@ -288,7 +288,7 @@ class GitHubIntegrationLayer {
     return files;
   }
 
-  private async getPRCommits(owner: string, repo: string, prNumber: number) {
+  async getPRCommits(owner: string, repo: string, prNumber: number) {
     const { data: commits } = await this.octokit.pulls.listCommits({
       owner,
       repo,
@@ -307,30 +307,49 @@ class GitHubIntegrationLayer {
     return runs.workflow_runs;
   }
 
-  private determinePriority(analysis: AIAnalysisResult): 'critical' | 'high' | 'medium' | 'low' {
-    if (analysis.severity > 0.8) return 'critical';
-    if (analysis.severity > 0.6) return 'high';
-    if (analysis.severity > 0.4) return 'medium';
+  async getPullRequest(owner: string, repo: string, prNumber: number): Promise<GitHubPullRequest> {
+    const { data } = await this.octokit.pulls.get({
+      owner,
+      repo,
+      pull_number: prNumber
+    });
+    return data as GitHubPullRequest;
+  }
+
+  async getPRReviews(owner: string, repo: string, prNumber: number): Promise<any[]> {
+    const { data } = await this.octokit.pulls.listReviews({
+      owner,
+      repo,
+      pull_number: prNumber
+    });
+    return data;
+  }
+
+  private determinePriority(analysis: any): 'critical' | 'high' | 'medium' | 'low' {
+    const severity = analysis.severity || 0.5;
+    if (severity > 0.8) return 'critical';
+    if (severity > 0.6) return 'high';
+    if (severity > 0.4) return 'medium';
     return 'low';
   }
 
-  private categorizeIssue(analysis: AIAnalysisResult): string {
+  private categorizeIssue(analysis: any): string {
     return analysis.category || 'general';
   }
 
-  private assessSeverity(analysis: AIAnalysisResult): number {
-    return analysis.severity;
+  private assessSeverity(analysis: any): number {
+    return analysis.severity || 0.5;
   }
 
-  private estimateEffort(analysis: AIAnalysisResult): string {
+  private estimateEffort(analysis: any): string {
     return analysis.estimatedEffort || 'medium';
   }
 
-  private suggestLabels(analysis: AIAnalysisResult): string[] {
+  private suggestLabels(analysis: any): string[] {
     return analysis.suggestedLabels || [];
   }
 
-  private async suggestAssignees(owner: string, repo: string, analysis: AIAnalysisResult): Promise<string[]> {
+  private async suggestAssignees(owner: string, repo: string, analysis: any): Promise<string[]> {
     // AI-based assignee suggestion logic
     return analysis.suggestedAssignees || [];
   }
@@ -710,7 +729,7 @@ class RateLimitHandler {
 }
 
 // Error classes
-class GitHubIntegrationError extends Error {
+export class GitHubIntegrationError extends Error {
   constructor(message: string, public cause?: Error) {
     super(message);
     this.name = 'GitHubIntegrationError';
@@ -752,10 +771,4 @@ interface CollaborationEnhancement {
   toolSuggestions: string[];
 }
 
-export {
-  GitHubIntegrationLayer,
-  GitHubIntegrationError,
-  type GitHubIntegrationOptions,
-  type RepositoryHealth,
-  type CollaborationEnhancement
-};
+export type { GitHubIntegrationOptions, RepositoryHealth, CollaborationEnhancement };

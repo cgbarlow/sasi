@@ -33,7 +33,7 @@ export interface Connection {
 
 export interface NetworkMessage {
   id: string;
-  type: 'broadcast' | 'direct' | 'consensus' | 'heartbeat' | 'agent-coordination';
+  type: 'broadcast' | 'direct' | 'consensus' | 'heartbeat' | 'agent-coordination' | 'neural-sync';
   source: string;
   destination?: string;
   timestamp: Date;
@@ -75,7 +75,7 @@ export interface WebRTCSignaling {
 // Consensus Engine Types
 export interface ConsensusMessage {
   id: string;
-  type: 'proposal' | 'vote' | 'commit' | 'abort';
+  type: 'proposal' | 'vote' | 'commit' | 'abort' | 'leader-election' | 'block-proposal' | 'block-vote';
   epoch: number;
   proposer: string;
   data: any;
@@ -145,7 +145,7 @@ export interface P2PNetworkConfig {
 
 // Agent Coordination Types
 export interface AgentCoordinationMessage {
-  type: 'spawn' | 'terminate' | 'task-assign' | 'task-complete' | 'status-update' | 'resource-request';
+  type: 'spawn' | 'terminate' | 'task-assign' | 'task-complete' | 'status-update' | 'resource-request' | 'resource-response';
   agentId: string;
   sourceNode: string;
   targetNode?: string;
@@ -154,6 +154,9 @@ export interface AgentCoordinationMessage {
     taskData?: any;
     resourceRequirements?: ResourceRequirements;
     status?: AgentStatus;
+    available?: boolean;
+    nodeId?: string;
+    resources?: ResourceRequirements;
   };
   priority: 'low' | 'medium' | 'high' | 'urgent';
   deadline?: Date;
@@ -171,13 +174,13 @@ export interface ResourceRequirements {
 export interface AgentStatus {
   agentId: string;
   nodeId: string;
-  status: 'spawning' | 'active' | 'idle' | 'working' | 'error' | 'terminated';
+  status: 'spawning' | 'active' | 'idle' | 'working' | 'error' | 'terminated' | 'processing' | 'completed' | 'neural_sync';
   currentTask?: string;
   progress: number;
   resourceUsage: {
     cpu: number;
     memory: number;
-    networkIO: number;
+    networkIO?: number;
   };
   lastActivity: Date;
 }

@@ -17,6 +17,7 @@ interface SIMDCapabilities {
   features: string[]
   vectorWidth: number
   instructions: string[]
+  parallelizationFactor?: number
   performance: {
     baseline: number
     simdAccelerated: number
@@ -47,7 +48,7 @@ export class SIMDAccelerationLayer {
   private capabilities: SIMDCapabilities
   private metrics: SIMDPerformanceMetrics
   private operations: Map<string, SIMDOperation> = new Map()
-  private isInitialized = false
+  private initialized = false
   private simdContext: any = null
 
   constructor() {
@@ -73,7 +74,7 @@ export class SIMDAccelerationLayer {
       // Run initial performance benchmarks
       await this.runInitialBenchmarks()
       
-      this.isInitialized = true
+      this.initialized = true
       
       console.log('✅ SIMD Acceleration Layer initialized')
       console.log(`🔧 SIMD Support: ${this.capabilities.supported}`)
@@ -666,7 +667,7 @@ ${capabilities.supported ? '✅ SIMD acceleration is active' : '⚠️ Using sca
    * Check if initialized
    */
   isInitialized(): boolean {
-    return this.isInitialized
+    return this.initialized
   }
 
   /**
@@ -682,7 +683,7 @@ ${capabilities.supported ? '✅ SIMD acceleration is active' : '⚠️ Using sca
    */
   cleanup(): void {
     this.reset()
-    this.isInitialized = false
+    this.initialized = false
     this.simdContext = null
     
     console.log('🧹 SIMD Acceleration Layer cleaned up')

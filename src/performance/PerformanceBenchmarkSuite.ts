@@ -550,3 +550,5 @@ export class PerformanceBenchmarkSuite {
     return (lateAvg - earlyAvg) / earlyAvg > 0.20
   }
 }
+
+export default PerformanceBenchmarkSuite

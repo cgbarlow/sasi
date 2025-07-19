@@ -41,7 +41,7 @@ class PlaceholderPerformanceOptimizer implements PerformanceOptimizer {
   }
 }
 
-class WorkflowOptimizer {
+export class WorkflowOptimizer {
   private githubIntegration: GitHubIntegrationLayer;
   private workflowAnalyzer: WorkflowAnalyzer;
   private performanceOptimizer: PerformanceOptimizer;
@@ -1613,7 +1613,6 @@ class WorkflowOptimizationError extends Error {
 
 
 export {
-  WorkflowOptimizer,
   WorkflowOptimizationError,
   type WorkflowOptimizerOptions,
   type WorkflowOptimization,

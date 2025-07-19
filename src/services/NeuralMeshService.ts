@@ -14,7 +14,7 @@ import { Agent } from '../types/agent'
 import { NodeTimer } from '../types/neural'
 import { P2PNetworkManager, getP2PNetworkManager } from './P2PNetworkManager'
 import { MeshTopology, getMeshTopology } from './MeshTopology'
-import { ConsensusEngine, getConsensusEngine } from './ConsensusEngine'
+import { ConsensusEngine, getConsensusEngine, ConsensusAlgorithm } from './ConsensusEngine'
 import {
   NetworkTopology,
   NetworkHealth,
@@ -561,7 +561,7 @@ export class NeuralMeshService {
     // Initialize consensus engine if enabled
     if (this.config.enableConsensus) {
       this.consensusEngine = getConsensusEngine({
-        algorithm: 'raft',
+        algorithm: ConsensusAlgorithm.RAFT,
         nodeId: this.nodeId,
         byzantineFaultTolerance: 0.33,
         consensusTimeout: 30000,
@@ -770,7 +770,15 @@ export class NeuralMeshService {
     const agent = this.distributedAgents.get(agentId)
     
     if (agent && status) {
-      agent.status = status.status
+      // Map the status types appropriately
+      const mappedStatus: 'active' | 'idle' | 'processing' | 'completed' | 'neural_sync' = 
+        status.status === 'working' ? 'processing' :
+        status.status === 'spawning' ? 'active' :
+        status.status === 'terminated' ? 'completed' :
+        status.status === 'error' ? 'idle' :
+        status.status as 'active' | 'idle' | 'processing' | 'completed' | 'neural_sync'
+      
+      agent.status = mappedStatus
       agent.progress = status.progress
       
       if (status.resourceUsage) {

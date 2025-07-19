@@ -8,7 +8,7 @@ import { TeamAnalyzer } from '../ai/TeamAnalyzer';
 import { CommunicationAnalyzer } from '../ai/CommunicationAnalyzer';
 import { MentorshipEngine } from '../ai/MentorshipEngine';
 
-class CollaborativeDevelopmentTools {
+export class CollaborativeDevelopmentTools {
   private githubIntegration: GitHubIntegrationLayer;
   private teamAnalyzer: TeamAnalyzer;
   private communicationAnalyzer: CommunicationAnalyzer;
@@ -2834,7 +2834,6 @@ class CollaborativeToolsError extends Error {
 }
 
 export {
-  CollaborativeDevelopmentTools,
   CollaborativeToolsError,
   type CollaborativeToolsOptions,
   type TeamCollaborationAnalysis,

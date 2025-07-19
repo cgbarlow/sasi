@@ -610,7 +610,7 @@ export class AutomatedIssueTriage {
 }
 
 // Type definitions
-interface TriageOptions {
+export interface TriageOptions {
   githubToken: string;
   mlConfig?: any;
   patternConfig?: any;
@@ -618,13 +618,13 @@ interface TriageOptions {
   learningEnabled?: boolean;
 }
 
-interface TriageRule {
+export interface TriageRule {
   name: string;
   condition: (data: IssueData) => boolean;
   action: (data: IssueData) => any;
 }
 
-interface IssueData {
+export interface IssueData {
   issue: any;
   comments: any[];
   events: any[];
@@ -633,7 +633,7 @@ interface IssueData {
   metadata: any;
 }
 
-interface TriageResult {
+export interface TriageResult {
   issueNumber: number;
   priority: 'critical' | 'high' | 'medium' | 'low';
   category: string;
@@ -678,19 +678,19 @@ interface CombinedAnalysis {
   confidence: number;
 }
 
-interface LabelSuggestion {
+export interface LabelSuggestion {
   label: string;
   confidence: number;
   reasoning: string;
 }
 
-interface AssigneeSuggestion {
+export interface AssigneeSuggestion {
   username: string;
   confidence: number;
   reasoning: string;
 }
 
-interface PriorityAssessment {
+export interface PriorityAssessment {
   priority: 'critical' | 'high' | 'medium' | 'low';
   score: number;
   confidence: number;
@@ -698,20 +698,20 @@ interface PriorityAssessment {
   factors: any[];
 }
 
-interface DuplicateDetection {
+export interface DuplicateDetection {
   isDuplicate: boolean;
   duplicates: any[];
   confidence: number;
 }
 
-interface AutomatedResponse {
+export interface AutomatedResponse {
   message: string;
   actions: string[];
   confidence: number;
   requiresHumanReview: boolean;
 }
 
-class TriageError extends Error {
+export class TriageError extends Error {
   constructor(message: string, public cause?: Error) {
     super(message);
     this.name = 'TriageError';
@@ -719,4 +719,3 @@ class TriageError extends Error {
 }
 
 // Types and interfaces already exported above
-export { TriageError };

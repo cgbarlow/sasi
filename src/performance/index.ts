@@ -61,8 +61,8 @@ export const PERFORMANCE_SYSTEM_INFO = {
   }
 }
 
-// Helper function to initialize the complete performance system
-export async function initializePerformanceSystem(config?: any) {
+// Helper function to initialize the complete performance system  
+export async function initializePerformanceSystem(config?: any): Promise<any> {
   const { default: PerformanceIntegrationSystem } = await import('./PerformanceIntegrationSystem')
   const system = new PerformanceIntegrationSystem(config)
   await system.start()
@@ -93,4 +93,5 @@ export async function runPerformanceBenchmarks() {
   return results
 }
 
-export default PerformanceIntegrationSystem
+// Export the main integration system
+export { default } from './PerformanceIntegrationSystem'

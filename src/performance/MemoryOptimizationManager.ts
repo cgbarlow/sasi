@@ -3,6 +3,15 @@
  * Advanced memory management, leak detection, and optimization
  */
 
+// WeakRef polyfill for environments that don't support it
+declare var WeakRef: any;
+interface WeakRefConstructor {
+  new <T extends object>(target: T): WeakRef<T>;
+}
+interface WeakRef<T extends object> {
+  deref(): T | undefined;
+}
+
 interface MemorySnapshot {
   timestamp: number
   heapUsed: number
@@ -211,12 +220,13 @@ export class MemoryOptimizationManager {
     if (this.objectTracker.has(category)) {
       const refs = this.objectTracker.get(category)!
       // Remove weak references to deallocated buffer
-      for (const ref of refs) {
-        if (ref.deref() === buffer) {
+      let found = false
+      refs.forEach(ref => {
+        if (!found && ref.deref() === buffer) {
           refs.delete(ref)
-          break
+          found = true
         }
-      }
+      })
     }
   }
 
@@ -315,26 +325,24 @@ export class MemoryOptimizationManager {
    * Clean up weak references
    */
   private cleanupWeakReferences(): void {
-    for (const [category, refs] of this.objectTracker) {
+    this.objectTracker.forEach((refs, category) => {
       const toDelete: WeakRef<object>[] = []
       
-      for (const ref of refs) {
+      refs.forEach(ref => {
         if (ref.deref() === undefined) {
           toDelete.push(ref)
         }
-      }
+      })
       
-      for (const ref of toDelete) {
-        refs.delete(ref)
-      }
-    }
+      toDelete.forEach(ref => refs.delete(ref))
+    })
   }
 
   /**
    * Optimize memory pools
    */
   private optimizeMemoryPools(): void {
-    for (const [name, pool] of this.memoryPools) {
+    this.memoryPools.forEach((pool, name) => {
       // If pool is over-allocated, reduce buffer count
       if (pool.buffers.length > 20) {
         pool.buffers.splice(15, pool.buffers.length - 15)
@@ -346,7 +354,7 @@ export class MemoryOptimizationManager {
           pool.buffers.push(new ArrayBuffer(pool.size))
         }
       }
-    }
+    })
   }
 
   /**
@@ -445,9 +453,9 @@ export class MemoryOptimizationManager {
   private estimateHeapUsed(): number {
     // Rough estimation based on object tracker
     let estimated = 0
-    for (const refs of this.objectTracker.values()) {
+    this.objectTracker.forEach(refs => {
       estimated += refs.size * 1024 // Estimate 1KB per tracked object
-    }
+    })
     return estimated
   }
 
@@ -497,12 +505,12 @@ export class MemoryOptimizationManager {
     }
     
     // Check pool efficiency
-    for (const pool of this.memoryPools.values()) {
+    this.memoryPools.forEach(pool => {
       const efficiency = pool.deallocations / Math.max(pool.allocation, 1)
       if (efficiency < 0.8) {
         recommendations.push(`Pool ${pool.name} has low deallocation rate - possible memory leak`)
       }
-    }
+    })
     
     return recommendations
   }

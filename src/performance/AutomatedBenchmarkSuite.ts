@@ -269,7 +269,7 @@ export class AutomatedBenchmarkSuite {
     console.log('🚀 Starting automated benchmark suite...')
 
     try {
-      for (const suite of this.suites.values()) {
+      for (const suite of Array.from(this.suites.values())) {
         if (suite.tests.some(t => t.enabled)) {
           const report = await this.runBenchmarkSuite(suite.id)
           reports.push(report)
