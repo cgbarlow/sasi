@@ -45,9 +45,9 @@ export class TeamAnalyzer {
   private collaborationHistory: CollaborationPattern[] = [];
   private analysisCacheTime: number = 0;
   private cachedAnalysis: TeamAnalysis | null = null;
-  private config: any;
+  private config: Record<string, unknown>;
 
-  constructor(config?: any) {
+  constructor(config?: Record<string, unknown>) {
     this.config = config || {};
   }
 
@@ -118,7 +118,6 @@ export class TeamAnalyzer {
 
   async getCollaborationPatterns(): Promise<CollaborationPattern[]> {
     // Return recent collaboration patterns
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
     return this.collaborationHistory.filter(pattern => 
       pattern.frequency > 0 // Stub filter
     );
@@ -236,7 +235,7 @@ export class TeamAnalyzer {
     return Array.from(this.members.values());
   }
 
-  async optimizeTeamFormation(options: any): Promise<any> {
+  async optimizeTeamFormation(_options: Record<string, unknown>): Promise<{ recommendedTeam: TeamMember[]; reasoning: string; confidence: number }> {
     // Stub implementation - would optimize team formation
     return {
       recommendedTeam: this.getMembers().slice(0, 5),

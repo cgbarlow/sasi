@@ -3,6 +3,15 @@
  * Analyzes code for security vulnerabilities, threats, and compliance issues
  */
 
+// Import the PRFile and PRData interfaces from CodeQualityAnalyzer
+import { PRFile, PRData } from './CodeQualityAnalyzer';
+
+export interface PatternMatch {
+  line: number;
+  column: number;
+  text: string;
+}
+
 export interface SecurityConfig {
   enableVulnerabilityScanning: boolean;
   enableComplianceChecks: boolean;
@@ -124,7 +133,7 @@ export class SecurityAnalyzer {
   /**
    * Analyze security for PR data
    */
-  async analyze(prData: any): Promise<SecurityAnalysis> {
+  async analyze(prData: PRData): Promise<SecurityAnalysis> {
     const cacheKey = this.generateCacheKey(prData);
     
     // Check cache
@@ -136,7 +145,7 @@ export class SecurityAnalyzer {
     }
 
     try {
-      console.log('🔒 Analyzing security vulnerabilities...');
+      // Analyzing security vulnerabilities...
 
       const [
         vulnerabilities,
@@ -166,11 +175,11 @@ export class SecurityAnalyzer {
       // Cache result
       this.analysisCache.set(cacheKey, analysis);
 
-      console.log(`🛡️ Security analysis complete (Score: ${overallScore.toFixed(2)}, ${allVulnerabilities.length} issues found)`);
+      // Security analysis complete
       return analysis;
 
     } catch (error) {
-      console.error('❌ Security analysis failed:', error);
+      // Security analysis failed - using fallback
       
       // Return fallback analysis
       return {
@@ -188,7 +197,7 @@ export class SecurityAnalyzer {
   /**
    * Scan for common vulnerabilities
    */
-  private async scanForVulnerabilities(files: any[]): Promise<SecurityVulnerability[]> {
+  private async scanForVulnerabilities(files: PRFile[]): Promise<SecurityVulnerability[]> {
     const vulnerabilities: SecurityVulnerability[] = [];
 
     for (const file of files) {
@@ -221,7 +230,7 @@ export class SecurityAnalyzer {
   /**
    * Detect SQL injection vulnerabilities
    */
-  private detectSQLInjection(file: any, content: string): SecurityVulnerability[] {
+  private detectSQLInjection(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     
     this.vulnerabilityPatterns.sqlInjection.forEach((pattern, index) => {
@@ -254,7 +263,7 @@ export class SecurityAnalyzer {
   /**
    * Detect XSS vulnerabilities
    */
-  private detectXSS(file: any, content: string): SecurityVulnerability[] {
+  private detectXSS(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     
     this.vulnerabilityPatterns.xss.forEach((pattern, index) => {
@@ -287,7 +296,7 @@ export class SecurityAnalyzer {
   /**
    * Detect weak cryptography
    */
-  private detectWeakCrypto(file: any, content: string): SecurityVulnerability[] {
+  private detectWeakCrypto(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     
     this.vulnerabilityPatterns.weakCrypto.forEach((pattern, index) => {
@@ -320,7 +329,7 @@ export class SecurityAnalyzer {
   /**
    * Detect authentication issues
    */
-  private detectAuthIssues(file: any, content: string): SecurityVulnerability[] {
+  private detectAuthIssues(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     
     this.vulnerabilityPatterns.authIssues.forEach((pattern, index) => {
@@ -353,7 +362,7 @@ export class SecurityAnalyzer {
   /**
    * Detect path traversal vulnerabilities
    */
-  private detectPathTraversal(file: any, content: string): SecurityVulnerability[] {
+  private detectPathTraversal(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     const pathTraversalPatterns = [
       /\.\.\//g,
@@ -392,7 +401,7 @@ export class SecurityAnalyzer {
   /**
    * Detect command injection vulnerabilities
    */
-  private detectCommandInjection(file: any, content: string): SecurityVulnerability[] {
+  private detectCommandInjection(file: PRFile, content: string): SecurityVulnerability[] {
     const vulnerabilities: SecurityVulnerability[] = [];
     const commandInjectionPatterns = [
       /exec\s*\(\s*[^)]*req\./gi,
@@ -431,7 +440,7 @@ export class SecurityAnalyzer {
   /**
    * Detect hardcoded secrets
    */
-  private async detectSecrets(files: any[]): Promise<SecurityVulnerability[]> {
+  private async detectSecrets(files: PRFile[]): Promise<SecurityVulnerability[]> {
     const secrets: SecurityVulnerability[] = [];
 
     for (const file of files) {
@@ -470,7 +479,7 @@ export class SecurityAnalyzer {
   /**
    * Check compliance with security standards
    */
-  private async checkCompliance(files: any[]): Promise<ComplianceCheck[]> {
+  private async checkCompliance(_files: PRFile[]): Promise<ComplianceCheck[]> {
     const checks: ComplianceCheck[] = [];
 
     // OWASP Top 10 compliance checks
@@ -489,7 +498,7 @@ export class SecurityAnalyzer {
   /**
    * Check OWASP Top 10 compliance
    */
-  private checkOWASPCompliance(files: any[]): ComplianceCheck[] {
+  private checkOWASPCompliance(_files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Example checks
@@ -513,7 +522,7 @@ export class SecurityAnalyzer {
   /**
    * Check CWE Top 25 compliance
    */
-  private checkCWECompliance(files: any[]): ComplianceCheck[] {
+  private checkCWECompliance(_files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     checks.push({
@@ -593,7 +602,7 @@ export class SecurityAnalyzer {
     return Math.min(100, totalRisk);
   }
 
-  private calculateOverallSecurityScore(metrics: SecurityMetrics, vulnerabilities: SecurityVulnerability[]): number {
+  private calculateOverallSecurityScore(metrics: SecurityMetrics, _vulnerabilities: SecurityVulnerability[]): number {
     const baseScore = 1.0;
     
     // Penalize based on vulnerability severity
@@ -649,9 +658,9 @@ export class SecurityAnalyzer {
     };
   }
 
-  private generateCacheKey(prData: any): string {
+  private generateCacheKey(prData: PRData): string {
     const filesHash = prData.files
-      .map((f: any) => `${f.filename}_${f.sha}`)
+      .map((f: PRFile) => `${f.filename}_${f.sha || 'no-sha'}`)
       .join('|');
     return `security_${filesHash}`;
   }

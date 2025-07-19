@@ -113,15 +113,22 @@ export interface AssessmentQuestion {
   points: number;
 }
 
+export interface MentorshipConfig {
+  enableAutomaticMatching?: boolean;
+  enableProgressTracking?: boolean;
+  maxMenteesPerMentor?: number;
+  sessionDurationMinutes?: number;
+}
+
 export class MentorshipEngine {
   private mentors: Map<string, MentorProfile> = new Map();
   private mentees: Map<string, MenteeProfile> = new Map();
   private mentorshipRecords: MentorshipRecord[] = [];
   private learningPaths: Map<string, LearningPath> = new Map();
   private resources: LearningResource[] = [];
-  private config: any;
+  private config: MentorshipConfig;
 
-  constructor(config?: any) {
+  constructor(config?: MentorshipConfig) {
     this.config = config || {};
   }
 

@@ -3,6 +3,65 @@
  * Analyzes code for maintainability, readability, and best practices
  */
 
+// Interfaces for PR data analysis
+export interface PRFile {
+  filename: string;
+  status: string;
+  additions: number;
+  deletions: number;
+  changes: number;
+  blob_url: string;
+  raw_url: string;
+  contents_url: string;
+  patch?: string;
+  sha?: string;
+}
+
+export interface PRData {
+  number: number;
+  title: string;
+  body: string;
+  files: PRFile[];
+  additions: number;
+  deletions: number;
+  changed_files: number;
+}
+
+export interface ComplexityMetrics {
+  cyclomatic: number;
+  cognitive: number;
+  halstead: number;
+}
+
+export interface MaintainabilityMetrics {
+  index: number;
+  techDebt: number;
+  codeSmells: number;
+}
+
+export interface DuplicationMetrics {
+  percentage: number;
+  duplicatedLines: number;
+  duplicatedBlocks: number;
+}
+
+export interface StyleMetrics {
+  consistency: number;
+  adherence: number;
+  violations: number;
+}
+
+export interface CoverageMetrics {
+  lines: number;
+  branches: number;
+  functions: number;
+}
+
+export interface AnalysisWithIssues {
+  issues: CodeQualityIssue[];
+  metrics: ComplexityMetrics | MaintainabilityMetrics | DuplicationMetrics | StyleMetrics;
+}
+
 export interface CodeQualityConfig {
   enableComplexityAnalysis: boolean;
   enableDuplicationDetection: boolean;
@@ -80,7 +139,7 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze code quality for PR data
    */
-  async analyze(prData: any): Promise<CodeQualityAnalysis> {
+  async analyze(prData: PRData): Promise<CodeQualityAnalysis> {
     const cacheKey = this.generateCacheKey(prData);
     
     // Check cache
@@ -92,7 +151,7 @@ export class CodeQualityAnalyzer {
     }
 
     try {
-      console.log('🔍 Analyzing code quality...');
+      // Analyzing code quality...
 
       const [
         complexityAnalysis,
@@ -136,11 +195,11 @@ export class CodeQualityAnalyzer {
       // Cache result
       this.analysisCache.set(cacheKey, analysis);
 
-      console.log(`📊 Code quality analysis complete (Score: ${overallScore.toFixed(2)})`);
+      // Code quality analysis complete
       return analysis;
 
     } catch (error) {
-      console.error('❌ Code quality analysis failed:', error);
+      // Code quality analysis failed - using fallback
       
       // Return fallback analysis
       return {
@@ -157,9 +216,9 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze code complexity
    */
-  private async analyzeComplexity(files: any[]): Promise<{
+  private async analyzeComplexity(files: PRFile[]): Promise<{
     issues: CodeQualityIssue[];
-    metrics: any;
+    metrics: ComplexityMetrics;
   }> {
     const issues: CodeQualityIssue[] = [];
     let totalComplexity = 0;
@@ -200,9 +259,9 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze code duplication
    */
-  private async analyzeDuplication(files: any[]): Promise<{
+  private async analyzeDuplication(files: PRFile[]): Promise<{
     issues: CodeQualityIssue[];
-    metrics: any;
+    metrics: DuplicationMetrics;
   }> {
     const issues: CodeQualityIssue[] = [];
     let duplicatedLines = 0;
@@ -235,7 +294,7 @@ export class CodeQualityAnalyzer {
     }
 
     // Find duplications
-    codeBlocks.forEach((occurrences, code) => {
+    codeBlocks.forEach((occurrences) => {
       if (occurrences.length > 1) {
         duplicatedLines += occurrences.length;
         
@@ -267,9 +326,9 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze code style
    */
-  private async analyzeStyle(files: any[]): Promise<{
+  private async analyzeStyle(files: PRFile[]): Promise<{
     issues: CodeQualityIssue[];
-    metrics: any;
+    metrics: StyleMetrics;
   }> {
     const issues: CodeQualityIssue[] = [];
     let styleViolations = 0;
@@ -300,9 +359,9 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze maintainability
    */
-  private async analyzeMaintainability(files: any[]): Promise<{
+  private async analyzeMaintainability(files: PRFile[]): Promise<{
     issues: CodeQualityIssue[];
-    metrics: any;
+    metrics: MaintainabilityMetrics;
   }> {
     const issues: CodeQualityIssue[] = [];
     let maintainabilityScore = 100;
@@ -332,7 +391,7 @@ export class CodeQualityAnalyzer {
   /**
    * Analyze test coverage
    */
-  private async analyzeCoverage(files: any[]): Promise<any> {
+  private async analyzeCoverage(files: PRFile[]): Promise<CoverageMetrics> {
     // Simplified coverage analysis
     const testFiles = files.filter(f => 
       f.filename.includes('.test.') || 
@@ -357,7 +416,7 @@ export class CodeQualityAnalyzer {
   /**
    * Calculate file complexity
    */
-  private calculateFileComplexity(file: any): { cyclomatic: number } {
+  private calculateFileComplexity(file: PRFile): { cyclomatic: number } {
     const patch = file.patch || '';
     
     // Count complexity indicators in the patch
@@ -387,7 +446,7 @@ export class CodeQualityAnalyzer {
   /**
    * Check style violations
    */
-  private checkStyleViolations(file: any): CodeQualityIssue[] {
+  private checkStyleViolations(file: PRFile): CodeQualityIssue[] {
     const issues: CodeQualityIssue[] = [];
     const patch = file.patch || '';
     const lines = patch.split('\n');
@@ -431,7 +490,7 @@ export class CodeQualityAnalyzer {
   /**
    * Detect code smells
    */
-  private detectCodeSmells(file: any): CodeQualityIssue[] {
+  private detectCodeSmells(file: PRFile): CodeQualityIssue[] {
     const issues: CodeQualityIssue[] = [];
     const patch = file.patch || '';
 
@@ -566,9 +625,9 @@ export class CodeQualityAnalyzer {
     };
   }
 
-  private generateCacheKey(prData: any): string {
+  private generateCacheKey(prData: PRData): string {
     const filesHash = prData.files
-      .map((f: any) => `${f.filename}_${f.sha}`)
+      .map((f: PRFile) => `${f.filename}_${f.sha || 'no-sha'}`)
       .join('|');
     return `quality_${filesHash}`;
   }

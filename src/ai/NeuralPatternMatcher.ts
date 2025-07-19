@@ -10,7 +10,7 @@ export interface PatternMatch {
     start: number;
     end: number;
   };
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean>;
 }
 
 export interface PatternConfig {
@@ -22,7 +22,7 @@ export interface PatternConfig {
 
 export class NeuralPatternMatcher {
   private config: PatternConfig;
-  private patterns: Map<string, any> = new Map();
+  private patterns: Map<string, { compiled: boolean; weights: number[]; bias: number }> = new Map();
   private initialized: boolean = false;
 
   constructor(config: PatternConfig) {
@@ -31,7 +31,7 @@ export class NeuralPatternMatcher {
 
   async initialize(): Promise<void> {
     // Stub implementation - would initialize neural pattern matching
-    console.log(`Initializing neural pattern matcher with ${this.config.patterns.length} patterns`);
+    // Initializing neural pattern matcher
     
     for (const pattern of this.config.patterns) {
       this.patterns.set(pattern, {
@@ -100,7 +100,7 @@ export class NeuralPatternMatcher {
     return this.initialized;
   }
 
-  async match(issueData: any): Promise<any> {
+  async match(issueData: { content?: string }): Promise<{ matchCount: number; matches: PatternMatch[]; confidence: number }> {
     // Stub implementation - would match patterns in issue data
     const matches = await this.findPatterns(issueData.content || '');
     return {
@@ -110,7 +110,7 @@ export class NeuralPatternMatcher {
     };
   }
 
-  async suggestLabels(patterns: string[]): Promise<any[]> {
+  async suggestLabels(patterns: string[]): Promise<Array<{ label: string; confidence: number; reasoning: string }>> {
     // Stub implementation - would suggest labels based on patterns
     return patterns.map(pattern => ({
       label: `pattern-${pattern}`,
@@ -119,8 +119,8 @@ export class NeuralPatternMatcher {
     }));
   }
 
-  async learn(issueData: any, triageResult: any): Promise<void> {
+  async learn(_issueData: Record<string, unknown>, _triageResult: Record<string, unknown>): Promise<void> {
     // Stub implementation - would update pattern matching model
-    console.log('Learning from triage patterns');
+    // Learning from triage patterns
   }
 }

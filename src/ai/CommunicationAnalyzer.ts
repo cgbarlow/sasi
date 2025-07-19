@@ -13,7 +13,14 @@ export interface CommunicationMessage {
   timestamp: Date;
   channel: string;
   type: 'text' | 'code' | 'document' | 'meeting' | 'email';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
+}
+
+export interface CommunicationConfig {
+  enableSentimentAnalysis?: boolean;
+  enablePatternDetection?: boolean;
+  cacheTimeout?: number;
+  maxMessageHistory?: number;
 }
 
 export interface CommunicationMetrics {
@@ -47,11 +54,11 @@ export interface CommunicationInsight {
 
 export class CommunicationAnalyzer {
   private messages: CommunicationMessage[] = [];
-  private analysisCache: Map<string, any> = new Map();
+  private analysisCache: Map<string, CommunicationMetrics | CommunicationPattern[] | CommunicationInsight[]> = new Map();
   private cacheExpiry: number = 300000; // 5 minutes
-  private config: any;
+  private config: CommunicationConfig;
 
-  constructor(config?: any) {
+  constructor(config?: CommunicationConfig) {
     this.config = config || {};
   }
 
@@ -118,7 +125,7 @@ export class CommunicationAnalyzer {
 
   async generateInsights(timeframe?: { start: Date; end: Date }): Promise<CommunicationInsight[]> {
     const metrics = await this.analyzeCommunication(timeframe);
-    const patterns = await this.identifyPatterns(timeframe);
+    await this.identifyPatterns(timeframe);
 
     // Stub implementation - would generate actual insights
     const insights: CommunicationInsight[] = [];
@@ -208,7 +215,7 @@ export class CommunicationAnalyzer {
     );
   }
 
-  private calculateAverageResponseTime(messages: CommunicationMessage[]): number {
+  private calculateAverageResponseTime(_messages: CommunicationMessage[]): number {
     // Stub implementation
     return Math.random() * 3600000; // Random time up to 1 hour
   }
@@ -223,27 +230,27 @@ export class CommunicationAnalyzer {
     return allParticipants.size > 0 ? uniqueSenders.size / allParticipants.size : 0;
   }
 
-  private calculateSentimentScore(messages: CommunicationMessage[]): number {
+  private calculateSentimentScore(_messages: CommunicationMessage[]): number {
     // Stub implementation - would analyze sentiment of all messages
     return 0.7; // Neutral to positive
   }
 
-  private calculateClarityScore(messages: CommunicationMessage[]): number {
+  private calculateClarityScore(_messages: CommunicationMessage[]): number {
     // Stub implementation - would analyze message clarity
     return 0.8;
   }
 
-  private calculateCollaborationIndex(messages: CommunicationMessage[]): number {
+  private calculateCollaborationIndex(_messages: CommunicationMessage[]): number {
     // Stub implementation - would measure collaboration indicators
     return 0.75;
   }
 
-  private calculateNetworkDensity(messages: CommunicationMessage[]): number {
+  private calculateNetworkDensity(_messages: CommunicationMessage[]): number {
     // Stub implementation - would calculate communication network density
     return 0.6;
   }
 
-  private calculateInformationFlow(messages: CommunicationMessage[]): number {
+  private calculateInformationFlow(_messages: CommunicationMessage[]): number {
     // Stub implementation - would measure information flow efficiency
     return 0.8;
   }
@@ -276,7 +283,7 @@ export class CommunicationAnalyzer {
            Date.now() < this.analysisCache.get(key + '_expiry');
   }
 
-  private setCacheWithExpiry(key: string, value: any): void {
+  private setCacheWithExpiry(key: string, value: CommunicationMetrics | CommunicationPattern[] | CommunicationInsight[]): void {
     this.analysisCache.set(key, value);
     this.analysisCache.set(key + '_expiry', Date.now() + this.cacheExpiry);
   }
