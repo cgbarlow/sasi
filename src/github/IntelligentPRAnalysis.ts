@@ -117,24 +117,24 @@ class IntelligentPRAnalysis {
     const prData = await this.fetchPRData(owner, repo, prNumber);
     
     const checks = await Promise.all([
-      this.checkCIStatus(prData),
-      this.checkCodeQuality(analysisResult),
-      this.checkSecurityRequirements(analysisResult),
-      this.checkTestCoverage(analysisResult),
-      this.checkReviewStatus(prData),
-      this.checkConflicts(prData),
-      this.checkBreakingChanges(analysisResult)
+      this.checkCIStatus(owner, repo, prNumber),
+      this.checkCodeQuality(prData),
+      this.checkSecurityRequirements(prData),
+      this.checkTestCoverage(prData),
+      this.checkReviewStatus(owner, repo, prNumber),
+      this.checkConflicts(owner, repo, prNumber),
+      this.checkBreakingChanges(prData)
     ]);
     
     const overall = this.calculateOverallReadiness(checks);
     
     return {
       prNumber,
-      isReady: overall.isReady,
-      readinessScore: overall.score,
-      blockers: overall.blockers,
-      warnings: overall.warnings,
-      recommendations: overall.recommendations,
+      isReady: overall >= 0.8,
+      readinessScore: overall,
+      blockers: checks.filter(c => c.status === 'failure').map(c => c.message || 'Check failed'),
+      warnings: checks.filter(c => c.status === 'warning').map(c => c.message || 'Warning detected'),
+      recommendations: this.generateReadinessRecommendations(checks),
       checks,
       timestamp: new Date().toISOString()
     };
@@ -159,10 +159,10 @@ class IntelligentPRAnalysis {
     
     return {
       prNumber,
-      overallImpact: this.calculateOverallImpact(impact),
+      overallImpact: this.calculateOverallImpact([impact.scope, impact.dependencies, impact.performance, impact.security, impact.breaking, impact.database, impact.api, impact.ui]),
       impactCategories: impact,
-      riskLevel: this.calculateRiskLevel(impact),
-      recommendations: this.generateImpactRecommendations(impact),
+      riskLevel: this.calculateRiskLevel(this.calculateOverallImpact([impact.scope, impact.dependencies, impact.performance, impact.security, impact.breaking, impact.database, impact.api, impact.ui])),
+      recommendations: this.generateImpactRecommendations([impact.scope, impact.dependencies, impact.performance, impact.security, impact.breaking, impact.database, impact.api, impact.ui], this.calculateRiskLevel(this.calculateOverallImpact([impact.scope, impact.dependencies, impact.performance, impact.security, impact.breaking, impact.database, impact.api, impact.ui])));
       timestamp: new Date().toISOString()
     };
   }
@@ -760,18 +760,109 @@ class IntelligentPRAnalysis {
     }
     
     impacts.forEach(impact => {
-      if (impact.hasDatabaseChanges) {
-        recommendations.push('Review database migration scripts carefully');
-      }
-      if (impact.hasAPIChanges) {
-        recommendations.push('Update API documentation and notify dependent services');
-      }
-      if (impact.hasBreakingChanges) {
-        recommendations.push('Coordinate with all teams using affected APIs');
+      if (impact && typeof impact === 'object') {
+        if (impact.hasDatabaseChanges) {
+          recommendations.push('Review database migration scripts carefully');
+        }
+        if (impact.hasAPIChanges) {
+          recommendations.push('Update API documentation and notify dependent services');
+        }
+        if (impact.hasBreakingChanges) {
+          recommendations.push('Coordinate with all teams using affected APIs');
+        }
       }
     });
     
     return recommendations;
+  }
+
+  // Missing helper methods for method signature compatibility
+  private generateReadinessRecommendations(checks: any[]): string[] {
+    const recommendations: string[] = [];
+    
+    checks.forEach(check => {
+      if (check.status === 'failure') {
+        recommendations.push(`Fix ${check.type || 'failed check'}: ${check.message || 'Unknown issue'}`);
+      }
+      if (check.status === 'warning') {
+        recommendations.push(`Address ${check.type || 'warning'}: ${check.message || 'Review needed'}`);
+      }
+    });
+    
+    if (recommendations.length === 0) {
+      recommendations.push('PR appears ready for merge');
+    }
+    
+    return recommendations;
+  }
+
+  // Missing method stubs for IntelligentPRAnalysis
+  private generateSizeLabels(prData: PRData): LabelSuggestion[] {
+    const size = this.calculatePRSize(prData.files);
+    return [{
+      label: `size/${size}`,
+      confidence: 0.9,
+      reasoning: `PR has ${prData.files.length} files with ${size} impact`
+    }];
+  }
+
+  private generateTypeLabels(analysisResult: PRAnalysisResult): LabelSuggestion[] {
+    const suggestions: LabelSuggestion[] = [];
+    
+    if (analysisResult.security > 0.7) {
+      suggestions.push({ label: 'security', confidence: 0.8, reasoning: 'Security-related changes detected' });
+    }
+    if (analysisResult.performance > 0.7) {
+      suggestions.push({ label: 'performance', confidence: 0.8, reasoning: 'Performance impact detected' });
+    }
+    
+    return suggestions;
+  }
+
+  private generateImpactLabels(analysisResult: PRAnalysisResult): LabelSuggestion[] {
+    const suggestions: LabelSuggestion[] = [];
+    
+    if (analysisResult.complexity > 0.8) {
+      suggestions.push({ label: 'high-complexity', confidence: 0.9, reasoning: 'High complexity changes' });
+    }
+    
+    return suggestions;
+  }
+
+  private generatePriorityLabels(analysisResult: PRAnalysisResult): LabelSuggestion[] {
+    const suggestions: LabelSuggestion[] = [];
+    
+    if (analysisResult.overallScore < 0.5) {
+      suggestions.push({ label: 'needs-work', confidence: 0.8, reasoning: 'Low quality score' });
+    }
+    
+    return suggestions;
+  }
+
+  private generateComponentLabels(prData: PRData): LabelSuggestion[] {
+    const suggestions: LabelSuggestion[] = [];
+    
+    const hasBackend = prData.files.some(f => f.filename.includes('server') || f.filename.includes('api'));
+    const hasFrontend = prData.files.some(f => f.filename.endsWith('.tsx') || f.filename.endsWith('.jsx'));
+    
+    if (hasBackend) suggestions.push({ label: 'backend', confidence: 0.9, reasoning: 'Backend files modified' });
+    if (hasFrontend) suggestions.push({ label: 'frontend', confidence: 0.9, reasoning: 'Frontend files modified' });
+    
+    return suggestions;
+  }
+
+  private rankLabelSuggestions(suggestions: LabelSuggestion[]): LabelSuggestion[] {
+    return suggestions.sort((a, b) => b.confidence - a.confidence).slice(0, 10);
+  }
+
+  private calculateChangeSize(prData: PRData): string {
+    return this.calculatePRSize(prData.files);
+  }
+
+  private calculateReviewability(prData: PRData, analysisResult: PRAnalysisResult): number {
+    const sizeScore = prData.files.length < 10 ? 1 : Math.max(0, 1 - (prData.files.length - 10) / 20);
+    const complexityScore = Math.max(0, 1 - analysisResult.complexity);
+    return (sizeScore + complexityScore) / 2;
   }
 
   // Helper methods for missing functionality
@@ -797,10 +888,7 @@ class IntelligentPRAnalysis {
     return filename.includes(pattern.replace('*', ''));
   }
 
-  private isCacheValid(cached: PRAnalysisResult): boolean {
-    const cacheAge = Date.now() - new Date(cached.timestamp).getTime();
-    return cacheAge < 3600000; // 1 hour cache
-  }
+  // Removed duplicate isCacheValid method - already exists above
 }
 
 // Type definitions

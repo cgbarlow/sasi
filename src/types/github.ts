@@ -205,3 +205,15 @@ export interface IssueWebhookPayload extends GitHubWebhookPayload {
 export interface PullRequestWebhookPayload extends GitHubWebhookPayload {
   pull_request: GitHubPullRequest;
 }
+
+export interface GitHubWorkflow {
+  id: number;
+  name: string;
+  path: string;
+  state: 'active' | 'deleted' | 'disabled_fork' | 'disabled_inactivity' | 'disabled_manually';
+  created_at: string;
+  updated_at: string;
+  url: string;
+  html_url: string;
+  badge_url: string;
+}

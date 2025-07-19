@@ -177,7 +177,11 @@ class GitHubIntegrationLayer {
    * GitHub Actions Workflow Optimization
    * Analyzes and optimizes CI/CD workflows
    */
-  async optimizeWorkflows(owner: string, repo: string): Promise<WorkflowOptimization> {
+  async optimizeWorkflows(owner: string, repo: string): Promise<{
+    optimizations: any[];
+    totalPotentialImprovement: number;
+    analysisTimestamp: string;
+  }> {
     try {
       // Fetch workflows
       const { data: workflows } = await this.octokit.actions.listRepoWorkflows({
@@ -210,7 +214,6 @@ class GitHubIntegrationLayer {
       }
 
       return {
-        repository: `${owner}/${repo}`,
         optimizations,
         totalPotentialImprovement: optimizations.reduce((sum, opt) => 
           sum + opt.estimatedImprovement, 0),
@@ -720,33 +723,6 @@ interface GitHubIntegrationOptions {
   rateLimitConfig?: any;
 }
 
-interface IssueTriage {
-  issueNumber: number;
-  priority: 'critical' | 'high' | 'medium' | 'low';
-  category: string;
-  severity: number;
-  estimatedEffort: string;
-  suggestedLabels: string[];
-  suggestedAssignees: string[];
-  aiConfidence: number;
-  analysisTimestamp: string;
-}
-
-interface PRAnalysis {
-  prNumber: number;
-  complexity: number;
-  testCoverage: number;
-  codeQuality: number;
-  securityRisk: number;
-  performance: number;
-  maintainability: number;
-  suggestedReviewers: string[];
-  potentialIssues: string[];
-  recommendations: string[];
-  mergeability: boolean;
-  analysisTimestamp: string;
-}
-
 interface RepositoryHealth {
   repository: string;
   overallScore: number;
@@ -765,16 +741,6 @@ interface RepositoryHealth {
   lastUpdated: string;
 }
 
-interface WorkflowOptimization {
-  workflowId: number;
-  workflowName: string;
-  currentPerformance: number;
-  optimizationOpportunities: string[];
-  suggestedChanges: string[];
-  estimatedImprovement: number;
-  priority: string;
-}
-
 interface CollaborationEnhancement {
   repository: string;
   teamInsights: any;
@@ -790,9 +756,6 @@ export {
   GitHubIntegrationLayer,
   GitHubIntegrationError,
   type GitHubIntegrationOptions,
-  type IssueTriage,
-  type PRAnalysis,
   type RepositoryHealth,
-  type WorkflowOptimization,
   type CollaborationEnhancement
 };

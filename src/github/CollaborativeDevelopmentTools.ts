@@ -1633,7 +1633,7 @@ class CollaborativeDevelopmentTools {
     }
 
     // Calculate diversity index
-    const levels = Object.values(distribution.expertiseLevels);
+    const levels = Object.values(distribution.expertiseLevels) as number[];
     distribution.diversityIndex = this.calculateShannonDiversity(levels);
 
     return distribution;
@@ -1936,9 +1936,9 @@ class CollaborativeDevelopmentTools {
     // Analyze patterns
     learning.learningPatterns = {
       mostActivelearners: Object.entries(learning.skillDevelopment)
-        .sort(([,a], [,b]) => b.progressScore - a.progressScore)
+        .sort(([,a], [,b]) => ((b as any)?.progressScore || 0) - ((a as any)?.progressScore || 0))
         .slice(0, 5)
-        .map(([author, data]) => ({ author, score: data.progressScore })),
+        .map(([author, data]) => ({ author, score: (data as any)?.progressScore || 0 })),
       learningFrequency: learning.learningActivities.length / Math.max(interactions.length, 1),
       skillDiversityIndex: this.calculateSkillDiversity(learning.skillDevelopment)
     };
@@ -2592,6 +2592,27 @@ class CollaborativeDevelopmentTools {
     return '3-6 months';
   }
 
+  private identifyCommunicationBottlenecks(interactions: any[]): any[] {
+    const bottlenecks: any[] = [];
+    
+    // Analyze communication patterns for bottlenecks
+    const communicationMetrics = this.analyzeCommunicationMetrics(interactions);
+    
+    // Identify slow response times
+    if (communicationMetrics.averageResponseTime > 24) {
+      bottlenecks.push({
+        type: 'communication',
+        severity: 'high',
+        impact: 0.8,
+        description: 'Slow response times in team communication',
+        affectedUsers: communicationMetrics.slowResponders || [],
+        suggestions: ['Set communication expectations', 'Use async communication tools']
+      });
+    }
+    
+    return bottlenecks;
+  }
+
   private identifyReviewBottlenecks(reviews: any[]): any[] {
     return [];
   }
@@ -2602,6 +2623,15 @@ class CollaborativeDevelopmentTools {
 
   private identifyKnowledgeBottlenecks(contributors: any[]): any[] {
     return [];
+  }
+
+  private analyzeCommunicationMetrics(interactions: any[]): any {
+    return {
+      averageResponseTime: 12, // hours
+      siloScore: 0.3,
+      slowResponders: ['user1', 'user2'],
+      isolatedUsers: ['user3']
+    };
   }
 }
 

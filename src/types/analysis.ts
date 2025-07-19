@@ -18,6 +18,42 @@ export interface AnalysisResult {
   };
 }
 
+export interface AIAnalysisResult {
+  severity: number;
+  confidence: number;
+  category: string;
+  estimatedEffort: string;
+  suggestedLabels: string[];
+  suggestedAssignees: string[];
+}
+
+export interface IssueTriage {
+  issueNumber: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  category: string;
+  severity: number;
+  estimatedEffort: string;
+  suggestedLabels: string[];
+  suggestedAssignees: string[];
+  aiConfidence: number;
+  analysisTimestamp: string;
+}
+
+export interface PRAnalysis {
+  prNumber: number;
+  complexity: number;
+  testCoverage: number;
+  codeQuality: number;
+  securityRisk: number;
+  performance: number;
+  maintainability: number;
+  suggestedReviewers: string[];
+  potentialIssues: string[];
+  recommendations: string[];
+  mergeability: boolean;
+  analysisTimestamp: string;
+}
+
 export interface DataPoint {
   id: string;
   timestamp: Date;
