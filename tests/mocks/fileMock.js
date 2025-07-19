@@ -1,0 +1,1 @@
+/**\n * Mock for static file imports (images, etc.)\n */\n\nmodule.exports = 'test-file-stub'\n

@@ -1,0 +1,37 @@
+{
+  "name": "Basic Development DevPod",
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
+  "runArgs": [
+    "--privileged"
+  ],
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "en_US.UTF-8",
+    "LANGUAGE": "en_US.UTF-8"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rooveterinaryinc.roo-cline",
+        "vsls-contrib.gistfs",
+        "github.copilot",
+        "github.copilot-chat"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/install-tools.sh && bash .devcontainer/setup-tmux.sh",
+  "shutdownAction": "none"
+}

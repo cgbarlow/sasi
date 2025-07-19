@@ -1,18 +1,28 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useNeuralMesh } from '../hooks/useNeuralMesh'
+import { NeuralAgent } from '../services/NeuralMeshService'
+import { Agent } from '../types/agent'
+import { neuralSwarmIntegration } from '../services/SwarmContextIntegration'
 
-export interface Agent {
-  id: string
-  name: string
-  type: 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger'
-  status: 'active' | 'idle' | 'processing' | 'completed'
-  currentTask: string
-  repository: string
-  branch: string
-  completedTasks: number
-  efficiency: number
-  progress: number
-  position: { x: number; y: number; z: number }
-  owner: string
+export type { Agent } from '../types/agent'
+
+export interface SwarmStats {
+  totalAgents: number
+  activeAgents: number
+  totalRepositories: number
+  tasksCompleted: number
+  asiProgress: number
+  networkEfficiency: number
+  globalContributors: number
+  processingUnits: number
+  neuralMeshStats?: {
+    totalNeurons: number
+    totalSynapses: number
+    meshConnectivity: number
+    neuralActivity: number
+    wasmAcceleration: boolean
+    averageLatency: number
+  }
 }
 
 export interface Repository {
@@ -30,16 +40,6 @@ export interface Repository {
   userVoted: boolean
 }
 
-export interface SwarmStats {
-  totalAgents: number
-  activeAgents: number
-  totalRepositories: number
-  tasksCompleted: number
-  asiProgress: number
-  networkEfficiency: number
-  globalContributors: number
-  processingUnits: number
-}
 
 interface SwarmContextType {
   agents: Agent[]
@@ -52,6 +52,25 @@ interface SwarmContextType {
   removeAgent: (id: string) => void
   voteForProject: (repositoryId: string) => void
   addRepository: (repository: Repository) => void
+  // Neural mesh integration
+  neuralMesh: {
+    isConnected: boolean
+    isInitializing: boolean
+    error: string | null
+    metrics: {
+      totalNeurons: number
+      totalSynapses: number
+      averageActivity: number
+      networkEfficiency: number
+      wasmAcceleration: boolean
+    }
+    connection: any
+    trainMesh: (patterns: any[]) => Promise<boolean>
+    getMeshStatus: () => Promise<any>
+    clearError: () => void
+    reconnect: () => Promise<void>
+    toggleNeuralMesh: (enabled: boolean) => void
+  }
 }
 
 const SwarmContext = createContext<SwarmContextType | undefined>(undefined)
@@ -82,30 +101,149 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     processingUnits: 0
   })
   const [isSwarmActive, setIsSwarmActive] = useState(false)
+  const [enableNeuralMesh, setEnableNeuralMesh] = useState(true)
+  const [neuralIntegrationReady, setNeuralIntegrationReady] = useState(false)
+  
+  // Neural mesh integration
+  const neuralMeshHook = useNeuralMesh({
+    serverUrl: 'ws://localhost:3000',
+    enableWasm: true,
+    enableRealtime: true,
+    debugMode: true
+  })
 
-  // Initialize mock data
+  // Initialize neural data (replaces mock data)
   useEffect(() => {
-    initializeMockData()
+    initializeNeuralData()
+  }, [])
+  
+  // Initialize neural integration
+  useEffect(() => {
+    const setupNeuralIntegration = async () => {
+      try {
+        await neuralSwarmIntegration.initializeNeuralData(repositories)
+        setNeuralIntegrationReady(true)
+      } catch (error) {
+        console.error('Neural integration setup failed:', error)
+        // Fallback to mock data if neural integration fails
+        initializeMockData()
+      }
+    }
+    setupNeuralIntegration()
   }, [])
 
   // Update stats when agents/repositories change
   useEffect(() => {
     updateStats()
-  }, [agents, repositories])
-
-  // Simulate swarm activity
+  }, [agents, repositories, neuralMeshHook.agents, neuralMeshHook.metrics])
+  
+  // Sync neural mesh agents with regular agents
   useEffect(() => {
-    if (!isSwarmActive) return
+    if (enableNeuralMesh && neuralMeshHook.agents.length > 0) {
+      const combinedAgents = [...agents.filter(a => !a.neuralId), ...neuralMeshHook.agents]
+      setAgents(combinedAgents)
+    }
+  }, [neuralMeshHook.agents, enableNeuralMesh])
+  
+  // Sync neural integration agents
+  useEffect(() => {
+    if (neuralIntegrationReady && isSwarmActive) {
+      const interval = setInterval(async () => {
+        try {
+          const updatedAgents = await neuralSwarmIntegration.simulateNeuralActivity()
+          setAgents(current => {
+            // Merge neural agents with existing agents
+            const nonNeuralAgents = current.filter(a => !a.neuralId)
+            return [...nonNeuralAgents, ...updatedAgents]
+          })
+        } catch (error) {
+          console.error('Neural activity simulation failed:', error)
+        }
+      }, 2000)
+      
+      return () => clearInterval(interval)
+    }
+  }, [neuralIntegrationReady, isSwarmActive])
+
+  // Simulate swarm activity (fallback when neural integration not available)
+  useEffect(() => {
+    if (!isSwarmActive || neuralIntegrationReady) return
 
     const interval = setInterval(() => {
       simulateSwarmActivity()
     }, 2000)
 
     return () => clearInterval(interval)
-  }, [isSwarmActive])
+  }, [isSwarmActive, neuralIntegrationReady])
 
+  const initializeNeuralData = async () => {
+    try {
+      // Enhanced neural repositories
+      const neuralRepos: Repository[] = [
+        {
+          id: 'repo_1',
+          name: 'neural-architecture-search',
+          owner: 'DeepMind',
+          description: 'Automated neural architecture discovery with reinforcement learning',
+          activeAgents: 8,
+          totalIssues: 47,
+          completedIssues: 32,
+          openPullRequests: 3,
+          lastActivity: new Date(),
+          techStack: ['Python', 'TensorFlow', 'JAX', 'CUDA'],
+          votes: 156,
+          userVoted: false
+        },
+        {
+          id: 'repo_2',
+          name: 'synaptic-mesh-framework',
+          owner: 'OpenAI',
+          description: 'Distributed neural mesh computing with WASM acceleration',
+          activeAgents: 12,
+          totalIssues: 73,
+          completedIssues: 51,
+          openPullRequests: 5,
+          lastActivity: new Date(),
+          techStack: ['Rust', 'WebAssembly', 'TypeScript', 'C++'],
+          votes: 289,
+          userVoted: true
+        },
+        {
+          id: 'repo_3',
+          name: 'ruv-fann-enhanced',
+          owner: 'FANN-Community',
+          description: 'Fast Artificial Neural Network library with SIMD optimization',
+          activeAgents: 6,
+          totalIssues: 95,
+          completedIssues: 78,
+          openPullRequests: 2,
+          lastActivity: new Date(),
+          techStack: ['C', 'Rust', 'Python', 'WebAssembly'],
+          votes: 445,
+          userVoted: false
+        }
+      ]
+
+      setRepositories(neuralRepos)
+      
+      // Initialize neural agents if integration is available
+      if (neuralIntegrationReady) {
+        const neuralAgents = neuralSwarmIntegration.generateNeuralAgents(25)
+        setAgents(neuralAgents)
+      } else {
+        // Fallback to enhanced mock agents
+        const mockAgents: Agent[] = generateMockAgents(25)
+        setAgents(mockAgents)
+      }
+    } catch (error) {
+      console.error('Neural data initialization failed:', error)
+      // Fallback to original mock data
+      initializeMockData()
+    }
+  }
+  
   const initializeMockData = () => {
-    // Mock repositories
+    // Original mock repositories (fallback)
     const mockRepos: Repository[] = [
       {
         id: 'repo_1',
@@ -131,7 +269,9 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         completedIssues: 51,
         openPullRequests: 5,
         lastActivity: new Date(),
-        techStack: ['Python', 'TensorFlow', 'C++'],        votes: 28,        userVoted: true
+        techStack: ['Python', 'TensorFlow', 'C++'],
+        votes: 28,
+        userVoted: true
       },
       {
         id: 'repo_3',
@@ -143,7 +283,9 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
         completedIssues: 67,
         openPullRequests: 7,
         lastActivity: new Date(),
-        techStack: ['Go', 'React', 'PostgreSQL'],        votes: 73,        userVoted: false
+        techStack: ['Go', 'React', 'PostgreSQL'],
+        votes: 73,
+        userVoted: false
       }
     ]
 
@@ -192,20 +334,39 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
   }
 
   const updateStats = () => {
-    const activeAgents = agents.filter(agent => agent.status === 'active').length
+    const activeAgents = agents.filter(agent => agent.status === 'active' || agent.status === 'processing').length
     const totalTasks = agents.reduce((sum, agent) => sum + agent.completedTasks, 0)
     const avgEfficiency = agents.reduce((sum, agent) => sum + agent.efficiency, 0) / agents.length
+    
+    // Include neural mesh metrics
+    const neuralMeshStats = enableNeuralMesh ? {
+      totalNeurons: neuralMeshHook.metrics.totalNeurons,
+      totalSynapses: neuralMeshHook.metrics.totalSynapses,
+      meshConnectivity: neuralMeshHook.metrics.networkEfficiency,
+      neuralActivity: neuralMeshHook.metrics.averageActivity,
+      wasmAcceleration: neuralMeshHook.metrics.wasmAcceleration,
+      averageLatency: neuralMeshHook.agents.reduce((sum: number, agent: any) => 
+        sum + (agent.realtime?.networkLatency || 0), 0) / (neuralMeshHook.agents.length || 1)
+    } : undefined
 
-    setStats({
+    // Get enhanced stats from neural integration if available
+    const baseStats = {
       totalAgents: agents.length,
       activeAgents,
       totalRepositories: repositories.length,
       tasksCompleted: totalTasks,
       asiProgress: Math.min(95, (totalTasks / 1000) * 100),
-      networkEfficiency: avgEfficiency || 0,
+      networkEfficiency: enableNeuralMesh ? neuralMeshHook.metrics.networkEfficiency : avgEfficiency || 0,
       globalContributors: Math.floor(Math.random() * 5000) + 15000,
-      processingUnits: Math.floor(agents.length * 42.5) + Math.floor(Math.random() * 200) + 1200
-    })
+      processingUnits: Math.floor(agents.length * 42.5) + Math.floor(Math.random() * 200) + 1200,
+      ...(neuralMeshStats && { neuralMeshStats })
+    }
+    
+    const enhancedStats = neuralIntegrationReady ? 
+      neuralSwarmIntegration.getEnhancedStats(baseStats) : 
+      baseStats
+    
+    setStats(enhancedStats)
   }
 
   const simulateSwarmActivity = () => {
@@ -246,7 +407,38 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     setIsSwarmActive(false)
   }
 
-  const addAgent = (type: Agent['type']) => {
+  const addAgent = async (type: Agent['type']) => {
+    // Try neural integration first
+    if (neuralIntegrationReady) {
+      try {
+        const neuralAgent = await neuralSwarmIntegration.addNeuralAgent(type)
+        if (neuralAgent) {
+          setAgents(current => [...current, neuralAgent])
+          return
+        }
+      } catch (error) {
+        console.error('Neural agent creation failed:', error)
+      }
+    }
+    
+    // Try neural mesh service
+    if (enableNeuralMesh && neuralMeshHook.isConnected) {
+      try {
+        const neuralAgent = await neuralMeshHook.createAgent(type, {
+          layer: Math.floor(Math.random() * 6) + 1,
+          threshold: 0.5
+        })
+        
+        if (neuralAgent) {
+          // Agent will be added automatically via useEffect hook
+          return
+        }
+      } catch (error) {
+        console.error('Neural mesh agent creation failed:', error)
+      }
+    }
+    
+    // Fallback to regular agent creation
     const newAgent: Agent = {
       id: `agent_${Date.now()}`,
       name: `${type.charAt(0).toUpperCase() + type.slice(1)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
@@ -269,7 +461,21 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     setAgents(current => [...current, newAgent])
   }
 
-  const removeAgent = (id: string) => {
+  const removeAgent = async (id: string) => {
+    // Remove from neural integration if available
+    if (neuralIntegrationReady) {
+      try {
+        await neuralSwarmIntegration.removeNeuralAgent(id)
+      } catch (error) {
+        console.error('Neural agent removal failed:', error)
+      }
+    }
+    
+    // Remove from neural mesh if it's a neural agent
+    if (enableNeuralMesh) {
+      neuralMeshHook.removeAgent(id)
+    }
+    
     setAgents(current => current.filter(agent => agent.id !== id))
   }
 
@@ -301,8 +507,32 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
     addAgent,
     removeAgent,
     voteForProject,
-    addRepository
+    addRepository,
+    // Neural mesh specific methods
+    neuralMesh: {
+      isConnected: neuralMeshHook.isConnected,
+      isInitializing: neuralMeshHook.isInitializing,
+      error: neuralMeshHook.error,
+      metrics: neuralMeshHook.metrics,
+      connection: neuralMeshHook.connection,
+      trainMesh: neuralMeshHook.trainMesh,
+      getMeshStatus: neuralMeshHook.getMeshStatus,
+      clearError: neuralMeshHook.clearError,
+      reconnect: neuralMeshHook.reconnect,
+      toggleNeuralMesh: (enabled: boolean) => setEnableNeuralMesh(enabled)
+    }
   }
+
+  // Cleanup neural resources on unmount
+  useEffect(() => {
+    return () => {
+      if (neuralIntegrationReady) {
+        neuralSwarmIntegration.cleanup().catch(error => {
+          console.error('Neural integration cleanup error:', error)
+        })
+      }
+    }
+  }, [neuralIntegrationReady])
 
   return (
     <SwarmContext.Provider value={value}>
