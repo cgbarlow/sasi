@@ -10,7 +10,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
   CLAUDE_FLOW_VERSION: '2.0.0-alpha.43'
 
 jobs:
@@ -36,7 +35,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-modules-
             
@@ -67,7 +66,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Run linting
         run: npm run lint
@@ -101,7 +100,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Install claude-flow
         run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
@@ -146,7 +145,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Install claude-flow
         run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
@@ -184,7 +183,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Install claude-flow
         run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
@@ -279,7 +278,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Run security audit
         run: npm audit --audit-level=moderate
@@ -312,7 +311,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Run mutation tests
         run: npm run test:mutation
@@ -345,7 +344,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Install claude-flow
         run: npm install -g claude-flow@${{ env.CLAUDE_FLOW_VERSION }}
@@ -379,7 +378,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Generate coverage report
         run: npm run test:coverage
@@ -439,7 +438,7 @@ jobs:
             ~/.npm
             node_modules
             */node_modules
-          key: ${{ env.CACHE_KEY }}
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
           
       - name: Build production bundles
         run: |
