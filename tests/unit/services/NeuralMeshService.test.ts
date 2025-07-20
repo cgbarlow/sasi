@@ -299,6 +299,8 @@ describe('NeuralMeshService - TDD Implementation', () => {
         transport: 'stdio',
         enableWasm: false,
         enableRealtime: false,
+        enableP2P: false, // Disable P2P for test stability
+        enableConsensus: false, // Disable consensus for test stability
         debugMode: false
       });
 

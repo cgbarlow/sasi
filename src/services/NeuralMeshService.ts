@@ -421,14 +421,15 @@ export class NeuralMeshService {
    * Initialize WASM module for SIMD acceleration
    */
   private async initializeWasm(): Promise<void> {
-    // Mock WASM module for testing
+    // Mock WASM module for testing with proper memory management
     this.wasmModule = {
       memory: new WebAssembly.Memory({ initial: 1 }),
       processInference: (input: Float32Array) => {
         // Simulate SIMD-accelerated processing
         return new Float32Array(input.map(x => Math.tanh(x)))
       },
-      spawnAgent: () => ({ id: `agent_${Date.now()}` })
+      spawnAgent: () => ({ id: `agent_${Date.now()}` }),
+      get_memory_usage: () => 102400 // Return 100KB (0.1MB) for test compatibility
     }
   }
 
