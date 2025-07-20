@@ -63,13 +63,17 @@ describe('P2P Network Manager', () => {
 
   beforeAll(() => {
     // Mock process.env for Node.js environment
-    jest.stubGlobal('process', {
-      env: {
-        SIGNALING_SERVER_URL: 'ws://localhost:8080'
+    Object.defineProperty(global, 'process', {
+      value: {
+        env: {
+          SIGNALING_SERVER_URL: 'ws://localhost:8080'
+        },
+        memoryUsage: () => ({
+          heapUsed: 1024 * 1024 // 1MB
+        }),
+        cwd: () => '/test/directory'
       },
-      memoryUsage: () => ({
-        heapUsed: 1024 * 1024 // 1MB
-      })
+      writable: true
     });
   });
 
