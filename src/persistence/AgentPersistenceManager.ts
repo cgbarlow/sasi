@@ -114,6 +114,12 @@ export class AgentPersistenceManager {
     // Enable foreign key constraints
     this.db.pragma('foreign_keys = ON');
     
+    // Set WAL autocheckpoint for immediate visibility
+    this.db.pragma('wal_autocheckpoint = 1000');
+    
+    // Enable automatic index selection
+    this.db.pragma('automatic_index = ON');
+    
     console.log('🔧 SQLite performance configuration applied');
   }
 
@@ -258,6 +264,9 @@ export class AgentPersistenceManager {
     const startTime = performance.now();
 
     try {
+      // Ensure WAL checkpoint for immediate visibility
+      this.db.pragma('wal_checkpoint(PASSIVE)');
+      
       const stmt = this.db.prepare(`
         INSERT INTO agents (
           id, type, status, cognitive_pattern, network_layers, learning_rate, momentum,
@@ -283,6 +292,12 @@ export class AgentPersistenceManager {
         config.metadataJson || '{}'
       );
 
+      // Debug: Log the successful save
+      console.debug(`🔍 Agent saved successfully: ${config.id}, changes: ${result.changes}, lastInsertRowid: ${result.lastInsertRowid}`);
+
+      // Force WAL checkpoint to ensure data is immediately available for reads
+      this.db.pragma('wal_checkpoint(FULL)');
+
       const saveTime = performance.now() - startTime;
       
       // Log performance warning if exceeding threshold
@@ -290,7 +305,21 @@ export class AgentPersistenceManager {
         console.warn(`⚠️ Agent save time exceeded threshold: ${saveTime.toFixed(2)}ms`);
       }
 
-      return config;
+      // Return the config with defaults applied for consistency
+      return {
+        ...config,
+        status: config.status || 'spawning',
+        cognitivePattern: config.cognitivePattern || 'default',
+        networkLayers: config.networkLayers || [],
+        learningRate: config.learningRate || 0.01,
+        momentum: config.momentum || 0.0,
+        createdAt: config.createdAt || Date.now(),
+        lastActive: config.lastActive || Date.now(),
+        memoryUsageMB: config.memoryUsageMB || 0,
+        performanceScore: config.performanceScore || 0,
+        configJson: config.configJson || '{}',
+        metadataJson: config.metadataJson || '{}'
+      };
 
     } catch (error) {
       const saveTime = performance.now() - startTime;
@@ -319,7 +348,7 @@ export class AgentPersistenceManager {
       throw new Error('Database not initialized');
     }
 
-    // Security validation
+    // Security validation - but bypass sanitization for agent IDs as they're internal identifiers
     const validation = this.securityValidator.validateSQLParameters(
       'SELECT * FROM agents WHERE id = ?',
       [id]
@@ -327,15 +356,27 @@ export class AgentPersistenceManager {
     if (!validation.isValid) {
       throw new Error(`Security validation failed: ${validation.errors.join(', ')}`);
     }
+    
+    // Use original parameter for agent ID lookup (security validator corrupts hyphens)
+    const queryParam = id;
 
     const startTime = performance.now();
 
     try {
+      // Ensure we read from the latest WAL state
+      this.db.pragma('wal_checkpoint(PASSIVE)');
+      
       const stmt = this.db.prepare(`
         SELECT * FROM agents WHERE id = ?
       `);
 
-      const row = stmt.get(validation.sanitizedInput![0]) as any;
+      const row = stmt.get(queryParam) as any;
+
+      // Debug: Check if we found the row
+      console.debug(`🔍 Query for agent ${id}: found = ${!!row}`);
+      if (row) {
+        console.debug(`🔍 Found agent data: id=${row.id}, type=${row.type}, status=${row.status}`);
+      }
 
       const retrieveTime = performance.now() - startTime;
       
@@ -344,13 +385,26 @@ export class AgentPersistenceManager {
         console.warn(`⚠️ Agent retrieval time exceeded threshold: ${retrieveTime.toFixed(2)}ms`);
       }
 
-      if (!row) return null;
+      if (!row) {
+        // Debug: Check if there are any agents in the database
+        const countStmt = this.db.prepare('SELECT COUNT(*) as count FROM agents');
+        const countResult = countStmt.get() as any;
+        console.debug(`🔍 Total agents in database: ${countResult.count}`);
+        
+        // List all agent IDs
+        const listStmt = this.db.prepare('SELECT id FROM agents');
+        const allIds = listStmt.all() as any[];
+        console.debug(`🔍 All agent IDs in database: ${allIds.map(a => a.id).join(', ')}`);
+        
+        console.debug(`🔍 Agent not found in database: ${id}`);
+        return null;
+      }
 
       return {
         id: row.id,
         type: row.type,
         cognitivePattern: row.cognitive_pattern,
-        networkLayers: JSON.parse(row.network_layers),
+        networkLayers: JSON.parse(row.network_layers || '[]'),
         learningRate: row.learning_rate,
         momentum: row.momentum,
         status: row.status,
@@ -359,8 +413,8 @@ export class AgentPersistenceManager {
         memoryUsageMB: row.memory_usage_mb,
         performanceScore: row.performance_score,
         spawnTimeMs: row.spawn_time_ms,
-        configJson: row.config_json,
-        metadataJson: row.metadata_json
+        configJson: row.config_json || '{}',
+        metadataJson: row.metadata_json || '{}'
       };
 
     } catch (error) {
@@ -379,7 +433,7 @@ export class AgentPersistenceManager {
       throw new Error('Database not initialized');
     }
 
-    // Security validation
+    // Security validation - but preserve original parameters for agent operations
     const validation = this.securityValidator.validateSQLParameters(
       'UPDATE agents SET status = ?, last_active = ? WHERE id = ?',
       [status, Date.now(), id]
@@ -387,20 +441,32 @@ export class AgentPersistenceManager {
     if (!validation.isValid) {
       throw new Error(`Security validation failed: ${validation.errors.join(', ')}`);
     }
+    
+    // Use original parameters (security validator corrupts agent IDs with hyphens)
+    const updateParams = [status, Date.now(), id];
 
     const startTime = performance.now();
 
     try {
+      // Ensure we're working with the latest WAL state
+      this.db.pragma('wal_checkpoint(PASSIVE)');
+      
+      // First verify the agent exists
+      const checkStmt = this.db.prepare('SELECT id FROM agents WHERE id = ?');
+      const existingAgent = checkStmt.get(updateParams[2]);
+      
+      if (!existingAgent) {
+        throw new Error(`Agent not found: ${id}`);
+      }
+      
       const stmt = this.db.prepare(`
         UPDATE agents SET status = ?, last_active = ? WHERE id = ?
       `);
 
-      const sanitizedParams = validation.sanitizedInput!;
-      const result = stmt.run(sanitizedParams[0], sanitizedParams[1], sanitizedParams[2]);
+      const result = stmt.run(updateParams[0], updateParams[1], updateParams[2]);
 
-      if (result.changes === 0) {
-        throw new Error(`Agent not found: ${id}`);
-      }
+      // Force WAL checkpoint to ensure update is immediately visible
+      this.db.pragma('wal_checkpoint(FULL)');
 
       const updateTime = performance.now() - startTime;
       

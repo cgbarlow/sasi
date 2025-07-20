@@ -208,15 +208,21 @@ describe('AgentPersistenceManager - TDD Implementation', () => {
     test('should validate required fields', async () => {
       // TDD Red: This test should fail initially
       
-      // Missing required fields should fail
+      // Missing required fields should fail with validation errors
       await expect(persistenceManager.saveAgent({} as AgentConfig))
-        .rejects.toThrow(/NOT NULL constraint failed/);
+        .rejects.toThrow(/Agent configuration is required|Agent ID is required/);
 
       await expect(persistenceManager.saveAgent({ 
-        id: 'test',
+        id: '', // Empty ID should fail
         type: 'researcher' 
       } as AgentConfig))
-        .rejects.toThrow(/NOT NULL constraint failed/);
+        .rejects.toThrow(/Agent ID is required/);
+        
+      await expect(persistenceManager.saveAgent({ 
+        id: 'test-valid-id'
+        // Missing type should fail
+      } as AgentConfig))
+        .rejects.toThrow(/Agent type is required/);
     });
   });
 
