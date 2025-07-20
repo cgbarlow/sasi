@@ -588,7 +588,7 @@ export class WasmBridge {
     if (this.module) {
       // Limit memory usage to stay under 7.63MB target
       const rawMemory = this.module.get_memory_usage();
-      this.performance.memoryUsage = Math.min(rawMemory, 7.63 * 1024 * 1024);
+      this.performance.memoryUsage = rawMemory / (1024 * 1024); // Convert to MB without artificial cap
     }
     return { ...this.performance }
   }

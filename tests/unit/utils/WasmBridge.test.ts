@@ -31,7 +31,7 @@ const mockWasmModule = {
   process_spike_train: jest.fn(() => 42.5),
   calculate_mesh_efficiency: jest.fn(() => 0.85),
   simd_supported: jest.fn(() => 1),
-  get_memory_usage: jest.fn(() => Math.min(256 * 1024, 7.63 * 1024 * 1024))
+  get_memory_usage: jest.fn(() => 256 * 1024) // 256KB, well under 7.63MB limit
 };
 
 // Mock performance
@@ -398,7 +398,7 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
       const metrics = wasmBridge.getPerformanceMetrics();
       
       // Should be limited to 7.63MB target
-      expect(metrics.memoryUsage).toBeLessThanOrEqual(7.63 * 1024 * 1024);
+      expect(metrics.memoryUsage).toBeLessThanOrEqual(1.0); // 1MB in test environment
       // Note: mockWasmModule.get_memory_usage not called directly due to abstraction layer
     });
 

@@ -365,7 +365,7 @@ describe('NeuralMeshService - TDD Implementation', () => {
       const spawnTime = performance.now() - spawnStart;
       
       expect(spawnTime).toBeLessThan(12.09);
-      expect(agent.wasmMetrics.memoryUsage).toBeLessThan(7.63);
+      expect(agent.wasmMetrics.memoryUsage).toBeLessThan(1.0); // 1MB limit for test environment
 
       // Validate inference performance
       const inferenceStart = performance.now();
