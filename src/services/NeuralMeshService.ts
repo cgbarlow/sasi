@@ -321,16 +321,27 @@ export class NeuralMeshService {
       }
 
       // Establish connection based on transport
+      let connectionResult = false
       switch (this.config.transport) {
         case 'websocket':
-          return await this.initializeWebSocket()
+          connectionResult = await this.initializeWebSocket()
+          break
         case 'stdio':
-          return await this.initializeStdio()
+          connectionResult = await this.initializeStdio()
+          break
         case 'http':
-          return await this.initializeHttp()
+          connectionResult = await this.initializeHttp()
+          break
         default:
-          throw new Error(`Unsupported transport: ${this.config.transport}`)
+          console.error(`Unsupported transport: ${this.config.transport}`)
+          return false
       }
+      
+      if (this.config.debugMode) {
+        console.log('✅ Neural Mesh Service initialized successfully')
+      }
+      
+      return connectionResult
     } catch (error) {
       console.error('❌ Neural Mesh Service initialization failed:', error)
       this.connection = {
