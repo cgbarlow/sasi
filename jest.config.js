@@ -192,6 +192,11 @@ module.exports = {
     }]
   ],
   
+  // ES Module Support - Critical for @octokit/rest and dependencies
+  transformIgnorePatterns: [
+    'node_modules/(?!(@octokit|node-fetch|fetch-blob|data-uri-to-buffer|formdata-polyfill|universal-user-agent|before-after-hook|deprecation)/)'
+  ],
+
   // Error Handling
   errorOnDeprecated: true,
   clearMocks: true,

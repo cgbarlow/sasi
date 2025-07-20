@@ -57,7 +57,7 @@ export interface McpExecutionResult {
   error?: string
 }
 
-class McpService {
+export class McpService {
   private servers: Map<string, McpServer> = new Map()
   private metrics: McpMetrics = {
     totalRequests: 0,

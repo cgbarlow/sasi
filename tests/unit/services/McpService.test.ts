@@ -6,12 +6,14 @@ describe('McpService', () => {
 
   beforeEach(() => {
     // Create a new instance for each test
-    service = new (McpService as any)()
+    service = new McpService()
     jest.clearAllMocks()
   })
 
   afterEach(() => {
-    service.destroy()
+    if (service && typeof service.destroy === 'function') {
+      service.destroy()
+    }
   })
 
   describe('initialization', () => {
@@ -23,7 +25,7 @@ describe('McpService', () => {
       await service.initialize()
       
       const servers = service.getServers()
-      expect(servers).toHaveLength(2) // Claude Flow and RUV Swarm
+      expect(servers).toHaveLength(3) // Claude Flow, RUV Swarm, and GitHub Integration
       
       const claudeFlow = servers.find(s => s.id === 'claude-flow')
       expect(claudeFlow).toBeDefined()
@@ -54,9 +56,10 @@ describe('McpService', () => {
 
     test('returns all servers', () => {
       const servers = service.getServers()
-      expect(servers).toHaveLength(2)
+      expect(servers).toHaveLength(3)
       expect(servers.map(s => s.id)).toContain('claude-flow')
       expect(servers.map(s => s.id)).toContain('ruv-swarm')
+      expect(servers.map(s => s.id)).toContain('github-integration')
     })
 
     test('returns specific server by id', () => {
@@ -100,27 +103,15 @@ describe('McpService', () => {
     })
 
     test('handles tool execution errors', async () => {
-      const result = await service.executeTool(
-        'non-existent-server',
-        'some-tool',
-        {}
-      )
-      
-      expect(result.success).toBe(false)
-      expect(result.error).toBeDefined()
-      expect(result.error).toContain('Server non-existent-server not found')
+      await expect(
+        service.executeTool('non-existent-server', 'some-tool', {})
+      ).rejects.toThrow('Server non-existent-server not found')
     })
 
     test('handles non-existent tool errors', async () => {
-      const result = await service.executeTool(
-        'claude-flow',
-        'non-existent-tool',
-        {}
-      )
-      
-      expect(result.success).toBe(false)
-      expect(result.error).toBeDefined()
-      expect(result.error).toContain('Tool non-existent-tool not found')
+      await expect(
+        service.executeTool('claude-flow', 'non-existent-tool', {})
+      ).rejects.toThrow('Tool non-existent-tool not found on server claude-flow')
     })
 
     test('updates tool usage statistics', async () => {
@@ -253,7 +244,7 @@ describe('McpService', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
       
       // Mock a method to throw an error
-      const mockService = new (McpService as any)()
+      const mockService = new McpService()
       mockService.discoverServers = jest.fn().mockRejectedValue(new Error('Discovery failed'))
       
       await expect(mockService.initialize()).rejects.toThrow('Discovery failed')

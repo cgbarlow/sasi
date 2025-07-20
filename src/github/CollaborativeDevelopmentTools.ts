@@ -438,18 +438,28 @@ export class CollaborativeDevelopmentTools {
       teamHealthMetrics: 0.1
     };
     
+    // Safe score extraction with defaults
+    const getScore = (obj: any, fallback = 0.7) => {
+      if (!obj) return fallback;
+      if (typeof obj === 'number') return isNaN(obj) ? fallback : Math.max(0, Math.min(1, obj));
+      return fallback;
+    };
+
     const scores = {
-      teamDynamics: analysis.teamDynamics.teamCohesion,
-      communicationPatterns: analysis.communicationPatterns.clarityIndex,
-      knowledgeSharing: analysis.knowledgeSharing.knowledgeTransferRate,
-      mentorshipOpportunities: analysis.mentorshipOpportunities.length > 0 ? 0.8 : 0.3,
-      collaborationBottlenecks: Math.max(0, 1 - (analysis.collaborationBottlenecks.length * 0.1)),
-      teamHealthMetrics: analysis.teamHealthMetrics.overallHealth
+      teamDynamics: getScore(analysis.teamDynamics?.teamCohesion),
+      communicationPatterns: getScore(analysis.communicationPatterns?.clarityIndex),
+      knowledgeSharing: getScore(analysis.knowledgeSharing?.knowledgeTransferRate),
+      mentorshipOpportunities: analysis.mentorshipOpportunities?.length > 0 ? 0.8 : 0.3,
+      collaborationBottlenecks: Math.max(0, 1 - ((analysis.collaborationBottlenecks?.length || 0) * 0.1)),
+      teamHealthMetrics: getScore(analysis.teamHealthMetrics?.overallHealth)
     };
     
-    return Object.entries(weights).reduce((total, [key, weight]) => {
-      return total + (scores[key] * weight);
+    const finalScore = Object.entries(weights).reduce((total, [key, weight]) => {
+      const score = scores[key] || 0.7;
+      return total + (score * weight);
     }, 0);
+    
+    return Math.max(0, Math.min(1, isNaN(finalScore) ? 0.7 : finalScore));
   }
 
   // Additional helper methods would be implemented here...
@@ -1278,9 +1288,15 @@ export class CollaborativeDevelopmentTools {
       const negativeMatches = negativeWords.filter(word => body.toLowerCase().includes(word)).length;
       const constructiveMatches = constructiveWords.filter(word => body.toLowerCase().includes(word)).length;
 
-      if (constructiveMatches > 0) patterns.constructiveCount++;
-      else if (positiveMatches > negativeMatches) patterns.positiveCount++;
-      else if (negativeMatches > 0) patterns.negativeCount++;
+      if (constructiveMatches > 0) {
+        patterns.constructiveCount++;
+      }
+      if (positiveMatches > negativeMatches) {
+        patterns.positiveCount++;
+      }
+      if (negativeMatches > 0) {
+        patterns.negativeCount++;
+      }
 
       // Track reviewer consistency
       const reviewer = review.user?.login || 'unknown';
@@ -1386,14 +1402,14 @@ export class CollaborativeDevelopmentTools {
 
       // Combine factors for overall clarity index
       const optimalSentenceLength = 15; // words
-      const sentenceLengthScore = 1 - Math.abs(clarityIndicators.avgSentenceLength - optimalSentenceLength) / optimalSentenceLength;
+      const sentenceLengthScore = Math.max(0, 1 - Math.abs(clarityIndicators.avgSentenceLength - optimalSentenceLength) / optimalSentenceLength);
       const questionScore = Math.min(clarityIndicators.questionRatio * 2, 1); // Questions help clarity
-      const technicalBalance = 1 - Math.abs(clarityIndicators.technicalTermRatio - 0.1) / 0.1; // ~10% technical terms is good
+      const technicalBalance = Math.max(0, 1 - Math.abs(clarityIndicators.technicalTermRatio - 0.1) / 0.1); // ~10% technical terms is good
 
       totalClarityScore = (
         sentenceLengthScore * 0.3 +
         questionScore * 0.2 +
-        technicalBalance * 0.2 +
+        Math.max(0, technicalBalance) * 0.2 +
         clarityIndicators.readabilityScore * 0.3
       );
     }
@@ -2157,13 +2173,13 @@ export class CollaborativeDevelopmentTools {
       learningIndicators: ['question', 'help', 'how', 'why', 'learn']
     };
 
-    return contributors.filter(contributor => {
+    const juniorDevs = contributors.filter(contributor => {
       const contributions = contributor.contributions || 0;
-      
-      // Basic contribution threshold
-      if (contributions > juniorCriteria.maxContributions) {
-        return false;
-      }
+      return contributions <= juniorCriteria.maxContributions;
+    });
+
+    return juniorDevs.map(contributor => {
+      const contributions = contributor.contributions || 0;
       
       // Additional indicators of junior status
       const profile = contributor.profile || {};
@@ -2187,7 +2203,47 @@ export class CollaborativeDevelopmentTools {
         contributionLevel: contributions,
         growthPotential: this.assessGrowthPotential(contributor)
       };
-    }).filter(Boolean);
+    });
+  }
+
+  private calculateJuniorScore(contributor: any): number {
+    const contributions = contributor.contributions || 0;
+    const maxContributions = 50;
+    
+    // Basic score based on contribution count (0-1, where 1 is most junior)
+    const contributionScore = Math.max(0, 1 - (contributions / maxContributions));
+    
+    // Additional factors that might indicate junior status
+    const profile = contributor.profile || {};
+    const accountAge = profile.accountAge || 365; // days
+    const ageScore = Math.max(0, 1 - (accountAge / 730)); // 2 years = mature
+    
+    return (contributionScore * 0.7) + (ageScore * 0.3);
+  }
+
+  private assessGrowthPotential(contributor: any): number {
+    const contributions = contributor.contributions || 0;
+    const profile = contributor.profile || {};
+    
+    // Recent activity trend
+    const recentActivity = profile.recentActivity || [];
+    const activityScore = Math.min(recentActivity.length / 10, 1); // Normalize to 10 activities
+    
+    // Learning indicators
+    const learningIndicators = ['question', 'help', 'learn', 'understand'];
+    let learningSignals = 0;
+    recentActivity.forEach((activity: any) => {
+      const text = (activity.text || '').toLowerCase();
+      learningIndicators.forEach(indicator => {
+        if (text.includes(indicator)) learningSignals++;
+      });
+    });
+    const learningScore = Math.min(learningSignals / 5, 1); // Normalize to 5 signals
+    
+    // Consistency in contributions
+    const consistencyScore = contributions > 0 ? Math.min(contributions / 25, 1) : 0;
+    
+    return (activityScore * 0.4) + (learningScore * 0.4) + (consistencyScore * 0.2);
   }
 
   private identifyQuickWins(optimization: any): any[] {
@@ -2538,30 +2594,7 @@ export class CollaborativeDevelopmentTools {
     return allSkillAreas.size / 5; // Normalize to 5 skill areas
   }
 
-  private calculateJuniorScore(contributor: any): number {
-    const contributions = contributor.contributions || 0;
-    const maxContributions = 100; // Threshold for senior
-    
-    // Lower contributions = higher junior score
-    const contributionScore = 1 - Math.min(contributions / maxContributions, 1);
-    
-    // Additional factors could include:
-    // - Account age
-    // - Commit size patterns
-    // - Question/help-seeking frequency
-    
-    return contributionScore;
-  }
-
-  private assessGrowthPotential(contributor: any): string {
-    const score = this.calculateJuniorScore(contributor);
-    const contributions = contributor.contributions || 0;
-    
-    if (score > 0.8 && contributions > 5) return 'high';
-    if (score > 0.6 && contributions > 2) return 'medium';
-    if (contributions > 0) return 'developing';
-    return 'new';
-  }
+  // Duplicate functions removed - keeping the first implementation only
 
   // Additional missing stub methods
   private identifySeniorDevelopers(contributors: any[]): any[] {

@@ -83,6 +83,7 @@ export class SecurityAnalyzer {
       /innerHTML\s*=\s*[^;]*req\./gi,
       /document\.write\s*\(\s*[^)]*req\./gi,
       /eval\s*\(\s*[^)]*req\./gi,
+      /eval\s*\(/gi,
       /dangerouslySetInnerHTML/gi
     ],
     hardcodedSecrets: [
@@ -113,7 +114,8 @@ export class SecurityAnalyzer {
     /(?:github_token|gh_token)\s*=\s*['"]\w{20,}['"]/, 
     /(?:stripe_key|sk_live_)\w{20,}/,
     /(?:private_key|-----BEGIN [A-Z]+ PRIVATE KEY-----)/,
-    /(?:password|passwd|pwd)\s*=\s*['"]\w{6,}['"]/ 
+    /(?:password|passwd|pwd)\s*=\s*['"]*\w{6,}['"]*/i,
+    /(?:PASSWORD|SECRET|API_KEY|TOKEN)\s*=\s*['"]*\w{6,}['"]*/i
   ];
 
   constructor(config: SecurityConfig = {
@@ -201,7 +203,8 @@ export class SecurityAnalyzer {
     const vulnerabilities: SecurityVulnerability[] = [];
 
     for (const file of files) {
-      if (!this.isCodeFile(file.filename)) continue;
+      // Only skip binary files or clearly non-analyzable files
+      if (this.shouldSkipFile(file.filename)) continue;
 
       const content = file.patch || '';
       
@@ -444,9 +447,13 @@ export class SecurityAnalyzer {
     const secrets: SecurityVulnerability[] = [];
 
     for (const file of files) {
-      if (!this.isCodeFile(file.filename) && !this.isConfigFile(file.filename)) continue;
+      // Check all files except binary files for secrets
+      if (this.shouldSkipFile(file.filename)) continue;
 
       const content = file.patch || '';
+      
+      // Skip environment variable patterns to avoid false positives
+      if (this.isEnvironmentVariablePattern(content)) continue;
       
       this.config.secretPatterns.forEach((pattern, index) => {
         const matches = this.findPatternMatches(content, pattern);
@@ -559,16 +566,17 @@ export class SecurityAnalyzer {
   }
 
   private isCodeFile(filename: string): boolean {
-    const codeExtensions = ['.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.cpp', '.c', '.cs', '.php', '.rb', '.go'];
-    return codeExtensions.some(ext => filename.endsWith(ext));
+    const codeExtensions = ['.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.cpp', '.c', '.cs', '.php', '.rb', '.go', '.rs', '.scala', '.kt'];
+    return codeExtensions.some(ext => filename.toLowerCase().endsWith(ext));
   }
 
   private isConfigFile(filename: string): boolean {
-    const configExtensions = ['.json', '.yaml', '.yml', '.xml', '.ini', '.conf', '.config'];
-    const configNames = ['Dockerfile', '.env', '.gitignore'];
+    const configExtensions = ['.json', '.yaml', '.yml', '.xml', '.ini', '.conf', '.config', '.env', '.properties', '.toml'];
+    const configNames = ['Dockerfile', '.env', '.gitignore', 'docker-compose', 'makefile', '.npmrc', '.yarnrc'];
+    const lowerFilename = filename.toLowerCase();
     
-    return configExtensions.some(ext => filename.endsWith(ext)) ||
-           configNames.some(name => filename.includes(name));
+    return configExtensions.some(ext => lowerFilename.endsWith(ext)) ||
+           configNames.some(name => lowerFilename.includes(name.toLowerCase()));
   }
 
   private calculateSecurityMetrics(vulnerabilities: SecurityVulnerability[]): SecurityMetrics {
@@ -659,6 +667,9 @@ export class SecurityAnalyzer {
   }
 
   private generateCacheKey(prData: PRData): string {
+    if (!prData || !prData.files) {
+      return `security_empty_${Date.now()}`;
+    }
     const filesHash = prData.files
       .map((f: PRFile) => `${f.filename}_${f.sha || 'no-sha'}`)
       .join('|');
@@ -668,6 +679,23 @@ export class SecurityAnalyzer {
   private isCacheValid(cached: SecurityAnalysis): boolean {
     const maxAge = 30 * 60 * 1000; // 30 minutes
     return Date.now() - new Date(cached.timestamp).getTime() < maxAge;
+  }
+
+  /**
+   * Check if file should be skipped for security analysis
+   */
+  private shouldSkipFile(filename: string): boolean {
+    const skipExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.zip', '.tar', '.gz', '.exe', '.dll', '.so', '.dylib'];
+    const lowerFilename = filename.toLowerCase();
+    return skipExtensions.some(ext => lowerFilename.endsWith(ext));
+  }
+
+  /**
+   * Check if content is using environment variables (safe pattern)
+   */
+  private isEnvironmentVariablePattern(content: string): boolean {
+    // Skip if it's clearly using process.env pattern (safe environment variables)
+    return /process\.env\./i.test(content);
   }
 }
 

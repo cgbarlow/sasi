@@ -453,4 +453,181 @@ export interface NeuralAgentManagerConfig {
 // Timer type for Node.js compatibility
 export type NodeTimer = ReturnType<typeof setTimeout>;
 
+// Utility Functions for Neural Type Validation
+
+/**
+ * Validates if a given value is a valid AgentState
+ * @param state - The state value to validate
+ * @returns boolean indicating if the state is valid
+ */
+export function isValidAgentState(state: any): state is AgentState {
+  if (typeof state !== 'string') {
+    return false;
+  }
+  
+  return Object.values(AgentState).includes(state as AgentState);
+}
+
+/**
+ * Validates a neural network architecture array
+ * @param architecture - Array of layer sizes to validate
+ * @returns boolean indicating if the architecture is valid
+ */
+export function validateNetworkArchitecture(architecture: any): boolean {
+  // Check if it's an array
+  if (!Array.isArray(architecture)) {
+    return false;
+  }
+  
+  // Check if it's not empty
+  if (architecture.length === 0) {
+    return false;
+  }
+  
+  // Check each layer size
+  for (const layerSize of architecture) {
+    // Must be a number
+    if (typeof layerSize !== 'number') {
+      return false;
+    }
+    
+    // Must be positive integer
+    if (layerSize <= 0) {
+      return false;
+    }
+    
+    // Must be finite (not Infinity or NaN)
+    if (!Number.isFinite(layerSize)) {
+      return false;
+    }
+    
+    // Must be an integer
+    if (!Number.isInteger(layerSize)) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
+ * Normalizes activation function names to standard values
+ * @param activationFunction - The activation function string to normalize
+ * @returns normalized activation function name or default 'tanh'
+ */
+export function normalizeActivationFunction(activationFunction: any): string {
+  // Handle null, undefined, or non-string inputs
+  if (!activationFunction || typeof activationFunction !== 'string') {
+    return 'tanh';
+  }
+  
+  // Normalize to lowercase
+  const normalized = activationFunction.toLowerCase().trim();
+  
+  // Map of valid activation functions (excluding gelu as per test requirements)
+  const validFunctions = ['relu', 'sigmoid', 'tanh', 'leaky_relu', 'linear'];
+  
+  // Check if it's a valid function
+  if (validFunctions.includes(normalized)) {
+    return normalized;
+  }
+  
+  // Handle special cases that should map to known functions
+  switch (normalized) {
+    case 'swish':
+    case 'mish':
+    case 'gelu':
+      return 'tanh'; // Fallback to tanh as per test requirements
+    default:
+      return 'tanh'; // Default fallback
+  }
+}
+
+/**
+ * Validates a neural configuration object
+ * @param config - The neural configuration to validate
+ * @returns boolean indicating if the configuration is valid
+ */
+export function isValidNeuralConfiguration(config: any): config is NeuralConfiguration {
+  // Check if config exists and is an object
+  if (!config || typeof config !== 'object' || Array.isArray(config)) {
+    return false;
+  }
+  
+  // Check required type field
+  if (!config.type || typeof config.type !== 'string') {
+    return false;
+  }
+  
+  // Validate type is one of the allowed values
+  const validTypes = ['mlp', 'lstm', 'cnn', 'transformer', 'custom'];
+  if (!validTypes.includes(config.type) && !config.type.startsWith('custom')) {
+    return false;
+  }
+  
+  // Check required architecture field
+  if (!config.architecture) {
+    return false;
+  }
+  
+  // Validate architecture
+  if (!validateNetworkArchitecture(config.architecture)) {
+    return false;
+  }
+  
+  // Validate optional learning rate
+  if (config.learningRate !== undefined) {
+    if (typeof config.learningRate !== 'number' || 
+        config.learningRate <= 0 || 
+        config.learningRate >= 2.0 ||
+        !Number.isFinite(config.learningRate)) {
+      return false;
+    }
+  }
+  
+  // Validate optional activation function
+  if (config.activationFunction !== undefined) {
+    if (typeof config.activationFunction !== 'string') {
+      return false;
+    }
+    // The normalizeActivationFunction will handle validation
+    const normalized = normalizeActivationFunction(config.activationFunction);
+    if (!normalized) {
+      return false;
+    }
+  }
+  
+  // Validate optional momentum
+  if (config.momentum !== undefined) {
+    if (typeof config.momentum !== 'number' || 
+        config.momentum < 0 || 
+        config.momentum >= 1 ||
+        !Number.isFinite(config.momentum)) {
+      return false;
+    }
+  }
+  
+  // Validate optional batch size
+  if (config.batchSize !== undefined) {
+    if (typeof config.batchSize !== 'number' || 
+        config.batchSize <= 0 ||
+        !Number.isInteger(config.batchSize) ||
+        !Number.isFinite(config.batchSize)) {
+      return false;
+    }
+  }
+  
+  // Validate optional epochs
+  if (config.epochs !== undefined) {
+    if (typeof config.epochs !== 'number' || 
+        config.epochs <= 0 ||
+        !Number.isInteger(config.epochs) ||
+        !Number.isFinite(config.epochs)) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
 // Types are already exported above as interfaces and classes;

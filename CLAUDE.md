@@ -901,6 +901,22 @@ Claude Flow extends the base coordination with:
 - Issues: https://github.com/ruvnet/claude-flow/issues
 - Examples: https://github.com/ruvnet/claude-flow/tree/main/examples
 
+## Protocols
+Standard protocols to be executed when asked: 
+
+### Continuous Integration (CI) protocol
+To use when creating/tracking issues during CI, fixing, testing, committing reguarly, push, pr, review, monitor the build, repeat. The whole thing should run and repeat unattended with zero intervention; the monitoring of the active action and the automated merge where possible is critical for this to happen:
+
+1. Actively monitor (using bash command on a timer) the current active workflow under GitHub actions in the current repo related to the current issue until completion.
+2. Analyze results when CI finishes.
+3. Investigate if any problems arise.
+4. Create a new GitHub issue documenting the problems and next steps to fix them; check what labels are available and use the labels available or create new labels before creating the issue if required.
+5. Use a swarm to fix all the problems using TDD until all tests are 100% successful. Create a new branch for any changes. Keep the issues updated using appropriate status and labels, close when done.
+6. Commit regularly, at the appropriate time push.
+7. Raise a new PR (if needed, or work with the existing PR), review, merge when you can.
+8. Check any outstanding issues that relate and close if possible.
+9. Keep iterating as needed following steps 1 to 7 until build is successfully deployed.
+
 ---
 
 Remember: **Claude Flow coordinates, Claude Code creates!** Start with `mcp__claude-flow__swarm_init` to enhance your development workflow.
