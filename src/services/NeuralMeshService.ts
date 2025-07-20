@@ -343,6 +343,13 @@ export class NeuralMeshService {
           break
         default:
           console.error(`Unsupported transport: ${this.config.transport}`)
+          this.connection = {
+            id: `conn_${Date.now()}`,
+            status: 'error',
+            nodeCount: 0,
+            synapseCount: 0,
+            lastActivity: new Date()
+          }
           return false
       }
       
