@@ -115,7 +115,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze performance impact for PR data
    */
-  async analyze(prData: any): Promise<PerformanceAnalysis> {
+  async analyze(prData: { files?: Array<{ filename: string; patch?: string }> }): Promise<PerformanceAnalysis> {
     const cacheKey = this.generateCacheKey(prData);
     
     // Check cache
@@ -188,7 +188,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze algorithm complexity
    */
-  private async analyzeComplexity(files: any[]): Promise<PerformanceIssue[]> {
+  private async analyzeComplexity(files: Array<{ filename: string; patch?: string }>): Promise<PerformanceIssue[]> {
     const issues: PerformanceIssue[] = [];
 
     for (const file of files) {
@@ -262,7 +262,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze memory usage patterns
    */
-  private async analyzeMemoryUsage(files: any[]): Promise<PerformanceIssue[]> {
+  private async analyzeMemoryUsage(files: Array<{ filename: string; patch?: string }>): Promise<PerformanceIssue[]> {
     const issues: PerformanceIssue[] = [];
 
     for (const file of files) {
@@ -316,7 +316,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze network performance impact
    */
-  private async analyzeNetworkImpact(files: any[]): Promise<PerformanceIssue[]> {
+  private async analyzeNetworkImpact(files: Array<{ filename: string; patch?: string }>): Promise<PerformanceIssue[]> {
     const issues: PerformanceIssue[] = [];
 
     for (const file of files) {
@@ -368,7 +368,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze rendering performance
    */
-  private async analyzeRenderingPerformance(files: any[]): Promise<PerformanceIssue[]> {
+  private async analyzeRenderingPerformance(files: Array<{ filename: string; patch?: string }>): Promise<PerformanceIssue[]> {
     const issues: PerformanceIssue[] = [];
 
     for (const file of files) {
@@ -410,7 +410,7 @@ export class PerformanceAnalyzer {
   /**
    * Analyze bundle impact
    */
-  private async analyzeBundleImpact(files: any[]): Promise<PerformanceIssue[]> {
+  private async analyzeBundleImpact(files: Array<{ filename: string; patch?: string }>): Promise<PerformanceIssue[]> {
     const issues: PerformanceIssue[] = [];
 
     for (const file of files) {
@@ -584,7 +584,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculatePerformanceMetrics(files: any[], issues: PerformanceIssue[]): PerformanceMetrics {
+  private calculatePerformanceMetrics(files: Array<{ filename: string; patch?: string }>, issues: PerformanceIssue[]): PerformanceMetrics {
     const complexity = this.calculateComplexityMetrics(files, issues);
     const memory = this.calculateMemoryMetrics(issues);
     const network = this.calculateNetworkMetrics(issues);
@@ -600,7 +600,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateComplexityMetrics(files: any[], issues: PerformanceIssue[]): any {
+  private calculateComplexityMetrics(files: Array<{ filename: string; patch?: string }>, issues: PerformanceIssue[]): { timeComplexity: string; spaceComplexity: string; cyclomaticComplexity: number } {
     const complexityIssues = issues.filter(i => i.type === 'cpu');
     const avgComplexity = complexityIssues.length > 0 ? complexityIssues.length / files.length : 1;
     
@@ -611,7 +611,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateMemoryMetrics(issues: PerformanceIssue[]): any {
+  private calculateMemoryMetrics(issues: PerformanceIssue[]): { estimatedUsage: number; leakRisk: number; optimizationOpportunities: number } {
     const memoryIssues = issues.filter(i => i.type === 'memory');
     
     return {
@@ -621,7 +621,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateNetworkMetrics(issues: PerformanceIssue[]): any {
+  private calculateNetworkMetrics(issues: PerformanceIssue[]): { requestCount: number; bundleSize: number; latencyRisk: number } {
     const networkIssues = issues.filter(i => i.type === 'network');
     
     return {
@@ -631,7 +631,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateRenderingMetrics(issues: PerformanceIssue[]): any {
+  private calculateRenderingMetrics(issues: PerformanceIssue[]): { renderingTime: number; repaints: number; reflows: number } {
     const renderingIssues = issues.filter(i => i.type === 'rendering');
     
     return {
@@ -641,7 +641,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateBundleMetrics(files: any[], issues: PerformanceIssue[]): any {
+  private calculateBundleMetrics(files: Array<{ filename: string; patch?: string }>, issues: PerformanceIssue[]): { totalSize: number; treeShakeability: number; compressionRatio: number } {
     const bundleIssues = issues.filter(i => i.type === 'bundle');
     const totalSizeImpact = bundleIssues.reduce((sum, issue) => {
       const match = issue.description.match(/(\d+)KB/);

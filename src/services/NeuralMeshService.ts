@@ -530,7 +530,7 @@ export class NeuralMeshService {
     }
 
     return { 
-      output: Array.from(output), // Convert Float32Array to regular array for test compatibility
+      output: new Float32Array(output), // Ensure Float32Array type compatibility
       metrics 
     }
   }
