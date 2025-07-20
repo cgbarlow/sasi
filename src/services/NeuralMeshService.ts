@@ -370,33 +370,61 @@ export class NeuralMeshService {
   private async initializeWebSocket(): Promise<boolean> {
     return new Promise((resolve) => {
       const ws = new WebSocket(this.config.serverUrl!)
+      let connectionHandled = false
+      
+      // Add connection timeout (especially important for testing)
+      const timeout = setTimeout(() => {
+        if (!connectionHandled) {
+          connectionHandled = true
+          ws.close()
+          if (this.config.debugMode) {
+            console.warn('⚠️ WebSocket connection timeout')
+          }
+          this.connection = {
+            id: `conn_${Date.now()}`,
+            status: 'error',
+            nodeCount: 0,
+            synapseCount: 0,
+            lastActivity: new Date()
+          }
+          resolve(false)
+        }
+      }, 2000) // 2 second timeout
       
       ws.addEventListener('open', () => {
-        if (this.config.debugMode) {
-          console.log('✅ Connected to Synaptic-mesh MCP server')
+        if (!connectionHandled) {
+          connectionHandled = true
+          clearTimeout(timeout)
+          if (this.config.debugMode) {
+            console.log('✅ Connected to Synaptic-mesh MCP server')
+          }
+          this.connection = {
+            id: `conn_${Date.now()}`,
+            status: 'connected',
+            meshId: `mesh_${Date.now()}`,
+            nodeCount: 0,
+            synapseCount: 0,
+            lastActivity: new Date()
+          }
+          this.mcpClient = ws
+          resolve(true)
         }
-        this.connection = {
-          id: `conn_${Date.now()}`,
-          status: 'connected',
-          meshId: `mesh_${Date.now()}`,
-          nodeCount: 0,
-          synapseCount: 0,
-          lastActivity: new Date()
-        }
-        this.mcpClient = ws
-        resolve(true)
       })
       
       ws.addEventListener('error', (error) => {
-        console.error('❌ Neural Mesh Service connection error:', error)
-        this.connection = {
-          id: `conn_${Date.now()}`,
-          status: 'error',
-          nodeCount: 0,
-          synapseCount: 0,
-          lastActivity: new Date()
+        if (!connectionHandled) {
+          connectionHandled = true
+          clearTimeout(timeout)
+          console.error('❌ Neural Mesh Service connection error:', error)
+          this.connection = {
+            id: `conn_${Date.now()}`,
+            status: 'error',
+            nodeCount: 0,
+            synapseCount: 0,
+            lastActivity: new Date()
+          }
+          resolve(false)
         }
-        resolve(false)
       })
       
       ws.addEventListener('message', (event) => {
