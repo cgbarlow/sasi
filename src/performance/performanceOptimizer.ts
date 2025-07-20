@@ -347,7 +347,7 @@ export class PerformanceOptimizer {
   }
 
   /**
-   * Call WASM matrix multiplication
+   * Call WASM matrix multiplication (optimized for testing)
    */
   private async callWASMMatrixMultiply(
     module: WebAssembly.WebAssemblyInstantiatedSource,
@@ -359,8 +359,7 @@ export class PerformanceOptimizer {
     // Simplified WASM call - in reality this would use the actual WASM exports
     const result = new Float32Array(rows * cols)
     
-    // Simulate WASM performance improvement (removed delay for faster tests)
-    // await new Promise(resolve => setTimeout(resolve, 1))
+    // No artificial delay for performance tests - immediate response
     
     return this.fallbackMatrixMultiply(a, b, rows, cols)
   }
