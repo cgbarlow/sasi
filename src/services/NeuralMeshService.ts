@@ -295,7 +295,16 @@ export class NeuralMeshService {
 
       // Initialize WASM module if enabled
       if (this.config.enableWasm) {
-        await this.initializeWasm()
+        try {
+          await this.initializeWasm()
+        } catch (error) {
+          if (this.config.debugMode) {
+            console.warn('⚠️ WASM initialization failed, falling back to JavaScript:', error)
+          }
+          // Disable WASM on failure
+          this.config.enableWasm = false
+          this.wasmModule = null
+        }
       }
 
       // Initialize P2P networking if enabled
@@ -644,6 +653,7 @@ export class NeuralMeshService {
     }
 
     // 4. Aggressively clear all collections and references
+    // Properly reset connection to null for clean shutdown
     this.connection = null
     this.networkHealth = null
     
@@ -698,24 +708,16 @@ export class NeuralMeshService {
    * Get connection status
    */
   getConnectionStatus(): NeuralMeshConnection | null {
-    // Ensure we always return a valid status object when tests expect it
-    if (!this.connection) {
-      return {
-        id: 'no-connection',
-        status: 'error' as any,
-        nodeCount: 0,
-        synapseCount: 0,
-        lastActivity: new Date()
-      }
-    }
-    return this.connection
+    // Return null when no connection exists (expected by comprehensive tests)
+    // Return connection object when it exists (expected by regular tests)
+    return this.connection || null
   }
 
   /**
-   * Check if WASM is enabled
+   * Check if WASM is enabled and working
    */
   isWasmEnabled(): boolean {
-    return !!this.wasmModule
+    return !!this.wasmModule && this.config.enableWasm
   }
 
   /**

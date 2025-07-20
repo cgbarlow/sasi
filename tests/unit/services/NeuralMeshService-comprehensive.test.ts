@@ -127,7 +127,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
 
       const connected = await service.initialize();
       expect(typeof connected).toBe('boolean'); // Accept any boolean result
-    });
+    }, 5000); // 5 second timeout instead of default 60 seconds
 
     test('should handle WebSocket with immediate error', async () => {
       const mockWS = {
