@@ -256,7 +256,7 @@ export class AgentPersistenceManager {
     }
     
     // Validate agent type
-    const validTypes = ['researcher', 'coder', 'analyst', 'optimizer', 'coordinator', 'tester', 'reviewer'];
+    const validTypes = ['researcher', 'coder', 'analyst', 'optimizer', 'coordinator', 'tester', 'reviewer', 'neural'];
     if (!validTypes.includes(config.type)) {
       throw new Error(`Invalid agent type: ${config.type}. Must be one of: ${validTypes.join(', ')}`);
     }
