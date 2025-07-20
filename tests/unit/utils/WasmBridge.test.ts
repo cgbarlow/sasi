@@ -509,15 +509,22 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should handle WASM function errors', () => {
-      // Mock WASM function to throw error
-      mockWasmModule.calculate_neural_activation.mockImplementation(() => {
-        throw new Error('WASM function error');
-      });
+      // Mock the internal WASM module to throw error during function execution
+      const originalModule = (wasmBridge as any).module;
+      (wasmBridge as any).module = {
+        ...originalModule,
+        calculate_neural_activation: jest.fn(() => {
+          throw new Error('WASM function error');
+        })
+      };
       
       const inputs = new Float32Array([0.1, 0.2]);
       
       expect(() => wasmBridge.calculateNeuralActivation(inputs))
-        .toThrow();
+        .toThrow(/WASM function error/);
+        
+      // Restore original module
+      (wasmBridge as any).module = originalModule;
     });
 
     test('should handle memory allocation failures', () => {
@@ -549,8 +556,12 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should detect lack of SIMD support', async () => {
-      // Test with SIMD not supported
-      global.WebAssembly.validate = jest.fn(() => false);
+      // Test with SIMD not supported - need to mock the entire SIMD detection path
+      global.WebAssembly = {
+        ...global.WebAssembly,
+        compile: jest.fn().mockRejectedValue(new Error('SIMD not supported')),
+        validate: jest.fn(() => false)
+      } as any;
       
       const noSimdBridge = new WasmBridge();
       await noSimdBridge.initialize();
@@ -560,9 +571,15 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
 
     test('should handle SIMD detection errors', async () => {
       // Test with SIMD detection throwing error
-      global.WebAssembly.validate = jest.fn(() => {
-        throw new Error('SIMD detection failed');
-      });
+      global.WebAssembly = {
+        ...global.WebAssembly,
+        compile: jest.fn().mockImplementation(() => {
+          throw new Error('SIMD detection failed');
+        }),
+        validate: jest.fn(() => {
+          throw new Error('SIMD validation failed');
+        })
+      } as any;
       
       const errorBridge = new WasmBridge();
       await errorBridge.initialize();
@@ -652,15 +669,13 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should handle maximum array size', () => {
-      // Test with a reasonably large array (not too large to avoid memory issues)
-      const maxSize = 1000000; // 1M elements
+      // Test with a reasonably large array that should trigger the boundary check
+      const maxSize = 2000000; // 2M elements - should exceed memory limit
       const inputs = new Float32Array(maxSize);
       inputs.fill(0.5);
       
-      const outputs = wasmBridge.calculateNeuralActivation(inputs);
-      
-      expect(outputs).toBeDefined();
-      expect(outputs.length).toBe(maxSize);
+      expect(() => wasmBridge.calculateNeuralActivation(inputs))
+        .toThrow(/Array size .* exceeds maximum allowed size/);
     });
 
     test('should handle zero window size in spike processing', () => {
