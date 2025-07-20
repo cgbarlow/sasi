@@ -93,7 +93,7 @@ export class WasmBridge {
         const instance = await WebAssembly.instantiate(module)
         
         // Test actual SIMD execution
-        const exports = instance.exports || instance.instance?.exports
+        const exports = instance.exports || (instance as any).instance?.exports
         const result = (exports as any)?.main?.()
         
         // More strict SIMD validation - ensure the function exists and executes
