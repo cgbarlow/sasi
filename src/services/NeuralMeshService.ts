@@ -522,7 +522,7 @@ export class NeuralMeshService {
       inputSize: input.length,
       outputSize: output.length,
       simdAccelerated: this.config.enableWasm && !!this.wasmModule,
-      memoryUsage: typeof process !== 'undefined' ? process.memoryUsage().heapUsed / (1024 * 1024) : 5
+      memoryUsage: this.wasmModule?.get_memory_usage ? (this.wasmModule.get_memory_usage() || 0) / (1024 * 1024) : 0.1
     }
 
     if (this.config.debugMode) {

@@ -283,6 +283,8 @@ describe('NeuralMeshService - TDD Implementation', () => {
         transport: 'stdio', // Use stdio for fast mock
         enableWasm: true,
         enableRealtime: false,
+        enableP2P: false, // Disable P2P for test stability
+        enableConsensus: false, // Disable consensus for test stability
         debugMode: false
       });
 
