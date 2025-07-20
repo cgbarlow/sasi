@@ -136,13 +136,50 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     benchmarkSuite: null,
     integrationSystem: null
   })
-  const [systemHealth, setSystemHealth] = useState<any>(null)
-  const [memoryStats, setMemoryStats] = useState<any>(null)
-  const [cacheStats, setCacheStats] = useState<any>(null)
-  const [wasmStats, setWasmStats] = useState<any>(null)
-  const [regressionStats, setRegressionStats] = useState<any>(null)
-  const [comprehensiveMetrics, setComprehensiveMetrics] = useState<any>(null)
-  const [performanceReport, setPerformanceReport] = useState<any>(null)
+  const [systemHealth, setSystemHealth] = useState<{
+    overall: string;
+    score: number;
+    components: Record<string, string>;
+  } | null>(null)
+  const [memoryStats, setMemoryStats] = useState<{
+    current?: { heapUsed: string; heapTotal: string };
+    pools?: any[];
+    gc?: { requestCount: number };
+    leaks?: any[];
+    growth?: string;
+  } | null>(null)
+  const [cacheStats, setCacheStats] = useState<{
+    metrics?: {
+      hitRatio: number;
+      totalSize: number;
+      entryCount: number;
+      averageAccessTime: number;
+    };
+    recommendations?: string[];
+  } | null>(null)
+  const [wasmStats, setWasmStats] = useState<{
+    loadedModules: number;
+    totalModules: number;
+    cacheSize?: number;
+    capabilities?: {
+      simdSupported: boolean;
+      streamingSupported: boolean;
+    };
+    modules?: Array<{ loadTime?: number }>;
+  } | null>(null)
+  const [regressionStats, setRegressionStats] = useState<{
+    summary?: {
+      passRate: number;
+      enabledTests: number;
+      regressions: number;
+    };
+    severity?: {
+      critical: number;
+    };
+    baselines?: any[];
+  } | null>(null)
+  const [comprehensiveMetrics, setComprehensiveMetrics] = useState<Record<string, any> | null>(null)
+  const [performanceReport, setPerformanceReport] = useState<Record<string, any> | null>(null)
 
   // Initialize advanced performance systems
   useEffect(() => {

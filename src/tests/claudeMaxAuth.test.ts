@@ -177,7 +177,7 @@ describe('ClaudeMaxAuthService', () => {
         expiresIn: 3600,
         timestamp: Date.now()
       })
-      global.localStorage.setItem('claude_max_tokens', Buffer.from(storedTokenData).toString('base64'))
+      global.localStorage.setItem('claude_max_tokens', btoa(storedTokenData))
 
       // Mock refresh response
       global.oauthTestUtils.mockTokenExchange({
@@ -199,7 +199,7 @@ describe('ClaudeMaxAuthService', () => {
         refreshToken: 'invalid-refresh',
         timestamp: Date.now()
       })
-      global.localStorage.setItem('claude_max_tokens', Buffer.from(invalidTokenData).toString('base64'))
+      global.localStorage.setItem('claude_max_tokens', btoa(invalidTokenData))
 
       // Mock token exchange failure
       global.oauthTestUtils.mockTokenExchangeFailure({
@@ -229,7 +229,7 @@ describe('ClaudeMaxAuthService', () => {
   describe('Logout', () => {
     it('should clear all authentication state', async () => {
       // Mock token revocation success
-      (fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
+      (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
 
       await authService.logout()
 
@@ -240,7 +240,7 @@ describe('ClaudeMaxAuthService', () => {
 
     it('should clear state even if token revocation fails', async () => {
       // Mock token revocation failure
-      (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
       await authService.logout()
 
@@ -294,11 +294,12 @@ describe('ClaudeMaxAuthService', () => {
         expiresIn: 3600,
         timestamp: Date.now()
       })
-      global.localStorage.setItem('claude_max_tokens', Buffer.from(storedTokenData).toString('base64'))
+      global.localStorage.setItem('claude_max_tokens', btoa(storedTokenData))
 
       // Mock profile fetch failure, then refresh success, then profile success
-      global.fetch
-        .mockResolvedValueOnce({ ok: false, status: 401 }) // Profile fails
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch
+        .mockResolvedValueOnce({ ok: false, status: 401 } as Response) // Profile fails
         .mockResolvedValueOnce({ // Refresh succeeds
           ok: true,
           json: () => Promise.resolve({
@@ -306,7 +307,7 @@ describe('ClaudeMaxAuthService', () => {
             refresh_token: 'new-refresh',
             expires_in: 3600
           })
-        })
+        } as Response)
         .mockResolvedValueOnce({ // Profile succeeds
           ok: true,
           json: () => Promise.resolve({
@@ -314,7 +315,7 @@ describe('ClaudeMaxAuthService', () => {
             email: 'test@example.com',
             username: 'testuser'
           })
-        })
+        } as Response)
 
       const user = await authService.initializeFromStorage()
       expect(user).toBeTruthy()
@@ -327,12 +328,13 @@ describe('ClaudeMaxAuthService', () => {
         expiresIn: 3600,
         timestamp: Date.now()
       })
-      global.localStorage.setItem('claude_max_tokens', Buffer.from(invalidTokenData).toString('base64'))
+      global.localStorage.setItem('claude_max_tokens', btoa(invalidTokenData))
 
       // Mock both profile and refresh failure
-      global.fetch
-        .mockResolvedValueOnce({ ok: false, status: 401 })
-        .mockResolvedValueOnce({ ok: false, status: 400 })
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch
+        .mockResolvedValueOnce({ ok: false, status: 401 } as Response)
+        .mockResolvedValueOnce({ ok: false, status: 400 } as Response)
 
       const user = await authService.initializeFromStorage()
       expect(user).toBeNull()
@@ -357,7 +359,8 @@ describe('ClaudeMaxAuthService', () => {
       global.oauthTestUtils.setupOAuthState('test-state', 'test-verifier')
 
       // Mock network error
-      global.fetch.mockRejectedValueOnce(new Error('Network error'))
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       await expect(authService.handleCallback('test-code', 'test-state'))
         .rejects.toThrow('Network error')

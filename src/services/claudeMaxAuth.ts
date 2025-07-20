@@ -128,8 +128,8 @@ class ClaudeMaxAuthService {
       window.location.href = authUrl.toString()
       
       // For testing: also call mock setter if available
-      if (window.location._mockHrefSetter) {
-        window.location._mockHrefSetter(authUrl.toString())
+      if ((window.location as any)._mockHrefSetter) {
+        (window.location as any)._mockHrefSetter(authUrl.toString())
       }
     } catch (error) {
       console.error('Failed to initiate OAuth flow:', error)

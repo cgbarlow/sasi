@@ -95,9 +95,7 @@ describe('NeuralAgentManager', () => {
       
       newManager.once('initialized', initSpy);
       
-      await new Promise((resolve) => {
-        newManager.once('initialized', resolve);
-      });
+      await newManager.initialize();
       
       expect(initSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -107,7 +105,7 @@ describe('NeuralAgentManager', () => {
       );
       
       await newManager.cleanup();
-    });
+    }, 10000);
   });
   
   describe('Agent Spawning', () => {

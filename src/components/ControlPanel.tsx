@@ -62,7 +62,7 @@ const ControlPanel: React.FC = () => {
             <select 
               id="agent-type"
               value={selectedAgentType}
-              onChange={(e) => setSelectedAgentType(e.target.value as any)}
+              onChange={(e) => setSelectedAgentType(e.target.value as 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger')}
               className="agent-type-select"
             >
               <option value="researcher">🔬 Researcher</option>

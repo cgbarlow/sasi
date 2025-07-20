@@ -216,9 +216,10 @@ export class CommunicationAnalyzer {
     );
   }
 
-  private calculateAverageResponseTime(_messages: CommunicationMessage[]): number {
-    // Stub implementation
-    return Math.random() * 3600000; // Random time up to 1 hour
+  private calculateAverageResponseTime(messages: CommunicationMessage[]): number {
+    // Stub implementation - would calculate actual response times
+    const baseTime = messages.length > 0 ? messages.length * 100 : 1000;
+    return Math.min(3600000, baseTime + Math.random() * 1800000); // Base time + random up to 30 min
   }
 
   private calculateParticipationRate(messages: CommunicationMessage[]): number {
@@ -231,29 +232,79 @@ export class CommunicationAnalyzer {
     return allParticipants.size > 0 ? uniqueSenders.size / allParticipants.size : 0;
   }
 
-  private calculateSentimentScore(_messages: CommunicationMessage[]): number {
+  private calculateSentimentScore(messages: CommunicationMessage[]): number {
     // Stub implementation - would analyze sentiment of all messages
-    return 0.7; // Neutral to positive
+    if (messages.length === 0) return 0.5;
+    
+    // Simple sentiment analysis based on message content
+    const positiveWords = ['good', 'great', 'excellent', 'success', 'thanks'];
+    const negativeWords = ['bad', 'error', 'problem', 'issue', 'fail'];
+    
+    let totalSentiment = 0;
+    messages.forEach(msg => {
+      const content = msg.content.toLowerCase();
+      const positive = positiveWords.some(word => content.includes(word));
+      const negative = negativeWords.some(word => content.includes(word));
+      
+      if (positive && !negative) totalSentiment += 0.8;
+      else if (negative && !positive) totalSentiment += 0.3;
+      else totalSentiment += 0.6;
+    });
+    
+    return totalSentiment / messages.length;
   }
 
-  private calculateClarityScore(_messages: CommunicationMessage[]): number {
+  private calculateClarityScore(messages: CommunicationMessage[]): number {
     // Stub implementation - would analyze message clarity
-    return 0.8;
+    if (messages.length === 0) return 0.5;
+    
+    // Simple clarity metric based on message length and question words
+    const avgLength = messages.reduce((sum, msg) => sum + msg.content.length, 0) / messages.length;
+    const questionWords = ['what', 'how', 'why', 'when', 'where', 'who'];
+    
+    const clarityQuestions = messages.filter(msg => 
+      questionWords.some(word => msg.content.toLowerCase().includes(word + ' '))
+    ).length;
+    
+    const clarityRatio = 1 - (clarityQuestions / messages.length);
+    const lengthScore = Math.min(1, avgLength / 100); // Reasonable length gets higher score
+    
+    return (clarityRatio + lengthScore) / 2;
   }
 
-  private calculateCollaborationIndex(_messages: CommunicationMessage[]): number {
+  private calculateCollaborationIndex(messages: CommunicationMessage[]): number {
     // Stub implementation - would measure collaboration indicators
-    return 0.75;
+    if (messages.length === 0) return 0;
+    
+    const collaborationWords = ['let\'s', 'we should', 'together', 'collaborate', 'help', 'support'];
+    const collaborativeMessages = messages.filter(msg => 
+      collaborationWords.some(word => msg.content.toLowerCase().includes(word))
+    ).length;
+    
+    return Math.min(1, collaborativeMessages / messages.length + 0.5);
   }
 
-  private calculateNetworkDensity(_messages: CommunicationMessage[]): number {
+  private calculateNetworkDensity(messages: CommunicationMessage[]): number {
     // Stub implementation - would calculate communication network density
-    return 0.6;
+    const participants = this.getUniqueParticipants(messages);
+    if (participants.length < 2) return 0;
+    
+    const maxConnections = participants.length * (participants.length - 1);
+    const actualConnections = messages.length;
+    
+    return Math.min(1, actualConnections / maxConnections);
   }
 
-  private calculateInformationFlow(_messages: CommunicationMessage[]): number {
+  private calculateInformationFlow(messages: CommunicationMessage[]): number {
     // Stub implementation - would measure information flow efficiency
-    return 0.8;
+    if (messages.length === 0) return 0;
+    
+    // Simple metric based on message distribution over time
+    const timeSpread = messages.length > 1 ? 
+      messages[messages.length - 1].timestamp.getTime() - messages[0].timestamp.getTime() : 1;
+    const messageRate = messages.length / (timeSpread / 3600000); // messages per hour
+    
+    return Math.min(1, messageRate / 10); // Normalize to 10 messages per hour = 1.0
   }
 
   private countDirectMessages(messages: CommunicationMessage[]): number {

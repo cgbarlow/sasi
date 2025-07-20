@@ -169,7 +169,7 @@ describe('ClaudeMaxAPIClient', () => {
     })
 
     it('should fail after max retries on persistent rate limiting', async () => {
-      ;(fetch as jest.Mock).mockResolvedValue({
+      (fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 429,
         headers: new Headers({ 'retry-after': '60' })
@@ -183,7 +183,7 @@ describe('ClaudeMaxAPIClient', () => {
 
   describe('Error Handling', () => {
     it('should handle network errors with retries', async () => {
-      ;(fetch as jest.Mock)
+      (fetch as jest.Mock)
         .mockRejectedValueOnce(new Error('Network error'))
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({
@@ -206,7 +206,7 @@ describe('ClaudeMaxAPIClient', () => {
     })
 
     it('should handle HTTP error responses', async () => {
-      ;(fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -246,7 +246,7 @@ describe('ClaudeMaxAPIClient', () => {
 
   describe('API Methods', () => {
     beforeEach(() => {
-      ;(fetch as jest.Mock).mockResolvedValue({
+      (fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true }),
         headers: new Headers()

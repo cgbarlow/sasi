@@ -73,7 +73,7 @@ const AgentList: React.FC<AgentListProps> = ({ agents }) => {
           <label>Filter by Type:</label>
           <select 
             value={filterType} 
-            onChange={(e) => setFilterType(e.target.value as any)}
+            onChange={(e) => setFilterType(e.target.value as Agent['type'] | 'all')}
             className="filter-select"
           >
             <option value="all">All Types</option>
@@ -89,7 +89,7 @@ const AgentList: React.FC<AgentListProps> = ({ agents }) => {
           <label>Filter by Status:</label>
           <select 
             value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as Agent['status'] | 'all')}
             className="filter-select"
           >
             <option value="all">All Status</option>
@@ -104,7 +104,7 @@ const AgentList: React.FC<AgentListProps> = ({ agents }) => {
           <label>Sort by:</label>
           <select 
             value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'type' | 'status' | 'efficiency' | 'tasks')}
             className="filter-select"
           >
             <option value="efficiency">Efficiency</option>
