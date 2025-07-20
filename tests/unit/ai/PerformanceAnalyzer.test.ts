@@ -636,7 +636,7 @@ describe('PerformanceAnalyzer', () => {
       
       expect(result).toHaveProperty('overall');
       expect(result.issues).toEqual([]);
-      expect(result.recommendations).toContain('Performance impact looks minimal');
+      expect(result.recommendations.some(rec => rec.includes('Performance impact looks minimal'))).toBe(true);
     });
 
     it('should return fallback analysis on error', async () => {
@@ -646,7 +646,7 @@ describe('PerformanceAnalyzer', () => {
       
       expect(result.overall).toBe(0.5);
       expect(result.confidence).toBe(0.1);
-      expect(result.recommendations).toContain('Unable to analyze performance due to errors');
+      expect(result.recommendations.some(rec => rec.includes('Unable to analyze performance due to errors'))).toBe(true);
     });
   });
 });

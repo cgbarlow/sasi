@@ -901,7 +901,7 @@ Claude Flow extends the base coordination with:
 - Issues: https://github.com/ruvnet/claude-flow/issues
 - Examples: https://github.com/ruvnet/claude-flow/tree/main/examples
 
-## Protocols
+## Protocols (a.k.a. YOLO Protocols)
 Standard protocols to be executed when asked: 
 
 ### Continuous Integration (CI) protocol
@@ -914,7 +914,7 @@ Enhanced protocol with research capabilities and proven implementation-first str
    - Store findings: `mcp__claude-flow__memory_usage` for coordination
 
 2. **MULTI-SOURCE RESEARCH**: Gather intelligence using all available resources:
-   - **Context7 MCP**: Use for TypeScript optimizations and bulk error suppression
+   - **Context7 MCP**: Search for latest best practices, error patterns, and solutions
    - **WebSearch**: Search for latest best practices, error patterns, and solutions
    - **Codebase Analysis**: Use Grep, Glob, Read tools to understand current state
    - **GitHub Integration**: Check issues, PRs, workflow history using `gh` commands
