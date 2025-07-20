@@ -90,12 +90,12 @@ export class PerformanceAnalyzer {
     ],
     domThrashing: [
       /document\.getElementById\s*\([^)]*\)\s*\.style/gi,
+      /\.style\.(\w+)\s*=/gi, // Any style property manipulation
       /\.innerHTML\s*\+=/gi,
       /appendChild[\s\S]*appendChild/gi // Multiple appendChild calls (simplified)
     ],
     networkIssues: [
-      /fetch[\s\S]*fetch/gi, // Multiple fetch calls (simplified)
-      /new\s+XMLHttpRequest\s*\(\s*\)/gi,
+      /new\s+XMLHttpRequest\s*\(\s*\)/gi, // XMLHttpRequest usage
       /import\s*\(\s*['"]/gi // Dynamic imports (track for bundle splitting)
     ]
   };
@@ -324,27 +324,44 @@ export class PerformanceAnalyzer {
 
       const content = file.patch || '';
       
-      // IMPLEMENTATION FIRST: Detect multiple network calls with simpler logic
+      // IMPLEMENTATION FIRST: Detect multiple network calls with improved logic
+      
+      // Count fetch occurrences in content
+      const fetchCount = (content.match(/fetch\s*\(/gi) || []).length;
+      if (fetchCount > 1) {
+        issues.push({
+          id: `network_multiple_${file.filename}`,
+          type: 'network',
+          severity: 'medium',
+          title: 'Multiple Network Requests',
+          description: `${fetchCount} fetch calls detected - consider batching`,
+          file: file.filename,
+          line: 1,
+          impact: 'moderate',
+          suggestion: 'Consider batching requests or implementing request deduplication',
+          estimatedImprovement: 'Reduce network latency by 50-80%',
+          confidence: 0.7
+        });
+      }
+      
+      // Also check regex patterns for other network issues
       this.performancePatterns.networkIssues.forEach((pattern, index) => {
         const matches = this.findPatternMatches(content, pattern);
-        
-        // IMPLEMENTATION FIRST: Detect any fetch patterns and create multiple network issue
         if (matches.length > 0) {
-          if (pattern.source.includes('fetch') || content.includes('fetch')) {
+          matches.forEach(match => {
             issues.push({
-              id: `network_multiple_${file.filename}_${index}`,
+              id: `network_pattern_${file.filename}_${match.line}_${index}`,
               type: 'network',
               severity: 'medium',
-              title: 'Multiple Network Requests',
-              description: `Multiple fetch calls detected in content`,
+              title: 'Network Performance Issue',
+              description: `Network pattern detected: ${match.match}`,
               file: file.filename,
-              line: matches[0].line,
+              line: match.line,
               impact: 'moderate',
-              suggestion: 'Consider batching requests or implementing request deduplication',
-              estimatedImprovement: 'Reduce network latency by 50-80%',
-              confidence: 0.7
+              suggestion: 'Optimize network usage patterns',
+              confidence: 0.6
             });
-          }
+          });
         }
       });
 
@@ -568,7 +585,7 @@ export class PerformanceAnalyzer {
         type: 'rendering',
         severity: 'medium',
         title: 'Inline Object Creation in Render',
-        description: 'Inline objects in JSX cause unnecessary re-renders',
+        description: 'inline objects in JSX cause unnecessary re-renders',
         file: filename,
         line: 1,
         impact: 'moderate',
