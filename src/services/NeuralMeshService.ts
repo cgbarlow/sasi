@@ -529,7 +529,10 @@ export class NeuralMeshService {
       console.log(`🧠 Processed inference in ${executionTime.toFixed(2)}ms`)
     }
 
-    return { output, metrics }
+    return { 
+      output: Array.from(output), // Convert Float32Array to regular array for test compatibility
+      metrics 
+    }
   }
 
   /**
