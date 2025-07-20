@@ -621,7 +621,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateNetworkMetrics(issues: PerformanceIssue[]): { requestCount: number; bundleSize: number; latencyRisk: number } {
+  private calculateNetworkMetrics(issues: PerformanceIssue[]): { requestCount: number; bundleImpact: number; cacheability: number } {
     const networkIssues = issues.filter(i => i.type === 'network');
     
     return {
@@ -631,7 +631,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateRenderingMetrics(issues: PerformanceIssue[]): { renderingTime: number; repaints: number; reflows: number } {
+  private calculateRenderingMetrics(issues: PerformanceIssue[]): { rerenderRisk: number; domManipulation: number; layoutThrashing: number } {
     const renderingIssues = issues.filter(i => i.type === 'rendering');
     
     return {
@@ -641,7 +641,7 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private calculateBundleMetrics(files: Array<{ filename: string; patch?: string }>, issues: PerformanceIssue[]): { totalSize: number; treeShakeability: number; compressionRatio: number } {
+  private calculateBundleMetrics(files: Array<{ filename: string; patch?: string }>, issues: PerformanceIssue[]): { sizeImpact: number; treeShakeable: boolean; dynamicImports: number } {
     const bundleIssues = issues.filter(i => i.type === 'bundle');
     const totalSizeImpact = bundleIssues.reduce((sum, issue) => {
       const match = issue.description.match(/(\d+)KB/);
@@ -759,9 +759,9 @@ export class PerformanceAnalyzer {
     };
   }
 
-  private generateCacheKey(prData: any): string {
-    const filesHash = prData.files
-      .map((f: any) => `${f.filename}_${f.sha}`)
+  private generateCacheKey(prData: { files?: Array<{ filename: string; patch?: string }> }): string {
+    const filesHash = (prData.files || [])
+      .map((f: { filename: string; patch?: string }, index: number) => `${f.filename}_${index}`)
       .join('|');
     return `performance_${filesHash}`;
   }

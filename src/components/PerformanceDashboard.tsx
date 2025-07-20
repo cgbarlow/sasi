@@ -111,7 +111,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     getPerformanceReport
   } = usePerformanceMonitoring()
 
-  const [benchmarkResults, setBenchmarkResults] = useState<any[]>([])
+  const [benchmarkResults, setBenchmarkResults] = useState<Array<{ name: string; value: number; status: string }>>([])
   const [showBenchmarks, setShowBenchmarks] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
   const [showMemoryDetails, setShowMemoryDetails] = useState(false)
@@ -136,7 +136,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     benchmarkSuite: null,
     integrationSystem: null
   })
-  const [systemHealth, setSystemHealth] = useState<any>(null)
+  const [systemHealth, setSystemHealth] = useState<{ status: string; score: number; issues: string[] } | null>(null)
   const [memoryStats, setMemoryStats] = useState<any>(null)
   const [cacheStats, setCacheStats] = useState<any>(null)
   const [wasmStats, setWasmStats] = useState<any>(null)
