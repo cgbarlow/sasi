@@ -471,7 +471,7 @@ export class NeuralMeshService {
       },
       wasmMetrics: {
         executionTime: perf.now() - startTime,
-        memoryUsage: typeof process !== 'undefined' ? process.memoryUsage().heapUsed / (1024 * 1024) : 5, // MB
+        memoryUsage: this.wasmModule?.get_memory_usage ? (this.wasmModule.get_memory_usage() || 0) / (1024 * 1024) : 0.1, // Agent-specific WASM memory in MB
         simdAcceleration: !!this.config.enableWasm,
         performanceScore: 1.0
       }
