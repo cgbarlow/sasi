@@ -902,7 +902,7 @@ Claude Flow extends the base coordination with:
 - Examples: https://github.com/ruvnet/claude-flow/tree/main/examples
 
 ## Protocols (a.k.a. YOLO Protocols)
-Standard protocols to be executed when asked: 
+Standard protocols to be executed when asked, e.g. "Initialize CI protocol": 
 
 ### Continuous Integration (CI) protocol
 Enhanced protocol with research capabilities and proven implementation-first strategy. For systematic CI fixing, testing, committing regularly, push, PR, review, monitor build, repeat. The whole thing should run and repeat unattended with zero intervention; the monitoring of the active action and automated merge where possible is critical:
@@ -914,7 +914,7 @@ Enhanced protocol with research capabilities and proven implementation-first str
    - Store findings: `mcp__claude-flow__memory_usage` for coordination
 
 2. **MULTI-SOURCE RESEARCH**: Gather intelligence using all available resources:
-   - **Context7 MCP**: Search for latest best practices, error patterns, and solutions
+   - **Context7 MCP**: Search for intel on specific products, platforms, technologies (add Context7 MCP if not available)
    - **WebSearch**: Search for latest best practices, error patterns, and solutions
    - **Codebase Analysis**: Use Grep, Glob, Read tools to understand current state
    - **GitHub Integration**: Check issues, PRs, workflow history using `gh` commands
@@ -922,11 +922,11 @@ Enhanced protocol with research capabilities and proven implementation-first str
 3. **SYSTEMATIC ANALYSIS**: Apply proven analysis patterns:
    - Identify root causes vs symptoms
    - Categorize issues by severity and component
-   - Document findings in GitHub issues with proper labels
+   - Document findings in GitHub issues with proper labels (check what labels are available, add new labels if required before creating/modifying issues)
    - Store research results in swarm memory for coordination
 
 ## 🎯 PHASE 2: Implementation-First Strategy
-4. **IMPLEMENTATION-FIRST FIXES**: Apply proven methodology that achieved 4x 100% test success:
+4. **IMPLEMENTATION-FIRST FIXES**: Apply proven methodology that achieves 100% test success:
    - Fix actual implementation logic rather than relaxing test expectations
    - Handle both edge cases and main use cases simultaneously  
    - Use realistic thresholds for test environment while maintaining production standards

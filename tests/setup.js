@@ -151,7 +151,7 @@ try {
   // WASM module not available in this environment
 }
 
-// Mock crypto for DAA tests
+// Enhanced crypto mock for OAuth/PKCE tests
 Object.defineProperty(global, 'crypto', {
   value: {
     getRandomValues: jest.fn((arr) => {
@@ -161,10 +161,228 @@ Object.defineProperty(global, 'crypto', {
       return arr;
     }),
     subtle: {
-      digest: jest.fn(() => Promise.resolve(new ArrayBuffer(32)))
-    }
+      digest: jest.fn((algorithm, data) => {
+        // Mock SHA-256 digest for PKCE challenge
+        if (algorithm === 'SHA-256') {
+          // Return a mock 32-byte ArrayBuffer
+          const buffer = new ArrayBuffer(32);
+          const view = new Uint8Array(buffer);
+          for (let i = 0; i < 32; i++) {
+            view[i] = Math.floor(Math.random() * 256);
+          }
+          return Promise.resolve(buffer);
+        }
+        return Promise.resolve(new ArrayBuffer(32));
+      }),
+      importKey: jest.fn(() => Promise.resolve({})),
+      exportKey: jest.fn(() => Promise.resolve(new ArrayBuffer(32))),
+      sign: jest.fn(() => Promise.resolve(new ArrayBuffer(32))),
+      verify: jest.fn(() => Promise.resolve(true))
+    },
+    randomUUID: jest.fn(() => '123e4567-e89b-12d3-a456-426614174000')
   }
 });
+
+// Enhanced btoa/atob with proper error handling
+if (!global.btoa) {
+  global.btoa = jest.fn((str) => {
+    try {
+      return Buffer.from(String(str), 'binary').toString('base64');
+    } catch (error) {
+      throw new Error('Failed to encode string');
+    }
+  });
+}
+
+if (!global.atob) {
+  global.atob = jest.fn((str) => {
+    try {
+      return Buffer.from(String(str), 'base64').toString('binary');
+    } catch (error) {
+      throw new Error('Failed to decode string');
+    }
+  });
+}
+
+// Mock TextEncoder/TextDecoder for OAuth PKCE
+if (!global.TextEncoder) {
+  global.TextEncoder = class TextEncoder {
+    constructor() {
+      this.encoding = 'utf-8';
+    }
+    
+    encode(input) {
+      // Convert string to UTF-8 bytes
+      const utf8 = unescape(encodeURIComponent(String(input || '')));
+      const bytes = new Uint8Array(utf8.length);
+      for (let i = 0; i < utf8.length; i++) {
+        bytes[i] = utf8.charCodeAt(i);
+      }
+      return bytes;
+    }
+    
+    encodeInto(source, destination) {
+      const encoded = this.encode(source);
+      const length = Math.min(encoded.length, destination.length);
+      destination.set(encoded.subarray(0, length));
+      return {
+        read: source.length,
+        written: length
+      };
+    }
+  };
+}
+
+if (!global.TextDecoder) {
+  global.TextDecoder = class TextDecoder {
+    constructor(encoding = 'utf-8') {
+      this.encoding = encoding.toLowerCase();
+      this.fatal = false;
+      this.ignoreBOM = false;
+    }
+    
+    decode(input) {
+      if (!input) return '';
+      
+      // Convert bytes to UTF-8 string
+      const bytes = new Uint8Array(input);
+      let str = '';
+      for (let i = 0; i < bytes.length; i++) {
+        str += String.fromCharCode(bytes[i]);
+      }
+      
+      try {
+        return decodeURIComponent(escape(str));
+      } catch (error) {
+        if (this.fatal) {
+          throw new TypeError('Failed to decode UTF-8');
+        }
+        return str;
+      }
+    }
+  };
+}
+
+// Mock URLSearchParams for OAuth callback parameters
+if (!global.URLSearchParams) {
+  global.URLSearchParams = class URLSearchParams {
+    constructor(init) {
+      this.params = new Map();
+      
+      if (typeof init === 'string') {
+        // Parse query string
+        if (init.startsWith('?')) {
+          init = init.substring(1);
+        }
+        if (init) {
+          init.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key) {
+              this.params.set(
+                decodeURIComponent(key),
+                decodeURIComponent(value || '')
+              );
+            }
+          });
+        }
+      } else if (init && typeof init === 'object') {
+        // Parse object or Map
+        const entries = init instanceof Map ? init.entries() : Object.entries(init);
+        for (const [key, value] of entries) {
+          this.params.set(String(key), String(value));
+        }
+      }
+    }
+    
+    append(name, value) {
+      const existing = this.params.get(name);
+      if (existing) {
+        this.params.set(name, existing + ',' + String(value));
+      } else {
+        this.params.set(name, String(value));
+      }
+    }
+    
+    delete(name) {
+      this.params.delete(name);
+    }
+    
+    get(name) {
+      return this.params.get(name) || null;
+    }
+    
+    has(name) {
+      return this.params.has(name);
+    }
+    
+    set(name, value) {
+      this.params.set(name, String(value));
+    }
+    
+    toString() {
+      const pairs = [];
+      for (const [key, value] of this.params) {
+        pairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+      }
+      return pairs.join('&');
+    }
+    
+    entries() {
+      return this.params.entries();
+    }
+    
+    keys() {
+      return this.params.keys();
+    }
+    
+    values() {
+      return this.params.values();
+    }
+    
+    [Symbol.iterator]() {
+      return this.params.entries();
+    }
+  };
+}
+
+// Mock URL constructor for OAuth URL building
+if (!global.URL) {
+  global.URL = class URL {
+    constructor(url, base) {
+      if (base) {
+        // Simple base URL resolution
+        if (!url.startsWith('http')) {
+          url = base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
+        }
+      }
+      
+      const parts = url.match(/^(https?:)\/\/([^\/]+)(\/[^?#]*)?(\?[^#]*)?(#.*)?$/);
+      if (!parts) {
+        throw new TypeError('Invalid URL');
+      }
+      
+      this.protocol = parts[1];
+      this.host = parts[2];
+      this.pathname = parts[3] || '/';
+      this.search = parts[4] || '';
+      this.hash = parts[5] || '';
+      this.href = url;
+      
+      const hostParts = this.host.split(':');
+      this.hostname = hostParts[0];
+      this.port = hostParts[1] || '';
+      
+      this.origin = `${this.protocol}//${this.host}`;
+      this.searchParams = new URLSearchParams(this.search);
+    }
+    
+    toString() {
+      // Rebuild URL from components
+      const search = this.searchParams.toString();
+      return `${this.protocol}//${this.host}${this.pathname}${search ? '?' + search : ''}${this.hash}`;
+    }
+  };
+}
 
 // Mock performance API
 global.performance = {
@@ -184,23 +402,61 @@ global.fetch = jest.fn(() =>
   })
 );
 
-// Mock localStorage
-global.localStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn()
+// Enhanced localStorage mock with proper storage behavior for OAuth tests
+const createStorageMock = (name) => {
+  const storage = new Map();
+  
+  return {
+    getItem: jest.fn((key) => {
+      try {
+        return storage.get(key) || null;
+      } catch (error) {
+        console.warn(`${name}.getItem error:`, error);
+        return null;
+      }
+    }),
+    
+    setItem: jest.fn((key, value) => {
+      try {
+        storage.set(key, String(value));
+      } catch (error) {
+        console.warn(`${name}.setItem error:`, error);
+        throw new Error(`${name} is not available`);
+      }
+    }),
+    
+    removeItem: jest.fn((key) => {
+      try {
+        storage.delete(key);
+      } catch (error) {
+        console.warn(`${name}.removeItem error:`, error);
+      }
+    }),
+    
+    clear: jest.fn(() => {
+      try {
+        storage.clear();
+      } catch (error) {
+        console.warn(`${name}.clear error:`, error);
+      }
+    }),
+    
+    get length() {
+      return storage.size;
+    },
+    
+    key: jest.fn((index) => {
+      const keys = Array.from(storage.keys());
+      return keys[index] || null;
+    })
+  };
 };
 
-// Mock sessionStorage
-global.sessionStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn()
-};
+// Apply enhanced storage mocks
+global.localStorage = createStorageMock('localStorage');
+global.sessionStorage = createStorageMock('sessionStorage');
 
-// Test utilities
+// Test utilities including OAuth helpers
 global.testUtils = {
   waitFor: async (condition, timeout = 5000) => {
     const start = Date.now();
@@ -241,6 +497,126 @@ global.testUtils = {
     clear: jest.fn(),
     drawArrays: jest.fn()
   })
+};
+
+// OAuth test utilities for authentication testing
+global.oauthTestUtils = {
+  /**
+   * Mock successful OAuth token exchange
+   */
+  mockTokenExchange: (tokens = {}) => {
+    const defaultTokens = {
+      access_token: 'mock-access-token',
+      refresh_token: 'mock-refresh-token',
+      expires_in: 3600,
+      token_type: 'Bearer',
+      scope: ['profile', 'projects']
+    };
+    
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ ...defaultTokens, ...tokens })
+    });
+  },
+  
+  /**
+   * Mock OAuth token exchange failure
+   */
+  mockTokenExchangeFailure: (error = {}) => {
+    const defaultError = {
+      error: 'invalid_grant',
+      error_description: 'Authorization code is invalid'
+    };
+    
+    global.fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({ ...defaultError, ...error })
+    });
+  },
+  
+  /**
+   * Mock user profile API response
+   */
+  mockUserProfile: (profile = {}) => {
+    const defaultProfile = {
+      id: 'user-123',
+      email: 'test@example.com',
+      username: 'testuser',
+      subscription: { plan: 'pro' },
+      limits: {
+        max_tokens: 100000,
+        max_projects: 10,
+        max_agents: 5
+      }
+    };
+    
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ ...defaultProfile, ...profile })
+    });
+  },
+  
+  /**
+   * Setup sessionStorage with OAuth state
+   */
+  setupOAuthState: (state = 'test-state', verifier = 'test-verifier') => {
+    global.sessionStorage.setItem('auth_state', state);
+    global.sessionStorage.setItem('pkce_verifier', verifier);
+  },
+  
+  /**
+   * Clear OAuth state from sessionStorage
+   */
+  clearOAuthState: () => {
+    global.sessionStorage.removeItem('auth_state');
+    global.sessionStorage.removeItem('pkce_verifier');
+  },
+  
+  /**
+   * Mock safe window.location.href assignment for OAuth redirect tests
+   */
+  mockLocationHref: () => {
+    const mockSetter = jest.fn();
+    
+    try {
+      // Override href setter to prevent JSDOM navigation errors
+      Object.defineProperty(window.location, 'href', {
+        set: mockSetter,
+        get: () => window.location._href || 'http://localhost:3000/',
+        configurable: true
+      });
+    } catch (error) {
+      // If defineProperty fails, create a tracking function
+      window.location._mockLocationSetter = mockSetter;
+      return jest.fn().mockImplementation((url) => {
+        mockSetter(url);
+        // Prevent actual navigation in tests
+        return undefined;
+      });
+    }
+    
+    return mockSetter;
+  },
+  
+  /**
+   * Reset all OAuth mocks for clean test isolation
+   */
+  resetMocks: () => {
+    jest.clearAllMocks();
+    global.sessionStorage.clear();
+    global.localStorage.clear();
+    
+    // Reset crypto mock to generate new values
+    if (global.crypto && global.crypto.getRandomValues) {
+      global.crypto.getRandomValues.mockImplementation((array) => {
+        for (let i = 0; i < array.length; i++) {
+          array[i] = Math.floor(Math.random() * 256);
+        }
+        return array;
+      });
+    }
+  }
 };
 
 // Custom matchers
