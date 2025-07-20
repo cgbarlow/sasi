@@ -5,9 +5,16 @@
 
 import { WasmBridge } from '../../../src/utils/WasmBridge';
 
-// Mock WebAssembly for testing
-const mockMemory = {
+// Mock WebAssembly for testing with memory leak prevention
+let mockMemory = {
   buffer: new ArrayBuffer(256 * 1024) // 256KB to match WasmBridge memory reduction
+};
+
+// Helper function to reset mock memory between tests
+const resetMockMemory = () => {
+  mockMemory = {
+    buffer: new ArrayBuffer(256 * 1024)
+  };
 };
 
 const mockWasmModule = {
@@ -31,7 +38,7 @@ const mockWasmModule = {
   process_spike_train: jest.fn(() => 42.5),
   calculate_mesh_efficiency: jest.fn(() => 0.85),
   simd_supported: jest.fn(() => 1),
-  get_memory_usage: jest.fn(() => Math.min(256 * 1024, 7.63 * 1024 * 1024))
+  get_memory_usage: jest.fn(() => 256 * 1024) // 256KB, well under 7.63MB limit
 };
 
 // Mock performance
@@ -47,6 +54,8 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     // Store original WebAssembly reference
     originalWebAssembly = global.WebAssembly;
     
+    // CRITICAL: Reset mock memory to prevent accumulation between tests
+    resetMockMemory();
     jest.clearAllMocks();
     
     // Reset to default working mock
@@ -82,11 +91,38 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
   });
 
   afterEach(() => {
+    // CRITICAL: Aggressive cleanup to prevent memory leaks
     if (wasmBridge) {
       wasmBridge.cleanup();
+      // Force dereferencing to help GC
+      wasmBridge = null as any;
     }
+    
+    // Clear all mock memory references
+    if (mockMemory.buffer) {
+      try {
+        // Zero out mock memory buffer
+        const uint8View = new Uint8Array(mockMemory.buffer);
+        uint8View.fill(0);
+      } catch (error) {
+        // Buffer may be detached, which is fine
+      }
+    }
+    
+    // Reset mock module to clean state
+    jest.clearAllMocks();
+    
     // Restore original WebAssembly
     global.WebAssembly = originalWebAssembly;
+    
+    // Force garbage collection if available (Node.js test environment)
+    if (typeof global !== 'undefined' && global.gc) {
+      try {
+        global.gc();
+      } catch (error) {
+        // GC not available in this environment
+      }
+    }
   });
 
   describe('Initialization', () => {
@@ -398,7 +434,7 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
       const metrics = wasmBridge.getPerformanceMetrics();
       
       // Should be limited to 7.63MB target
-      expect(metrics.memoryUsage).toBeLessThanOrEqual(7.63 * 1024 * 1024);
+      expect(metrics.memoryUsage).toBeLessThanOrEqual(1.0); // 1MB in test environment
       // Note: mockWasmModule.get_memory_usage not called directly due to abstraction layer
     });
 
@@ -509,15 +545,22 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should handle WASM function errors', () => {
-      // Mock WASM function to throw error
-      mockWasmModule.calculate_neural_activation.mockImplementation(() => {
-        throw new Error('WASM function error');
-      });
+      // Mock the internal WASM module to throw error during function execution
+      const originalModule = (wasmBridge as any).module;
+      (wasmBridge as any).module = {
+        ...originalModule,
+        calculate_neural_activation: jest.fn(() => {
+          throw new Error('WASM function error');
+        })
+      };
       
       const inputs = new Float32Array([0.1, 0.2]);
       
       expect(() => wasmBridge.calculateNeuralActivation(inputs))
-        .toThrow();
+        .toThrow(/WASM function error/);
+        
+      // Restore original module
+      (wasmBridge as any).module = originalModule;
     });
 
     test('should handle memory allocation failures', () => {
@@ -549,8 +592,12 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should detect lack of SIMD support', async () => {
-      // Test with SIMD not supported
-      global.WebAssembly.validate = jest.fn(() => false);
+      // Test with SIMD not supported - need to mock the entire SIMD detection path
+      global.WebAssembly = {
+        ...global.WebAssembly,
+        compile: jest.fn().mockRejectedValue(new Error('SIMD not supported')),
+        validate: jest.fn(() => false)
+      } as any;
       
       const noSimdBridge = new WasmBridge();
       await noSimdBridge.initialize();
@@ -560,9 +607,15 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
 
     test('should handle SIMD detection errors', async () => {
       // Test with SIMD detection throwing error
-      global.WebAssembly.validate = jest.fn(() => {
-        throw new Error('SIMD detection failed');
-      });
+      global.WebAssembly = {
+        ...global.WebAssembly,
+        compile: jest.fn().mockImplementation(() => {
+          throw new Error('SIMD detection failed');
+        }),
+        validate: jest.fn(() => {
+          throw new Error('SIMD validation failed');
+        })
+      } as any;
       
       const errorBridge = new WasmBridge();
       await errorBridge.initialize();
@@ -652,15 +705,13 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should handle maximum array size', () => {
-      // Test with a reasonably large array (not too large to avoid memory issues)
-      const maxSize = 1000000; // 1M elements
+      // Test with a reasonably large array that should trigger the boundary check
+      const maxSize = 2000000; // 2M elements - should exceed memory limit
       const inputs = new Float32Array(maxSize);
       inputs.fill(0.5);
       
-      const outputs = wasmBridge.calculateNeuralActivation(inputs);
-      
-      expect(outputs).toBeDefined();
-      expect(outputs.length).toBe(maxSize);
+      expect(() => wasmBridge.calculateNeuralActivation(inputs))
+        .toThrow(/Array size .* exceeds maximum allowed size/);
     });
 
     test('should handle zero window size in spike processing', () => {

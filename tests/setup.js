@@ -1,6 +1,9 @@
 // Global test setup for SASI/Synaptic-mesh integration
 const path = require('path');
 
+// Ensure NODE_ENV is set to test for consistent behavior
+process.env.NODE_ENV = 'test';
+
 // Import Jest DOM matchers for React component testing
 require('@testing-library/jest-dom');
 
