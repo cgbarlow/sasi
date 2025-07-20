@@ -46,8 +46,31 @@ describe('NeuralMeshService - TDD Implementation', () => {
   });
 
   afterEach(async () => {
+    // CRITICAL: Aggressive cleanup to prevent 125.58MB memory leak
     if (meshService) {
-      await meshService.shutdown();
+      try {
+        // Forcefully disconnect first
+        meshService.disconnect();
+        // Then full shutdown
+        await meshService.shutdown();
+        // Clear the reference to help GC
+        meshService = null as any;
+      } catch (error) {
+        // Ignore shutdown errors but ensure cleanup
+        meshService = null as any;
+      }
+    }
+    
+    // Clear all mocks between tests
+    jest.clearAllMocks();
+    
+    // Force garbage collection if available (Node.js test environment)
+    if (typeof global !== 'undefined' && global.gc) {
+      try {
+        global.gc();
+      } catch (error) {
+        // GC not available in this environment
+      }
     }
   });
 

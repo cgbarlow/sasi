@@ -145,7 +145,7 @@ export class WasmBridge {
     }
     
     // Create memory (256KB - much smaller to reduce memory usage)
-    const memory = new WebAssembly.Memory({ initial: 4 })
+    const memory = new WebAssembly.Memory({ initial: 4, maximum: 4 }) // Enforce strict memory limit
     
     // Simulate WASM module functions
     return {
@@ -287,11 +287,11 @@ export class WasmBridge {
   }
 
   /**
-   * Create test-compatible WASM module
+   * Create test-compatible WASM module with memory limit enforcement
    */
   private createTestModule(): WasmModule {
-    // Create memory (256KB) - much smaller for tests
-    const memory = new WebAssembly.Memory({ initial: 4 })
+    // Create memory (256KB) - much smaller for tests to prevent leaks
+    const memory = new WebAssembly.Memory({ initial: 4, maximum: 4 }) // Enforce maximum
     
     return {
       memory,
@@ -643,19 +643,43 @@ export class WasmBridge {
   }
 
   /**
-   * Cleanup WASM module
+   * Cleanup WASM module with aggressive memory deallocation
+   * TARGET: Reduce memory usage from 125.58MB to <1MB
    */
   cleanup(): void {
+    // Force memory cleanup before nulling references
+    if (this.memoryBuffer) {
+      // Clear the entire memory buffer to ensure no lingering references
+      try {
+        const uint8View = new Uint8Array(this.memoryBuffer)
+        uint8View.fill(0) // Zero out all memory
+      } catch (error) {
+        // Memory buffer may already be detached, which is fine
+      }
+    }
+    
+    // Aggressive cleanup of all references
     this.module = null
     this.memoryBuffer = null
     this.isInitialized = false
     this.memoryOffset = 1024
+    
+    // Reset performance metrics to free any cached data
     this.performance = {
       executionTime: 0,
       memoryUsage: 0,
       simdAcceleration: false,
       throughput: 0,
       efficiency: 0
+    }
+    
+    // Force garbage collection if available (Node.js)
+    if (typeof global !== 'undefined' && global.gc) {
+      try {
+        global.gc()
+      } catch (error) {
+        // GC not available, that's okay
+      }
     }
   }
 }

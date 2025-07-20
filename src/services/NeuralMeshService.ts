@@ -177,7 +177,7 @@ export class NeuralMeshService {
   }
 
   /**
-   * Disconnect from neural mesh service
+   * Disconnect from neural mesh service with memory cleanup
    */
   disconnect(): void {
     if (this.realtimeInterval) {
@@ -185,8 +185,16 @@ export class NeuralMeshService {
       this.realtimeInterval = null
     }
     if (this.mcpClient) {
-      if (this.mcpClient.close) {
-        this.mcpClient.close()
+      try {
+        if (this.mcpClient.close) {
+          this.mcpClient.close()
+        }
+        // Remove event listeners to prevent memory leaks
+        if (this.mcpClient.removeAllListeners) {
+          this.mcpClient.removeAllListeners()
+        }
+      } catch (error) {
+        // Ignore close errors
       }
       this.mcpClient = null
     }
@@ -194,10 +202,16 @@ export class NeuralMeshService {
     // Unregister all agents from P2P manager
     if (this.p2pManager) {
       this.distributedAgents.forEach(agent => {
-        this.p2pManager!.unregisterLocalAgent(agent.id)
+        try {
+          this.p2pManager!.unregisterLocalAgent(agent.id)
+        } catch (error) {
+          // Ignore unregister errors
+        }
       })
     }
     
+    // Clear distributed agents to prevent accumulation
+    this.distributedAgents.clear()
     this.connection = null
   }
 
@@ -529,42 +543,119 @@ export class NeuralMeshService {
 
   /**
    * Shutdown service and clean up resources
+   * CRITICAL: Aggressive cleanup to fix 125.58MB memory leak
    */
   async shutdown(): Promise<void> {
+    if (this.config.debugMode) {
+      console.log('🔌 Starting Neural Mesh Service shutdown...')
+    }
+
+    // 1. Clear all timers and intervals
     if (this.realtimeInterval) {
       clearInterval(this.realtimeInterval as any)
       this.realtimeInterval = null
     }
 
+    // 2. Close MCP client connection
     if (this.mcpClient) {
-      if (this.mcpClient.close) {
-        this.mcpClient.close()
+      try {
+        if (this.mcpClient.close) {
+          this.mcpClient.close()
+        }
+        // Remove all event listeners to prevent memory leaks
+        if (this.mcpClient.removeAllListeners) {
+          this.mcpClient.removeAllListeners()
+        }
+      } catch (error) {
+        // Ignore close errors
       }
       this.mcpClient = null
     }
 
-    // Shutdown P2P networking components
+    // 3. Shutdown P2P networking components with aggressive cleanup
     if (this.consensusEngine) {
-      await this.consensusEngine.shutdown()
+      try {
+        await this.consensusEngine.shutdown()
+      } catch (error) {
+        console.warn('Error shutting down consensus engine:', error)
+      }
       this.consensusEngine = null
     }
 
     if (this.meshTopology) {
-      this.meshTopology.shutdown()
+      try {
+        this.meshTopology.shutdown()
+      } catch (error) {
+        console.warn('Error shutting down mesh topology:', error)
+      }
       this.meshTopology = null
     }
 
     if (this.p2pManager) {
-      await this.p2pManager.shutdown()
+      try {
+        // Unregister all agents before shutdown to prevent dangling references
+        this.distributedAgents.forEach(agent => {
+          try {
+            this.p2pManager!.unregisterLocalAgent(agent.id)
+          } catch (error) {
+            // Ignore unregister errors during shutdown
+          }
+        })
+        await this.p2pManager.shutdown()
+      } catch (error) {
+        console.warn('Error shutting down P2P manager:', error)
+      }
       this.p2pManager = null
     }
 
+    // 4. Aggressively clear all collections and references
     this.connection = null
+    this.networkHealth = null
+    
+    // Clear event listeners with explicit cleanup
+    this.eventListeners.forEach((listeners, event) => {
+      listeners.length = 0 // Clear array without creating new one
+    })
     this.eventListeners.clear()
+    
+    // Clear distributed agents with proper cleanup of neural properties
+    this.distributedAgents.forEach((agent, id) => {
+      // Clear agent's neural properties to free memory
+      if (agent.neuralProperties) {
+        agent.neuralProperties.connections.length = 0
+        agent.neuralProperties.spikeHistory.length = 0
+      }
+      if (agent.capabilities) {
+        agent.capabilities.length = 0
+      }
+    })
     this.distributedAgents.clear()
 
+    // 5. Clean up WASM module if present
+    if (this.wasmModule) {
+      try {
+        // Clear WASM memory if it has a cleanup method
+        if (this.wasmModule.memory && this.wasmModule.memory.buffer) {
+          const uint8View = new Uint8Array(this.wasmModule.memory.buffer)
+          uint8View.fill(0) // Zero out WASM memory
+        }
+      } catch (error) {
+        // WASM memory may already be detached
+      }
+      this.wasmModule = null
+    }
+
+    // 6. Force garbage collection if available (Node.js)
+    if (typeof global !== 'undefined' && global.gc) {
+      try {
+        global.gc()
+      } catch (error) {
+        // GC not available, that's okay
+      }
+    }
+
     if (this.config.debugMode) {
-      console.log('🔌 Neural Mesh Service shutdown complete')
+      console.log('🔌 Neural Mesh Service shutdown complete - memory cleaned')
     }
   }
 

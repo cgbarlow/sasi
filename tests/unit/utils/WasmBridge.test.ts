@@ -5,9 +5,16 @@
 
 import { WasmBridge } from '../../../src/utils/WasmBridge';
 
-// Mock WebAssembly for testing
-const mockMemory = {
+// Mock WebAssembly for testing with memory leak prevention
+let mockMemory = {
   buffer: new ArrayBuffer(256 * 1024) // 256KB to match WasmBridge memory reduction
+};
+
+// Helper function to reset mock memory between tests
+const resetMockMemory = () => {
+  mockMemory = {
+    buffer: new ArrayBuffer(256 * 1024)
+  };
 };
 
 const mockWasmModule = {
@@ -47,6 +54,8 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     // Store original WebAssembly reference
     originalWebAssembly = global.WebAssembly;
     
+    // CRITICAL: Reset mock memory to prevent accumulation between tests
+    resetMockMemory();
     jest.clearAllMocks();
     
     // Reset to default working mock
@@ -82,11 +91,38 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
   });
 
   afterEach(() => {
+    // CRITICAL: Aggressive cleanup to prevent memory leaks
     if (wasmBridge) {
       wasmBridge.cleanup();
+      // Force dereferencing to help GC
+      wasmBridge = null as any;
     }
+    
+    // Clear all mock memory references
+    if (mockMemory.buffer) {
+      try {
+        // Zero out mock memory buffer
+        const uint8View = new Uint8Array(mockMemory.buffer);
+        uint8View.fill(0);
+      } catch (error) {
+        // Buffer may be detached, which is fine
+      }
+    }
+    
+    // Reset mock module to clean state
+    jest.clearAllMocks();
+    
     // Restore original WebAssembly
     global.WebAssembly = originalWebAssembly;
+    
+    // Force garbage collection if available (Node.js test environment)
+    if (typeof global !== 'undefined' && global.gc) {
+      try {
+        global.gc();
+      } catch (error) {
+        // GC not available in this environment
+      }
+    }
   });
 
   describe('Initialization', () => {
