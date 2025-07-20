@@ -478,7 +478,7 @@ export class NeuralMeshService {
     const agent: NeuralAgent = {
       id: config.id || `agent_${Date.now()}`,
       name: config.name || 'Neural Agent',
-      type: (config.type as 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker') || 'neural',
+      type: (config.type as 'researcher' | 'coder' | 'tester' | 'reviewer' | 'debugger' | 'neural' | 'synaptic' | 'worker') || 'worker',
       status: 'idle',
       currentTask: config.currentTask || '',
       repository: config.repository || 'default',
