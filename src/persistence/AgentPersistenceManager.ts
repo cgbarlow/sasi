@@ -233,6 +233,28 @@ export class AgentPersistenceManager {
       throw new Error('Database not initialized');
     }
 
+    // TDD Green Phase: Implement input validation as expected by tests
+    
+    // Check if config is empty or null
+    if (!config || typeof config !== 'object') {
+      throw new Error('Agent configuration is required');
+    }
+    
+    // Check for required fields
+    if (!config.id) {
+      throw new Error('Agent ID is required');
+    }
+    
+    if (!config.type) {
+      throw new Error('Agent type is required');
+    }
+    
+    // Validate agent type
+    const validTypes = ['researcher', 'coder', 'analyst', 'optimizer', 'coordinator', 'tester', 'reviewer'];
+    if (!validTypes.includes(config.type)) {
+      throw new Error(`Invalid agent type: ${config.type}. Must be one of: ${validTypes.join(', ')}`);
+    }
+
     const startTime = performance.now();
 
     try {
@@ -247,16 +269,16 @@ export class AgentPersistenceManager {
       const result = stmt.run(
         config.id,
         config.type,
-        config.status,
-        config.cognitivePattern,
-        JSON.stringify(config.networkLayers),
+        config.status || 'spawning',
+        config.cognitivePattern || 'default',
+        JSON.stringify(config.networkLayers || []),
         config.learningRate || 0.01,
         config.momentum || 0.0,
-        config.createdAt,
-        config.lastActive,
+        config.createdAt || Date.now(),
+        config.lastActive || Date.now(),
         config.memoryUsageMB || 0,
         config.performanceScore || 0,
-        config.spawnTimeMs,
+        config.spawnTimeMs || null,
         config.configJson || '{}',
         config.metadataJson || '{}'
       );
@@ -272,8 +294,19 @@ export class AgentPersistenceManager {
 
     } catch (error) {
       const saveTime = performance.now() - startTime;
+      
+      // If it's a database constraint error (like UNIQUE constraint), re-throw with specific message
+      if (error.message.includes('UNIQUE constraint failed')) {
+        throw new Error(`UNIQUE constraint failed: Agent with ID ${config.id} already exists`);
+      }
+      
+      // If it's a validation error, re-throw it
+      if (error.message.includes('required') || error.message.includes('Invalid')) {
+        throw error;
+      }
+      
       console.error(`❌ Failed to save agent ${config.id} (${saveTime.toFixed(2)}ms):`, error.message);
-      throw error;
+      throw new Error(`Failed to save agent: ${error.message}`);
     }
   }
 

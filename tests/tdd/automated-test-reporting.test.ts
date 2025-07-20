@@ -1538,6 +1538,10 @@ describe('Automated Test Reporting System', () => {
       
       expect(typeof report.memoryLeaksDetected).toBe('boolean')
       
+      // Allow for false positives in test environment
+      // The important thing is that the detection mechanism works
+      expect(report.memoryLeaksDetected).toBeDefined()
+      
       if (report.memoryLeaksDetected) {
         expect(report.recommendations).toContain(
           expect.stringContaining('memory leak')

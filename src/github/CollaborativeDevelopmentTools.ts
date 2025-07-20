@@ -2594,30 +2594,7 @@ export class CollaborativeDevelopmentTools {
     return allSkillAreas.size / 5; // Normalize to 5 skill areas
   }
 
-  private calculateJuniorScore(contributor: any): number {
-    const contributions = contributor.contributions || 0;
-    const maxContributions = 100; // Threshold for senior
-    
-    // Lower contributions = higher junior score
-    const contributionScore = 1 - Math.min(contributions / maxContributions, 1);
-    
-    // Additional factors could include:
-    // - Account age
-    // - Commit size patterns
-    // - Question/help-seeking frequency
-    
-    return contributionScore;
-  }
-
-  private assessGrowthPotential(contributor: any): string {
-    const score = this.calculateJuniorScore(contributor);
-    const contributions = contributor.contributions || 0;
-    
-    if (score > 0.8 && contributions > 5) return 'high';
-    if (score > 0.6 && contributions > 2) return 'medium';
-    if (contributions > 0) return 'developing';
-    return 'new';
-  }
+  // Duplicate functions removed - keeping the first implementation only
 
   // Additional missing stub methods
   private identifySeniorDevelopers(contributors: any[]): any[] {
