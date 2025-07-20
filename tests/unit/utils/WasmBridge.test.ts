@@ -12,20 +12,27 @@ const mockMemory = {
 
 const mockWasmModule = {
   memory: mockMemory,
-  calculate_neural_activation: jest.fn(),
-  optimize_connections: jest.fn(),
+  calculate_neural_activation: jest.fn((inputs: number, inputsPtr: number, outputs: number, outputsPtr: number) => {
+    // Mock neural activation by copying input to output with tanh transformation
+    const inputArray = new Float32Array(mockMemory.buffer, inputsPtr, inputs);
+    const outputArray = new Float32Array(mockMemory.buffer, outputsPtr, outputs);
+    for (let i = 0; i < Math.min(inputs, outputs); i++) {
+      outputArray[i] = Math.tanh(inputArray[i] * 0.5);
+    }
+  }),
+  optimize_connections: jest.fn((connections: number, connectionsPtr: number, count: number) => {
+    // Mock optimization by slightly adjusting connection weights
+    const connectionArray = new Float32Array(mockMemory.buffer, connectionsPtr, count);
+    for (let i = 0; i < count; i++) {
+      const adjustment = (Math.random() - 0.5) * 0.1;
+      connectionArray[i] = Math.min(1, Math.max(0, connectionArray[i] + adjustment));
+    }
+  }),
   process_spike_train: jest.fn(() => 42.5),
   calculate_mesh_efficiency: jest.fn(() => 0.85),
   simd_supported: jest.fn(() => 1),
   get_memory_usage: jest.fn(() => 1024 * 1024)
 };
-
-global.WebAssembly = {
-  Memory: jest.fn(() => mockMemory),
-  compile: jest.fn().mockResolvedValue({}),
-  instantiate: jest.fn().mockResolvedValue({ instance: mockWasmModule }),
-  validate: jest.fn(() => true)
-} as any;
 
 // Mock performance
 global.performance = {
@@ -34,9 +41,43 @@ global.performance = {
 
 describe('WasmBridge - Comprehensive Unit Tests', () => {
   let wasmBridge: WasmBridge;
+  let originalWebAssembly: any;
 
   beforeEach(() => {
+    // Store original WebAssembly reference
+    originalWebAssembly = global.WebAssembly;
+    
     jest.clearAllMocks();
+    
+    // Reset to default working mock
+    global.WebAssembly = {
+      Memory: jest.fn(() => mockMemory),
+      compile: jest.fn().mockImplementation(async (bytes: any) => {
+        return Promise.resolve({});
+      }),
+      instantiate: jest.fn().mockImplementation(async (moduleOrBuffer: any, imports?: any) => {
+        // Handle both WebAssembly.instantiate(module) and WebAssembly.instantiate(buffer, imports)
+        if (imports !== undefined) {
+          // Called with (buffer, imports) - return full result
+          return Promise.resolve({ 
+            instance: { 
+              exports: { 
+                main: () => true
+              } 
+            } 
+          });
+        } else {
+          // Called with just (module) - return instance directly
+          return Promise.resolve({ 
+            exports: { 
+              main: () => true  // This ensures SIMD detection returns true
+            } 
+          });
+        }
+      }),
+      validate: jest.fn(() => true)
+    } as any;
+    
     wasmBridge = new WasmBridge();
   });
 
@@ -44,6 +85,8 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     if (wasmBridge) {
       wasmBridge.cleanup();
     }
+    // Restore original WebAssembly
+    global.WebAssembly = originalWebAssembly;
   });
 
   describe('Initialization', () => {
@@ -74,15 +117,17 @@ describe('WasmBridge - Comprehensive Unit Tests', () => {
     });
 
     test('should handle WASM compilation errors', async () => {
-      const originalCompile = global.WebAssembly.compile;
-      global.WebAssembly.compile = jest.fn().mockRejectedValue(new Error('Compilation failed'));
+      // Override the WebAssembly mock for this test
+      global.WebAssembly = {
+        ...global.WebAssembly,
+        compile: jest.fn().mockRejectedValue(new Error('Compilation failed'))
+      } as any;
       
-      const result = await wasmBridge.initialize();
+      const testBridge = new WasmBridge();
+      const result = await testBridge.initialize();
       
       expect(result).toBe(false);
-      
-      // Restore original
-      global.WebAssembly.compile = originalCompile;
+      expect(testBridge.isWasmInitialized()).toBe(false);
     });
 
     test('should detect SIMD support failure', async () => {

@@ -9,3 +9,4 @@ Commands for hooks operations in Claude Flow.
 - [pre-edit](./pre-edit.md)
 - [post-edit](./post-edit.md)
 - [session-end](./session-end.md)
+- [ci-monitor-init](./ci-monitor-init.md) - Intelligent CI monitoring with adaptive polling
