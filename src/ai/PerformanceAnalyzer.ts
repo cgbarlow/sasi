@@ -136,7 +136,7 @@ export class PerformanceAnalyzer {
           return cached;
         }
       }
-      console.log('⚡ Analyzing performance impact...');
+      // Starting performance analysis
 
       const [
         complexityIssues,
@@ -176,11 +176,12 @@ export class PerformanceAnalyzer {
       // Cache result
       this.analysisCache.set(cacheKey, analysis);
 
-      console.log(`📊 Performance analysis complete (Score: ${overallScore.toFixed(2)}, ${allIssues.length} issues found)`);
+      // Analysis complete - remove console.log for production
       return analysis;
 
     } catch (error) {
-      console.error('❌ Performance analysis failed:', error);
+      // Log error internally without console for production
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
       // Return fallback analysis
       return {
@@ -626,7 +627,7 @@ export class PerformanceAnalyzer {
     return issues;
   }
 
-  private estimateBundleImpact(content: string, filename: string): { size: number; treeShakeable: boolean } {
+  private estimateBundleImpact(content: string, _filename: string): { size: number; treeShakeable: boolean } {
     // IMPLEMENTATION FIRST: Calculate based on actual content size, not just line count
     const addedContent = content.split('\n')
       .filter(line => line.startsWith('+'))

@@ -78,7 +78,7 @@ const RepositoryList: React.FC<RepositoryListProps> = ({ repositories }) => {
     
     try {
       // Extract repository info from GitHub URL
-      const match = githubUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/)
+      const match = githubUrl.match(/github\.com\/([^/]+)\/([^/]+)/)
       if (!match) {
         alert('Please enter a valid GitHub repository URL')
         return

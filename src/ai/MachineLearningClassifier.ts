@@ -43,7 +43,7 @@ export class MachineLearningClassifier {
     this.config = config;
   }
 
-  async train(trainingData: TrainingData[]): Promise<void> {
+  async train(_trainingData: TrainingData[]): Promise<void> {
     // Stub implementation - would train ML model
     // Training classifier with data
     this.model = { trained: true, algorithm: this.config.algorithm };
@@ -86,7 +86,7 @@ export class MachineLearningClassifier {
   async learn(issueData: TrainingData, triageResult: ClassificationResult): Promise<void> {
     // Stub implementation - would update model with new training data
     // Learning from triage result
-    console.log('Learning from:', issueData.label, 'Result:', triageResult.category);
+    // Store learning data for model training (production would use real ML training)
   }
 
   async evaluate(testData: EvaluationData[]): Promise<PerformanceMetrics> {
