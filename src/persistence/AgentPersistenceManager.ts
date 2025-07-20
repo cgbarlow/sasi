@@ -309,7 +309,7 @@ export class AgentPersistenceManager {
       return {
         ...config,
         status: config.status || 'spawning',
-        cognitivePattern: config.cognitivePattern || 'default',
+        cognitivePattern: config.cognitivePattern || 'convergent',
         networkLayers: config.networkLayers || [],
         learningRate: config.learningRate || 0.01,
         momentum: config.momentum || 0.0,

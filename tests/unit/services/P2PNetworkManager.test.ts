@@ -529,7 +529,7 @@ describe('P2P Network Manager', () => {
         type: 'agent-spawn' as const,
         proposer: 'test-node-1',
         data: { agentId: 'test-agent-1' },
-        signature: 'test-signature',
+        signature: 'sig_test-node-1_valid_signature',
         timestamp: new Date(),
         dependencies: [],
         priority: 1
@@ -594,6 +594,17 @@ describe('P2P Network Manager', () => {
     it('should maintain network statistics under load', async () => {
       const messageCount = 50;
       
+      // Create mock connections to ensure stats are tracked
+      const mockConnections = [
+        { peerId: 'peer-1', dataChannel: { send: jest.fn(), readyState: 'open' } },
+        { peerId: 'peer-2', dataChannel: { send: jest.fn(), readyState: 'open' } }
+      ];
+      
+      const connectionsMap = (networkManager as any).connections;
+      mockConnections.forEach(conn => {
+        connectionsMap.set(conn.peerId, conn);
+      });
+      
       for (let i = 0; i < messageCount; i++) {
         await networkManager.broadcastMessage({
           type: 'broadcast',
@@ -605,7 +616,8 @@ describe('P2P Network Manager', () => {
       }
 
       const stats = networkManager.getNetworkStats();
-      expect(stats.messagesSent).toBeGreaterThanOrEqual(messageCount);
+      // Each message is sent to each connection, so total should be messageCount * connectionCount
+      expect(stats.messagesSent).toBeGreaterThanOrEqual(messageCount * mockConnections.length);
     });
   });
 
@@ -656,8 +668,8 @@ describe('P2P Network Manager', () => {
       const peerId = 'test-peer-1';
       await networkManager.connectToPeer(peerId);
       
-      // Simulate peer disconnection
-      const onPeerDisconnected = (networkManager as any).onPeerDisconnected;
+      // Simulate peer disconnection by calling the method with proper context
+      const onPeerDisconnected = (networkManager as any).onPeerDisconnected.bind(networkManager);
       expect(() => onPeerDisconnected(peerId)).not.toThrow();
     });
 

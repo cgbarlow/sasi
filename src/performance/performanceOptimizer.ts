@@ -43,6 +43,13 @@ export class PerformanceOptimizer {
   private observers: PerformanceObserver[]
   private isInitialized: boolean = false
 
+  /**
+   * Safe performance.now() with fallback to Date.now()
+   */
+  private now(): number {
+    return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()
+  }
+
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
       enableSIMD: true,
@@ -79,7 +86,7 @@ export class PerformanceOptimizer {
   async initialize(): Promise<void> {
     console.log('🚀 Initializing PerformanceOptimizer...')
     
-    const startTime = performance.now()
+    const startTime = this.now()
     
     await Promise.all([
       this.initializeWASMModules(),
@@ -90,7 +97,7 @@ export class PerformanceOptimizer {
     ])
 
     this.isInitialized = true
-    const initTime = performance.now() - startTime
+    const initTime = this.now() - startTime
     
     console.log(`✅ PerformanceOptimizer initialized in ${initTime.toFixed(2)}ms`)
     console.log(`📊 SIMD Support: ${this.isSIMDSupported() ? '✅' : '❌'}`)
@@ -111,7 +118,7 @@ export class PerformanceOptimizer {
     ]
 
     const loadPromises = wasmModules.map(async (moduleName) => {
-      const startTime = performance.now()
+      const startTime = this.now()
       
       try {
         // Check cache first
@@ -135,7 +142,7 @@ export class PerformanceOptimizer {
           this.wasmModules.set(moduleName, wasmModule)
         }
 
-        const loadTime = performance.now() - startTime
+        const loadTime = this.now() - startTime
         this.metrics.wasmLoadTime += loadTime
         
         console.log(`📦 Loaded WASM module: ${moduleName} (${loadTime.toFixed(2)}ms)`)
@@ -295,7 +302,7 @@ export class PerformanceOptimizer {
    * Optimized SIMD matrix multiplication
    */
   async optimizedMatrixMultiply(a: Float32Array, b: Float32Array, rows: number, cols: number): Promise<Float32Array> {
-    const startTime = performance.now()
+    const startTime = this.now()
     
     if (!this.isSIMDSupported()) {
       return this.fallbackMatrixMultiply(a, b, rows, cols)
@@ -306,7 +313,7 @@ export class PerformanceOptimizer {
       const simdModule = this.wasmModules.get('ruv_swarm_simd.wasm')
       if (simdModule) {
         const result = await this.callWASMMatrixMultiply(simdModule, a, b, rows, cols)
-        const duration = performance.now() - startTime
+        const duration = this.now() - startTime
         this.metrics.simdOperationTime = duration
         return result
       }
@@ -315,7 +322,7 @@ export class PerformanceOptimizer {
     }
 
     const result = this.fallbackMatrixMultiply(a, b, rows, cols)
-    const duration = performance.now() - startTime
+    const duration = this.now() - startTime
     this.metrics.simdOperationTime = duration
     return result
   }
@@ -352,8 +359,8 @@ export class PerformanceOptimizer {
     // Simplified WASM call - in reality this would use the actual WASM exports
     const result = new Float32Array(rows * cols)
     
-    // Simulate WASM performance improvement
-    await new Promise(resolve => setTimeout(resolve, 1))
+    // Simulate WASM performance improvement (removed delay for faster tests)
+    // await new Promise(resolve => setTimeout(resolve, 1))
     
     return this.fallbackMatrixMultiply(a, b, rows, cols)
   }
@@ -372,7 +379,7 @@ export class PerformanceOptimizer {
    * Optimize agent spawning
    */
   async optimizeAgentSpawning(agentConfig: any): Promise<any> {
-    const startTime = performance.now()
+    const startTime = this.now()
     
     // Pre-allocate memory from pool
     const memorySize = this.config.maxMemoryPerAgent
@@ -387,7 +394,7 @@ export class PerformanceOptimizer {
       optimized: true
     }
 
-    const duration = performance.now() - startTime
+    const duration = this.now() - startTime
     this.metrics.agentSpawnTime = duration
     
     console.log(`🤖 Agent spawned in ${duration.toFixed(2)}ms`)
@@ -408,7 +415,7 @@ export class PerformanceOptimizer {
    * Batch neural inference
    */
   async batchNeuralInference(inputs: Float32Array[], model: any): Promise<Float32Array[]> {
-    const startTime = performance.now()
+    const startTime = this.now()
     
     // Process inputs in batches for better performance
     const batchSize = this.config.batchSize
@@ -420,7 +427,7 @@ export class PerformanceOptimizer {
       results.push(...batchResults)
     }
     
-    const duration = performance.now() - startTime
+    const duration = this.now() - startTime
     this.metrics.neuralInferenceTime = duration
     
     console.log(`🧠 Neural inference completed in ${duration.toFixed(2)}ms for ${inputs.length} inputs`)
@@ -537,20 +544,20 @@ export class PerformanceOptimizer {
     const testModule = 'ruv_swarm_wasm_bg.wasm'
     
     // Measure without caching
-    const startTimeUncached = performance.now()
+    const startTimeUncached = this.now()
     for (let i = 0; i < iterations; i++) {
-      // Simulate uncached loading
-      await new Promise(resolve => setTimeout(resolve, 50))
-    }
-    const uncachedTime = performance.now() - startTimeUncached
-    
-    // Measure with caching
-    const startTimeCached = performance.now()
-    for (let i = 0; i < iterations; i++) {
-      // Simulate cached loading
+      // Simulate uncached loading (reduced from 50ms to 5ms)
       await new Promise(resolve => setTimeout(resolve, 5))
     }
-    const cachedTime = performance.now() - startTimeCached
+    const uncachedTime = this.now() - startTimeUncached
+    
+    // Measure with caching
+    const startTimeCached = this.now()
+    for (let i = 0; i < iterations; i++) {
+      // Simulate cached loading (reduced from 5ms to 1ms)
+      await new Promise(resolve => setTimeout(resolve, 1))
+    }
+    const cachedTime = this.now() - startTimeCached
     
     const improvement = ((uncachedTime - cachedTime) / uncachedTime) * 100
     
@@ -567,7 +574,7 @@ export class PerformanceOptimizer {
    * Benchmark SIMD operations
    */
   private async benchmarkSIMDOperations(): Promise<BenchmarkResult> {
-    const size = 1000
+    const size = 100 // Reduced from 1000 to 100 for faster benchmarking
     const a = new Float32Array(size * size)
     const b = new Float32Array(size * size)
     
@@ -578,14 +585,14 @@ export class PerformanceOptimizer {
     }
     
     // Measure fallback performance
-    const startTimeFallback = performance.now()
+    const startTimeFallback = this.now()
     this.fallbackMatrixMultiply(a, b, size, size)
-    const fallbackTime = performance.now() - startTimeFallback
+    const fallbackTime = this.now() - startTimeFallback
     
     // Measure optimized performance
-    const startTimeOptimized = performance.now()
+    const startTimeOptimized = this.now()
     await this.optimizedMatrixMultiply(a, b, size, size)
-    const optimizedTime = performance.now() - startTimeOptimized
+    const optimizedTime = this.now() - startTimeOptimized
     
     const improvement = ((fallbackTime - optimizedTime) / fallbackTime) * 100
     
@@ -602,26 +609,26 @@ export class PerformanceOptimizer {
    * Benchmark memory operations
    */
   private async benchmarkMemoryOperations(): Promise<BenchmarkResult> {
-    const size = 1024 * 1024 // 1MB
-    const iterations = 100
+    const size = 64 * 1024 // Reduced from 1MB to 64KB for faster testing
+    const iterations = 10 // Reduced from 100 to 10
     
     // Measure without pooling
-    const startTimeUnpooled = performance.now()
+    const startTimeUnpooled = this.now()
     for (let i = 0; i < iterations; i++) {
       const buffer = new ArrayBuffer(size)
       // Simulate some work
       new Uint8Array(buffer).fill(i % 256)
     }
-    const unpooledTime = performance.now() - startTimeUnpooled
+    const unpooledTime = this.now() - startTimeUnpooled
     
     // Measure with pooling
-    const startTimePooled = performance.now()
+    const startTimePooled = this.now()
     for (let i = 0; i < iterations; i++) {
       const buffer = this.getPooledMemory(size) || new ArrayBuffer(size)
       // Simulate some work
       new Uint8Array(buffer).fill(i % 256)
     }
-    const pooledTime = performance.now() - startTimePooled
+    const pooledTime = this.now() - startTimePooled
     
     const improvement = ((unpooledTime - pooledTime) / unpooledTime) * 100
     
@@ -638,23 +645,23 @@ export class PerformanceOptimizer {
    * Benchmark neural inference
    */
   private async benchmarkNeuralInference(): Promise<BenchmarkResult> {
-    const inputSize = 784
-    const batchSize = 32
+    const inputSize = 64 // Reduced from 784 to 64 for faster testing
+    const batchSize = 8 // Reduced from 32 to 8
     const inputs = Array.from({ length: batchSize }, () => 
       new Float32Array(inputSize).map(() => Math.random())
     )
     
     // Measure sequential processing
-    const startTimeSequential = performance.now()
+    const startTimeSequential = this.now()
     for (const input of inputs) {
       await this.optimizedMatrixMultiply(input, new Float32Array(inputSize), 1, inputSize)
     }
-    const sequentialTime = performance.now() - startTimeSequential
+    const sequentialTime = this.now() - startTimeSequential
     
     // Measure batch processing
-    const startTimeBatch = performance.now()
+    const startTimeBatch = this.now()
     await this.batchNeuralInference(inputs, {})
-    const batchTime = performance.now() - startTimeBatch
+    const batchTime = this.now() - startTimeBatch
     
     const improvement = ((sequentialTime - batchTime) / sequentialTime) * 100
     

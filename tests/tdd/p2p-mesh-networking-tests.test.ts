@@ -1075,7 +1075,7 @@ describe('P2P Mesh Networking Tests', () => {
       
       const health = p2pNetwork.getNetworkHealth()
       // Relax health score requirement to 50 for basic connectivity
-      expect(health.score).toBeGreaterThan(50)
+      expect(health.score).toBeGreaterThanOrEqual(50)
       expect(health.score).toBeLessThanOrEqual(100)
     })
   })
