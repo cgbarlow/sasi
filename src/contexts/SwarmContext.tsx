@@ -96,9 +96,16 @@ export const useSwarm = () => {
 }
 
 
+interface SwarmConfig {
+  maxAgents?: number;
+  neuralMeshEnabled?: boolean;
+  memoryOptimization?: boolean;
+  [key: string]: unknown;
+}
+
 interface SwarmProviderProps {
   children: ReactNode
-  config?: any
+  config?: SwarmConfig
 }
 
 export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }) => {

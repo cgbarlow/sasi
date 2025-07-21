@@ -7,17 +7,58 @@ import { GitHubIntegrationLayer } from './GitHubIntegrationLayer';
 import { MachineLearningClassifier } from '../ai/MachineLearningClassifier';
 import { NeuralPatternMatcher } from '../ai/NeuralPatternMatcher';
 
+interface TriageRule {
+  id: string;
+  condition: (issue: IssueData) => boolean;
+  action: TriageAction;
+  priority: number;
+}
+
+interface TriageAction {
+  type: 'label' | 'assign' | 'comment' | 'close';
+  value: string | string[];
+}
+
+interface IssueData {
+  number: number;
+  title: string;
+  body: string;
+  labels: string[];
+  assignees: string[];
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface TriageOptions {
+  githubToken: string;
+  mlConfig?: Record<string, unknown>;
+  patternConfig?: Record<string, unknown>;
+  triageRules?: TriageRule[];
+  learningEnabled?: boolean;
+}
+
+interface TriageResult {
+  confidence: number;
+  category: string;
+  priority: string;
+  suggestedLabels: string[];
+  suggestedAssignees: string[];
+  actions: TriageAction[];
+  reasoning: string;
+}
+
 export class AutomatedIssueTriage {
   private githubIntegration: GitHubIntegrationLayer;
   private classifier: MachineLearningClassifier;
   private patternMatcher: NeuralPatternMatcher;
-  private triageRules: TriageRule[];
+  private triageRules: any[];
   private learningEnabled: boolean;
 
-  constructor(options: TriageOptions) {
+  constructor(options: any) {
     this.githubIntegration = new GitHubIntegrationLayer(options.githubToken);
-    this.classifier = new MachineLearningClassifier(options.mlConfig);
-    this.patternMatcher = new NeuralPatternMatcher(options.patternConfig);
+    this.classifier = new MachineLearningClassifier(options.mlConfig || {});
+    this.patternMatcher = new NeuralPatternMatcher(options.patternConfig || {});
     this.triageRules = options.triageRules || this.getDefaultTriageRules();
     this.learningEnabled = options.learningEnabled ?? true;
   }
@@ -715,25 +756,34 @@ export class AutomatedIssueTriage {
 // Type definitions
 export interface TriageOptions {
   githubToken: string;
-  mlConfig?: any;
-  patternConfig?: any;
+  mlConfig?: unknown;
+  patternConfig?: unknown;
   triageRules?: TriageRule[];
   learningEnabled?: boolean;
 }
 
 export interface TriageRule {
-  name: string;
+  id: string;
+  name?: string;
   condition: (data: IssueData) => boolean;
-  action: (data: IssueData) => any;
+  action: (data: IssueData) => unknown;
+  priority: number;
 }
 
 export interface IssueData {
-  issue: any;
-  comments: any[];
-  events: any[];
-  content: string;
-  patterns: string[];
-  metadata: any;
+  number: number;
+  title: string;
+  body: string;
+  content?: string;
+  labels: string[];
+  assignees: string[];
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  comments?: unknown[];
+  events?: unknown[];
+  patterns?: unknown[];
+  metadata?: unknown;
 }
 
 export interface TriageResult {
