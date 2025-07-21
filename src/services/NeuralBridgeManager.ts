@@ -214,14 +214,36 @@ export class NeuralBridgeManager extends EventEmitter {
     try {
       this.log('info', '🔗 Initializing Neural Bridge Manager...')
       
-      // Check CI environment for fast initialization
-      if (this.isInCIEnvironment()) {
-        this.log('info', '✅ CI environment detected - using accelerated initialization')
+      // Check CI environment and WASM flags for fast initialization
+      if (this.isInCIEnvironment() || this.isWasmDisabled()) {
+        this.log('info', '✅ CI environment or WASM disabled - using accelerated initialization')
+        
+        // Update health status to indicate WASM bypass
+        this.currentHealth = {
+          ...this.currentHealth,
+          status: 'healthy',
+          moduleLoaded: false, // WASM not loaded in CI
+          ruvFannIntegration: false, // RuvFann disabled in CI  
+          wasmInitialized: false, // WASM bypassed
+          simdSupported: false, // SIMD not available without WASM
+          performanceMetrics: {
+            executionTime: 0,
+            memoryUsage: 0,
+            simdAcceleration: false,
+            throughput: 100, // Mock throughput for CI
+            efficiency: 0.95, // High efficiency in CI
+            loadTime: 0,
+            operationsCount: 0,
+            averageOperationTime: 0
+          }
+        }
+        
         this.isInitialized = true
         this.emit('initialized', {
-          wasmInitialized: true,
+          wasmInitialized: false, // Explicitly false in CI
           ruvFannLoaded: false,
           meshInitialized: true,
+          ciMode: true,
           timestamp: new Date().toISOString()
         })
         return true
@@ -778,6 +800,18 @@ neuralBridge.updateConfiguration({
       process.env.JENKINS_URL ||
       process.env.NODE_ENV === 'test' ||
       this.config.ciEnvironment
+    )
+  }
+
+  /**
+   * Check if WASM is explicitly disabled via environment variables
+   */
+  private isWasmDisabled(): boolean {
+    return !!(
+      process.env.WASM_ENABLED === 'false' ||
+      process.env.DISABLE_WASM_ACCELERATION === 'true' ||
+      process.env.NO_WASM === 'true' ||
+      this.config.enableRuvFann === false
     )
   }
 

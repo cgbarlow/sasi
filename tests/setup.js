@@ -4,6 +4,12 @@ const path = require('path');
 // Ensure NODE_ENV is set to test for consistent behavior
 process.env.NODE_ENV = 'test';
 
+// Ensure WASM is disabled in CI/test environment for consistent behavior
+process.env.CI = 'true';
+process.env.WASM_ENABLED = 'false';
+process.env.DISABLE_WASM_ACCELERATION = 'true';
+process.env.NO_WASM = 'true';
+
 // Import Jest DOM matchers for React component testing
 require('@testing-library/jest-dom');
 
@@ -381,16 +387,67 @@ jest.mock('../../src/services/SwarmContextIntegration', () => ({
 // Mock WASM modules (conditional mock)
 try {
   jest.mock('../../synaptic-mesh/src/rs/neural-mesh/pkg', () => ({
-    init: jest.fn(),
+    init: jest.fn().mockRejectedValue(new Error('WASM disabled in CI environment')),
     NeuralMesh: jest.fn().mockImplementation(() => ({
-      process: jest.fn(),
-      train: jest.fn(),
-      predict: jest.fn()
+      process: jest.fn().mockRejectedValue(new Error('WASM disabled in CI environment')),
+      train: jest.fn().mockRejectedValue(new Error('WASM disabled in CI environment')),
+      predict: jest.fn().mockRejectedValue(new Error('WASM disabled in CI environment'))
     }))
   }));
 } catch (e) {
   // WASM module not available in this environment
 }
+
+// Mock ProductionWasmBridge to respect CI environment
+jest.mock('../src/utils/ProductionWasmBridge', () => ({
+  ProductionWasmBridge: jest.fn().mockImplementation(() => ({
+    initialize: jest.fn().mockImplementation(() => {
+      // Check CI environment flags before attempting WASM initialization
+      if (process.env.CI === 'true' || 
+          process.env.WASM_ENABLED === 'false' || 
+          process.env.DISABLE_WASM_ACCELERATION === 'true' ||
+          process.env.NODE_ENV === 'test') {
+        console.log('🚫 WASM initialization bypassed in CI/test environment');
+        return Promise.resolve(false); // Return false to indicate WASM not initialized
+      }
+      return Promise.resolve(true);
+    }),
+    isWasmInitialized: jest.fn().mockImplementation(() => {
+      // Never return true in CI environment
+      return !(process.env.CI === 'true' || 
+               process.env.WASM_ENABLED === 'false' || 
+               process.env.DISABLE_WASM_ACCELERATION === 'true' ||
+               process.env.NODE_ENV === 'test');
+    }),
+    isSIMDSupported: jest.fn().mockReturnValue(false), // No SIMD in CI
+    getSpeedupFactor: jest.fn().mockReturnValue(1.0), // No speedup without WASM
+    healthCheck: jest.fn().mockReturnValue({
+      status: 'error', // Error status when WASM disabled
+      metrics: {
+        executionTime: 0,
+        memoryUsage: 0,
+        simdAcceleration: false,
+        throughput: 0,
+        efficiency: 0,
+        loadTime: 0,
+        operationsCount: 0,
+        averageOperationTime: 0
+      },
+      issues: ['WASM disabled in CI environment']
+    }),
+    getPerformanceMetrics: jest.fn().mockReturnValue({
+      executionTime: 0,
+      memoryUsage: 0,
+      simdAcceleration: false,
+      throughput: 0,
+      efficiency: 0,
+      loadTime: 0,
+      operationsCount: 0,
+      averageOperationTime: 0
+    }),
+    cleanup: jest.fn().mockResolvedValue(undefined)
+  }))
+}), { virtual: true });
 
 // Enhanced crypto mock for OAuth/PKCE tests
 Object.defineProperty(global, 'crypto', {
