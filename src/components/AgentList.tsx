@@ -156,16 +156,16 @@ const AgentList: React.FC<AgentListProps> = ({ agents }) => {
                   <div 
                     className="metric-fill"
                     style={{ 
-                      width: `${agent.efficiency}%`,
-                      backgroundColor: getEfficiencyColor(agent.efficiency)
+                      width: `${agent.efficiency || 0}%`,
+                      backgroundColor: getEfficiencyColor(agent.efficiency || 0)
                     }}
                   />
                 </div>
                 <span 
                   className="metric-value"
-                  style={{ color: getEfficiencyColor(agent.efficiency) }}
+                  style={{ color: getEfficiencyColor(agent.efficiency || 0) }}
                 >
-                  {agent.efficiency.toFixed(1)}%
+                  {(agent.efficiency || 0).toFixed(1)}%
                 </span>
               </div>
 
