@@ -1285,7 +1285,9 @@ export class NeuralMeshService {
     const agent = this.distributedAgents.get(agentId)
     
     if (agent && taskData) {
-      agent.currentTask = taskData.description || 'Remote task'
+      // Safe property access for taskData
+      const safeTaskData = taskData as { description?: string };
+      agent.currentTask = safeTaskData.description || 'Remote task'
       agent.status = 'active'
       
       this.emit('task-assigned', { agentId, taskData })

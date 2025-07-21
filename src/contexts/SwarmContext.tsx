@@ -523,8 +523,8 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
           }
           
           // Convert unknown data to TrainingData format
-          const convertToTrainingData = (data: unknown): { inputs: unknown; outputs: unknown } => {
-            const defaultResult = { inputs: { value: 0 } as unknown, outputs: { result: 1 } as unknown }
+          const convertToTrainingData = (data: unknown): { inputs: Record<string, number>; outputs: Record<string, number> } => {
+            const defaultResult = { inputs: { value: 0 }, outputs: { result: 1 } }
             
             if (isValidPattern(data)) {
               // Try to convert inputs and outputs to proper format

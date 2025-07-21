@@ -100,13 +100,19 @@ export class AutomatedIssueTriage {
     const contentSuggestions = await this.classifier.suggestLabels(issueData.content);
     suggestions.push(...contentSuggestions);
     
-    // Pattern-based suggestions
+    // Pattern-based suggestions (convert unknown to LabelSuggestion)
     const patternSuggestions = await this.patternMatcher.suggestLabels(issueData.patterns);
-    suggestions.push(...patternSuggestions);
+    const validPatternSuggestions = Array.isArray(patternSuggestions) ? patternSuggestions.filter((s: unknown): s is LabelSuggestion => 
+      typeof s === 'object' && s !== null && 'label' in s && 'confidence' in s && 'reasoning' in s
+    ) : [];
+    suggestions.push(...validPatternSuggestions);
     
-    // Rule-based suggestions
+    // Rule-based suggestions (convert unknown to LabelSuggestion)
     const ruleSuggestions = this.applyLabelRules(issueData);
-    suggestions.push(...ruleSuggestions);
+    const validRuleSuggestions = Array.isArray(ruleSuggestions) ? ruleSuggestions.filter((s: unknown): s is LabelSuggestion => 
+      typeof s === 'object' && s !== null && 'label' in s && 'confidence' in s && 'reasoning' in s
+    ) : [];
+    suggestions.push(...validRuleSuggestions);
     
     // Deduplicate and rank suggestions
     return this.rankLabelSuggestions(suggestions);
@@ -270,11 +276,31 @@ export class AutomatedIssueTriage {
 
   private combineAnalyses(analyses: unknown[]): CombinedAnalysis {
     // Intelligent combination of different analysis results
+    const defaultClassification: ClassificationResult = {
+      category: 'unknown',
+      severity: 0.5,
+      confidence: 0.5
+    };
+    const defaultPatterns: PatternMatchResult = {
+      matchCount: 0,
+      matches: [],
+      confidence: 0.5
+    };
+    const defaultRules: RuleResult = {
+      appliedCount: 0,
+      results: []
+    };
+    const defaultContext: ContextResult = {
+      repositoryContext: {},
+      temporalContext: {},
+      userContext: {}
+    };
+
     return {
-      classification: analyses[0],
-      patterns: analyses[1],
-      rules: analyses[2],
-      context: analyses[3],
+      classification: (analyses[0] as ClassificationResult) || defaultClassification,
+      patterns: (analyses[1] as PatternMatchResult) || defaultPatterns,
+      rules: (analyses[2] as RuleResult) || defaultRules,
+      context: (analyses[3] as ContextResult) || defaultContext,
       confidence: this.calculateCombinedConfidence(analyses)
     };
   }
@@ -406,7 +432,24 @@ export class AutomatedIssueTriage {
   }
 
   private extractContent(issue: unknown, comments: unknown[]): string {
-    return [issue.title, issue.body, ...comments.map(c => c.body)].join(' ');
+    // Safe property access with type guards
+    const getTitle = (obj: unknown): string => {
+      return (typeof obj === 'object' && obj !== null && 'title' in obj && typeof (obj as any).title === 'string') 
+        ? (obj as any).title 
+        : '';
+    };
+    
+    const getBody = (obj: unknown): string => {
+      return (typeof obj === 'object' && obj !== null && 'body' in obj && typeof (obj as any).body === 'string') 
+        ? (obj as any).body 
+        : '';
+    };
+
+    const title = getTitle(issue);
+    const body = getBody(issue);
+    const commentBodies = comments.map(getBody);
+    
+    return [title, body, ...commentBodies].join(' ');
   }
 
   private extractPatterns(issue: unknown, comments: unknown[]): string[] {
@@ -426,14 +469,21 @@ export class AutomatedIssueTriage {
   }
 
   private extractMetadata(issue: unknown, comments: unknown[], events: unknown[]): unknown {
+    // Safe property access with type guards
+    const safeGet = (obj: unknown, prop: string): unknown => {
+      return (typeof obj === 'object' && obj !== null && prop in obj) 
+        ? (obj as any)[prop] 
+        : null;
+    };
+
     return {
-      createdAt: issue.created_at,
-      updatedAt: issue.updated_at,
-      authorAssociation: issue.author_association,
+      createdAt: safeGet(issue, 'created_at'),
+      updatedAt: safeGet(issue, 'updated_at'),
+      authorAssociation: safeGet(issue, 'author_association'),
       commentCount: comments.length,
       eventCount: events.length,
-      labels: issue.labels,
-      milestone: issue.milestone
+      labels: safeGet(issue, 'labels'),
+      milestone: safeGet(issue, 'milestone')
     };
   }
 

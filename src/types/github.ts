@@ -185,7 +185,7 @@ export interface GitHubEvent {
     name: string;
     url: string;
   };
-  payload: any;
+  payload: unknown;
   public: boolean;
   created_at: string;
 }

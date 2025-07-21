@@ -37,7 +37,7 @@ export interface NetworkMessage {
   source: string;
   destination?: string;
   timestamp: Date;
-  payload: any;
+  payload: unknown;
   signature?: string;
   hop: number;
   ttl: number;
@@ -78,7 +78,7 @@ export interface ConsensusMessage {
   type: 'proposal' | 'vote' | 'commit' | 'abort' | 'leader-election' | 'block-proposal' | 'block-vote';
   epoch: number;
   proposer: string;
-  data: any;
+  data: unknown;
   signature: string;
   timestamp: Date;
 }
@@ -94,7 +94,7 @@ export interface ConsensusState {
 
 export interface DAGNode {
   id: string;
-  data: any;
+  data: unknown;
   parents: string[];
   children: string[];
   timestamp: Date;
@@ -105,7 +105,7 @@ export interface DAGNode {
 // Network Discovery Types
 export interface DiscoveryService {
   type: 'mdns' | 'bootstrap' | 'dht' | 'webrtc-signaling';
-  config: any;
+  config: unknown;
   status: 'active' | 'inactive' | 'error';
 }
 
@@ -133,7 +133,7 @@ export interface P2PNetworkConfig {
   consensus: {
     enabled: boolean;
     type: 'raft' | 'pbft' | 'qudag' | 'avalanche';
-    config: any;
+    config: unknown;
   };
   security: {
     enableTLS: boolean;
@@ -151,7 +151,7 @@ export interface AgentCoordinationMessage {
   targetNode?: string;
   payload: {
     agentConfig?: Partial<Agent>;
-    taskData?: any;
+    taskData?: unknown;
     resourceRequirements?: ResourceRequirements;
     status?: AgentStatus;
     available?: boolean;
@@ -190,7 +190,7 @@ export interface SyncMessage {
   type: 'state-request' | 'state-response' | 'delta-sync' | 'full-sync';
   nodeId: string;
   timestamp: Date;
-  data: any;
+  data: unknown;
   checksum: string;
 }
 
@@ -288,7 +288,7 @@ export interface NetworkEvent {
   type: 'peer-connected' | 'peer-disconnected' | 'message-received' | 'consensus-reached' | 'fault-detected' | 'recovery-initiated';
   nodeId: string;
   timestamp: Date;
-  data: any;
+  data: unknown;
 }
 
 export interface P2PNetworkEventListener {
@@ -316,7 +316,7 @@ export interface ConsensusTransaction {
   id: string;
   type: 'agent-spawn' | 'agent-terminate' | 'task-assign' | 'resource-allocate' | 'state-update';
   proposer: string;
-  data: any;
+  data: unknown;
   signature: string;
   timestamp: Date;
   dependencies: string[]; // Transaction dependencies

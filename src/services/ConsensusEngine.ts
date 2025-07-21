@@ -641,7 +641,10 @@ export class ConsensusEngine {
    * Handle vote message
    */
   private async handleVote(message: ConsensusMessage): Promise<void> {
-    const { proposalId, vote } = message.data;
+    // Safe property access with type guards
+    const safeData = message.data as { proposalId?: string; vote?: boolean };
+    const proposalId = safeData.proposalId || '';
+    const vote = safeData.vote || false;
     
     console.log(`🗳 Handling vote: ${message.proposer} voted ${vote ? 'YES' : 'NO'} on ${proposalId}`);
     
@@ -710,7 +713,8 @@ export class ConsensusEngine {
     console.log(`📦 Processing committed proposal: ${proposal.id}`);
     
     // Execute the proposal data
-    if (proposal.data && proposal.data.transactions) {
+    const proposalData = proposal.data as { transactions?: unknown[] };
+    if (proposal.data && proposalData.transactions) {
       const block = proposal.data as ConsensusBlock;
       block.finalized = true;
       
@@ -793,10 +797,12 @@ export class ConsensusEngine {
    * Handle commit message
    */
   private async handleCommit(message: ConsensusMessage): Promise<void> {
-    console.log(`✅ Handling commit: ${message.data.proposalId}`);
+    const commitData = message.data as { proposalId?: string };
+    const proposalId = commitData.proposalId || '';
+    console.log(`✅ Handling commit: ${proposalId}`);
     
     // Process the commit
-    const proposal = this.state.proposals.get(message.data.proposalId);
+    const proposal = this.state.proposals.get(proposalId);
     if (proposal) {
       await this.processCommittedProposal(proposal);
     }
@@ -806,11 +812,13 @@ export class ConsensusEngine {
    * Handle abort message
    */
   private async handleAbort(message: ConsensusMessage): Promise<void> {
-    console.log(`❌ Handling abort: ${message.data.proposalId}`);
+    const abortData = message.data as { proposalId?: string };
+    const proposalId = abortData.proposalId || '';
+    console.log(`❌ Handling abort: ${proposalId}`);
     
     // Clean up aborted proposal
-    this.state.proposals.delete(message.data.proposalId);
-    this.state.votes.delete(message.data.proposalId);
+    this.state.proposals.delete(proposalId);
+    this.state.votes.delete(proposalId);
   }
 
   /**
@@ -831,7 +839,8 @@ export class ConsensusEngine {
   private async processRaftLeaderElection(message: ConsensusMessage): Promise<void> {
     // Simplified Raft leader election
     const candidate = message.proposer;
-    const currentTerm = message.data.term || 0;
+    const electionData = message.data as { term?: number };
+    const currentTerm = electionData.term || 0;
     
     if (currentTerm > this.currentEpoch) {
       this.currentEpoch = currentTerm;
@@ -928,7 +937,7 @@ export class ConsensusEngine {
         blockId: block.id,
         vote
       },
-      signature: this.signMessage({ blockId: block.id, vote }),
+      signature: this.signMessage({ blockId: block.id, vote } as Record<string, unknown>),
       timestamp: new Date()
     };
     
@@ -942,7 +951,9 @@ export class ConsensusEngine {
    * Handle block vote message
    */
   private async handleBlockVote(message: ConsensusMessage): Promise<void> {
-    const { blockId, vote } = message.data;
+    const voteData = message.data as { blockId?: string; vote?: boolean };
+    const blockId = voteData.blockId || '';
+    const vote = voteData.vote || false;
     
     console.log(`🗳 Handling block vote: ${message.proposer} voted ${vote ? 'YES' : 'NO'} on ${blockId}`);
     
