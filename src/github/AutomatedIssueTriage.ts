@@ -7,58 +7,22 @@ import { GitHubIntegrationLayer } from './GitHubIntegrationLayer';
 import { MachineLearningClassifier } from '../ai/MachineLearningClassifier';
 import { NeuralPatternMatcher } from '../ai/NeuralPatternMatcher';
 
-interface TriageRule {
-  id: string;
-  condition: (issue: IssueData) => boolean;
-  action: TriageAction;
-  priority: number;
-}
-
 interface TriageAction {
   type: 'label' | 'assign' | 'comment' | 'close';
   value: string | string[];
-}
-
-interface IssueData {
-  number: number;
-  title: string;
-  body: string;
-  labels: string[];
-  assignees: string[];
-  author: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface TriageOptions {
-  githubToken: string;
-  mlConfig?: Record<string, unknown>;
-  patternConfig?: Record<string, unknown>;
-  triageRules?: TriageRule[];
-  learningEnabled?: boolean;
-}
-
-interface TriageResult {
-  confidence: number;
-  category: string;
-  priority: string;
-  suggestedLabels: string[];
-  suggestedAssignees: string[];
-  actions: TriageAction[];
-  reasoning: string;
 }
 
 export class AutomatedIssueTriage {
   private githubIntegration: GitHubIntegrationLayer;
   private classifier: MachineLearningClassifier;
   private patternMatcher: NeuralPatternMatcher;
-  private triageRules: any[];
+  private triageRules: unknown[];
   private learningEnabled: boolean;
 
-  constructor(options: any) {
+  constructor(options: TriageOptions) {
     this.githubIntegration = new GitHubIntegrationLayer(options.githubToken);
-    this.classifier = new MachineLearningClassifier(options.mlConfig || {});
-    this.patternMatcher = new NeuralPatternMatcher(options.patternConfig || {});
+    this.classifier = new MachineLearningClassifier(options.mlConfig as any || {});
+    this.patternMatcher = new NeuralPatternMatcher(options.patternConfig as any || {});
     this.triageRules = options.triageRules || this.getDefaultTriageRules();
     this.learningEnabled = options.learningEnabled ?? true;
   }
@@ -142,7 +106,7 @@ export class AutomatedIssueTriage {
     suggestions.push(...contentSuggestions);
     
     // Pattern-based suggestions (convert unknown to LabelSuggestion)
-    const patternSuggestions = await this.patternMatcher.suggestLabels(issueData.patterns);
+    const patternSuggestions = await this.patternMatcher.suggestLabels((issueData.patterns as string[]) || []);
     const validPatternSuggestions = Array.isArray(patternSuggestions) ? patternSuggestions.filter((s: unknown): s is LabelSuggestion => 
       typeof s === 'object' && s !== null && 'label' in s && 'confidence' in s && 'reasoning' in s
     ) : [];
@@ -220,10 +184,17 @@ export class AutomatedIssueTriage {
     const allDuplicates = [...semanticDuplicates, ...patternDuplicates, ...keywordDuplicates];
     const rankedDuplicates = this.rankDuplicates(allDuplicates);
     
+    // Safe confidence access
+    const getConfidence = (item: unknown): number => {
+      return (typeof item === 'object' && item !== null && 'confidence' in item && typeof (item as any).confidence === 'number') 
+        ? (item as any).confidence 
+        : 0;
+    };
+    
     return {
-      isDuplicate: rankedDuplicates.length > 0 && rankedDuplicates[0].confidence > 0.7,
+      isDuplicate: rankedDuplicates.length > 0 && getConfidence(rankedDuplicates[0]) > 0.7,
       duplicates: rankedDuplicates,
-      confidence: rankedDuplicates[0]?.confidence || 0
+      confidence: getConfidence(rankedDuplicates[0])
     };
   }
 
@@ -256,12 +227,19 @@ export class AutomatedIssueTriage {
     const events = await this.githubIntegration.getIssueEvents(owner, repo, issueNumber);
     
     return {
-      issue,
-      comments,
-      events,
+      number: typeof issue === 'object' && issue !== null && 'number' in issue ? (issue as any).number : 0,
+      title: typeof issue === 'object' && issue !== null && 'title' in issue ? (issue as any).title : '',
+      body: typeof issue === 'object' && issue !== null && 'body' in issue ? (issue as any).body : '',
+      labels: typeof issue === 'object' && issue !== null && 'labels' in issue ? (issue as any).labels : [],
+      assignees: typeof issue === 'object' && issue !== null && 'assignees' in issue ? (issue as any).assignees : [],
+      author: typeof issue === 'object' && issue !== null && 'user' in issue && (issue as any).user && 'login' in (issue as any).user ? (issue as any).user.login : '',
+      createdAt: typeof issue === 'object' && issue !== null && 'created_at' in issue ? (issue as any).created_at : '',
+      updatedAt: typeof issue === 'object' && issue !== null && 'updated_at' in issue ? (issue as any).updated_at : '',
       content: this.extractContent(issue, comments),
       patterns: this.extractPatterns(issue, comments),
-      metadata: this.extractMetadata(issue, comments, events)
+      metadata: this.extractMetadata(issue, comments, events),
+      comments,
+      events
     };
   }
 
@@ -298,8 +276,14 @@ export class AutomatedIssueTriage {
     const results: RuleResult[] = [];
     
     for (const rule of this.triageRules) {
-      if (rule.condition(issueData)) {
-        results.push(rule.action(issueData));
+      // Safe property access with type guards
+      const safeRule = rule as TriageRule;
+      if (typeof safeRule === 'object' && safeRule !== null && 
+          'condition' in safeRule && typeof safeRule.condition === 'function' &&
+          'action' in safeRule && typeof safeRule.action === 'function') {
+        if (safeRule.condition(issueData)) {
+          results.push(safeRule.action(issueData) as RuleResult);
+        }
       }
     }
     
@@ -353,18 +337,18 @@ export class AutomatedIssueTriage {
     const priority = await this.assessPriority(issueData);
     const labels = await this.suggestLabels(issueData);
     const assignees = await this.suggestAssignees(
-      issueData.issue.owner,
-      issueData.issue.repo,
+      'owner', // TODO: Extract from issueData metadata
+      'repo',  // TODO: Extract from issueData metadata
       issueData
     );
     const duplicates = await this.detectDuplicates(
-      issueData.issue.owner,
-      issueData.issue.repo,
+      'owner', // TODO: Extract from issueData metadata
+      'repo',  // TODO: Extract from issueData metadata
       issueData
     );
     
     return {
-      issueNumber: issueData.issue.number,
+      issueNumber: issueData.number,
       priority: priority.priority,
       category: analysis.classification.category,
       severity: analysis.classification.severity,
@@ -448,22 +432,30 @@ export class AutomatedIssueTriage {
       {
         name: 'Security Issue',
         condition: (data) => /security|vulnerability|exploit/i.test(data.content),
-        action: (data) => ({ priority: 'critical', labels: ['security'] })
+        action: (data) => ({ priority: 'critical', labels: ['security'] }),
+        id: 'security-rule',
+        priority: 1
       },
       {
         name: 'Bug Report',
         condition: (data) => /bug|error|crash|exception/i.test(data.content),
-        action: (data) => ({ priority: 'high', labels: ['bug'] })
+        action: (data) => ({ priority: 'high', labels: ['bug'] }),
+        id: 'bug-rule',
+        priority: 2
       },
       {
         name: 'Feature Request',
         condition: (data) => /feature|enhancement|improvement/i.test(data.content),
-        action: (data) => ({ priority: 'medium', labels: ['enhancement'] })
+        action: (data) => ({ priority: 'medium', labels: ['enhancement'] }),
+        id: 'feature-rule',
+        priority: 3
       },
       {
         name: 'Documentation',
         condition: (data) => /documentation|docs|readme/i.test(data.content),
-        action: (data) => ({ priority: 'low', labels: ['documentation'] })
+        action: (data) => ({ priority: 'low', labels: ['documentation'] }),
+        id: 'docs-rule',
+        priority: 4
       }
     ];
   }
@@ -529,30 +521,30 @@ export class AutomatedIssueTriage {
   }
 
   // Missing method implementations
-  private applyLabelRules(issueData: IssueData): unknown[] {
+  private applyLabelRules(issueData: IssueData): LabelSuggestion[] {
     // Apply rule-based label suggestions
-    const suggestions: any[] = [];
+    const suggestions: LabelSuggestion[] = [];
     
-    if (/security|vulnerability/i.test(issueData.content)) {
+    if (/security|vulnerability/i.test(issueData.content || '')) {
       suggestions.push({ label: 'security', confidence: 0.9, reasoning: 'Security-related content detected' });
     }
-    if (/bug|error|crash/i.test(issueData.content)) {
+    if (/bug|error|crash/i.test(issueData.content || '')) {
       suggestions.push({ label: 'bug', confidence: 0.8, reasoning: 'Bug-related content detected' });
     }
-    if (/feature|enhancement/i.test(issueData.content)) {
+    if (/feature|enhancement/i.test(issueData.content || '')) {
       suggestions.push({ label: 'enhancement', confidence: 0.7, reasoning: 'Feature request detected' });
     }
     
     return suggestions;
   }
 
-  private rankLabelSuggestions(suggestions: any[]): any[] {
+  private rankLabelSuggestions(suggestions: LabelSuggestion[]): LabelSuggestion[] {
     return suggestions
-      .sort((a, b) => b.confidence - a.confidence)
+      .sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
       .slice(0, 5); // Top 5 suggestions
   }
 
-  private async findExpertiseMatches(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findExpertiseMatches(owner: string, repo: string, issueData: IssueData): Promise<AssigneeSuggestion[]> {
     // Find team members with relevant expertise
     return [
       { username: 'expert1', confidence: 0.8, reasoning: 'Has experience with similar issues' },
@@ -560,7 +552,7 @@ export class AutomatedIssueTriage {
     ];
   }
 
-  private async findWorkloadOptimal(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findWorkloadOptimal(owner: string, repo: string, issueData: IssueData): Promise<AssigneeSuggestion[]> {
     // Find assignees based on current workload
     return [
       { username: 'available1', confidence: 0.9, reasoning: 'Low current workload' },
@@ -568,20 +560,20 @@ export class AutomatedIssueTriage {
     ];
   }
 
-  private async findHistoricalMatches(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findHistoricalMatches(owner: string, repo: string, issueData: IssueData): Promise<AssigneeSuggestion[]> {
     // Find assignees based on historical patterns
     return [
       { username: 'historical1', confidence: 0.7, reasoning: 'Previously resolved similar issues' }
     ];
   }
 
-  private rankAssigneeSuggestions(suggestions: any[]): any[] {
+  private rankAssigneeSuggestions(suggestions: AssigneeSuggestion[]): AssigneeSuggestion[] {
     return suggestions
-      .sort((a, b) => b.confidence - a.confidence)
+      .sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
       .slice(0, 3); // Top 3 suggestions
   }
 
-  private async assessSeverity(issueData: IssueData): Promise<any> {
+  private async assessSeverity(issueData: IssueData): Promise<{ score: number; confidence: number; reasoning: string }> {
     let score = 0.5;
     let reasoning = 'Standard severity assessment';
     
@@ -599,7 +591,7 @@ export class AutomatedIssueTriage {
     return { score, confidence: 0.8, reasoning };
   }
 
-  private async assessUrgency(issueData: IssueData): Promise<any> {
+  private async assessUrgency(issueData: IssueData): Promise<{ score: number; confidence: number; reasoning: string }> {
     let score = 0.5;
     let reasoning = 'Standard urgency assessment';
     
@@ -614,7 +606,7 @@ export class AutomatedIssueTriage {
     return { score, confidence: 0.7, reasoning };
   }
 
-  private async assessBusinessImpact(issueData: IssueData): Promise<any> {
+  private async assessBusinessImpact(issueData: IssueData): Promise<{ score: number; confidence: number; reasoning: string }> {
     let score = 0.5;
     let reasoning = 'Standard business impact';
     
@@ -626,7 +618,7 @@ export class AutomatedIssueTriage {
     return { score, confidence: 0.6, reasoning };
   }
 
-  private async assessUserImpact(issueData: IssueData): Promise<any> {
+  private async assessUserImpact(issueData: IssueData): Promise<{ score: number; confidence: number; reasoning: string }> {
     let score = 0.5;
     let reasoning = 'Standard user impact';
     
@@ -639,14 +631,24 @@ export class AutomatedIssueTriage {
   }
 
   // Additional helper methods would be implemented here...
-  private calculateWeightedPriority(assessments: any[]): number {
-    // Implementation for weighted priority calculation
-    return assessments.reduce((sum, assessment) => sum + assessment.score, 0) / assessments.length;
+  private calculateWeightedPriority(assessments: unknown[]): number {
+    // Implementation for weighted priority calculation with type guards
+    const validAssessments = assessments.filter((a: unknown): a is { score: number } => 
+      typeof a === 'object' && a !== null && 'score' in a && typeof (a as any).score === 'number'
+    );
+    return validAssessments.length > 0 
+      ? validAssessments.reduce((sum, assessment) => sum + assessment.score, 0) / validAssessments.length 
+      : 0.5;
   }
 
-  private calculateConfidence(assessments: any[]): number {
-    // Implementation for confidence calculation
-    return assessments.reduce((sum, assessment) => sum + assessment.confidence, 0) / assessments.length;
+  private calculateConfidence(assessments: unknown[]): number {
+    // Implementation for confidence calculation with type guards
+    const validAssessments = assessments.filter((a: unknown): a is { confidence: number } => 
+      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number'
+    );
+    return validAssessments.length > 0 
+      ? validAssessments.reduce((sum, assessment) => sum + assessment.confidence, 0) / validAssessments.length 
+      : 0.5;
   }
 
   private scoreToPriority(score: number): 'critical' | 'high' | 'medium' | 'low' {
@@ -656,8 +658,11 @@ export class AutomatedIssueTriage {
     return 'low';
   }
 
-  private generatePriorityReasoning(assessments: any[]): string {
-    return assessments.map(a => a.reasoning).join('; ');
+  private generatePriorityReasoning(assessments: unknown[]): string {
+    const validAssessments = assessments.filter((a: unknown): a is { reasoning: string } => 
+      typeof a === 'object' && a !== null && 'reasoning' in a && typeof (a as any).reasoning === 'string'
+    );
+    return validAssessments.map(a => a.reasoning).join('; ');
   }
 
   private generateReasoning(analysis: CombinedAnalysis): string {
@@ -689,9 +694,13 @@ export class AutomatedIssueTriage {
     ];
   }
 
-  private rankDuplicates(duplicates: any[]): any[] {
+  private rankDuplicates(duplicates: unknown[]): unknown[] {
     return duplicates
-      .sort((a, b) => b.confidence - a.confidence)
+      .sort((a, b) => {
+        const aConfidence = (typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number') ? (a as any).confidence : 0;
+        const bConfidence = (typeof b === 'object' && b !== null && 'confidence' in b && typeof (b as any).confidence === 'number') ? (b as any).confidence : 0;
+        return bConfidence - aConfidence;
+      })
       .slice(0, 5); // Top 5 potential duplicates
   }
 
@@ -704,9 +713,10 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private async personalizeResponse(templates: any, issueData: IssueData, triageResult: TriageResult): Promise<any> {
+  private async personalizeResponse(templates: unknown, issueData: IssueData, triageResult: TriageResult): Promise<any> {
     // Stub implementation - would personalize response
-    const template = templates[triageResult.category] || templates.bug;
+    const safeTemplates = templates as any;
+    const template = safeTemplates[triageResult.category] || safeTemplates.bug || 'Default response template';
     return {
       message: template,
       actions: ['label', 'assign'],
@@ -714,7 +724,7 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private combineRuleResults(results: any[]): any {
+  private combineRuleResults(results: unknown[]): RuleResult {
     return {
       appliedCount: results.length,
       results: results
@@ -748,8 +758,13 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private calculateCombinedConfidence(analyses: any[]): number {
-    return analyses.reduce((sum, analysis) => sum + (analysis.confidence || 0.5), 0) / analyses.length;
+  private calculateCombinedConfidence(analyses: unknown[]): number {
+    const validAnalyses = analyses.filter((a: unknown): a is { confidence: number } => 
+      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number'
+    );
+    return validAnalyses.length > 0 
+      ? validAnalyses.reduce((sum, analysis) => sum + analysis.confidence, 0) / validAnalyses.length 
+      : 0.5;
   }
 }
 
@@ -774,16 +789,16 @@ export interface IssueData {
   number: number;
   title: string;
   body: string;
-  content?: string;
+  content: string;
   labels: string[];
   assignees: string[];
   author: string;
   createdAt: string;
   updatedAt: string;
-  comments?: unknown[];
-  events?: unknown[];
-  patterns?: unknown[];
-  metadata?: unknown;
+  comments: unknown[];
+  events: unknown[];
+  patterns: unknown[];
+  metadata: unknown;
 }
 
 export interface TriageResult {
@@ -794,7 +809,7 @@ export interface TriageResult {
   confidence: number;
   suggestedLabels: string[];
   suggestedAssignees: string[];
-  duplicates: any[];
+  duplicates: unknown[];
   automatedResponse?: AutomatedResponse;
   reasoning: string;
   timestamp: string;
@@ -808,19 +823,19 @@ interface ClassificationResult {
 
 interface PatternMatchResult {
   matchCount: number;
-  matches: any[];
+  matches: unknown[];
   confidence: number;
 }
 
 interface RuleResult {
   appliedCount: number;
-  results: any[];
+  results: unknown[];
 }
 
 interface ContextResult {
-  repositoryContext: any;
-  temporalContext: any;
-  userContext: any;
+  repositoryContext: unknown;
+  temporalContext: unknown;
+  userContext: unknown;
 }
 
 interface CombinedAnalysis {
@@ -848,12 +863,12 @@ export interface PriorityAssessment {
   score: number;
   confidence: number;
   reasoning: string;
-  factors: any[];
+  factors: unknown[];
 }
 
 export interface DuplicateDetection {
   isDuplicate: boolean;
-  duplicates: any[];
+  duplicates: unknown[];
   confidence: number;
 }
 
