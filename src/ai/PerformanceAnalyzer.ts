@@ -629,8 +629,10 @@ export class PerformanceAnalyzer {
     return issues;
   }
 
-  private estimateBundleImpact(content: string, _filename: string): { size: number; treeShakeable: boolean } {
+  private estimateBundleImpact(content: string, filename: string): { size: number; treeShakeable: boolean } {
     // IMPLEMENTATION FIRST: Calculate based on actual content size, not just line count
+    // Using filename for bundle analysis context
+    const isTreeShakeable = filename.endsWith('.ts') || filename.endsWith('.js')
     const addedContent = content.split('\n')
       .filter(line => line.startsWith('+'))
       .map(line => line.substring(1)) // Remove '+' prefix

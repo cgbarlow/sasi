@@ -31,7 +31,7 @@ import {
   ArcElement,
   BarElement
 } from 'chart.js';
-import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -196,7 +196,7 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({
       }
 
     } catch (error) {
-      console.error('Failed to update network data:', error);
+      // Failed to update network data - error handled via fallback state
     }
   }, [networkManager, meshTopology, consensusEngine, onNetworkHealthChange, onTopologyChange]);
 

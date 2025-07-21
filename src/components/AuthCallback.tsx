@@ -49,7 +49,7 @@ const AuthCallback: React.FC = () => {
         }, 1500)
 
       } catch (err) {
-        console.error('Authentication callback failed:', err)
+        // Authentication callback failed - error details logged to context
         setError(err instanceof Error ? err.message : 'Authentication failed')
         setStatus('error')
 

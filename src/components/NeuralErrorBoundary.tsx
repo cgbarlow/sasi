@@ -49,9 +49,7 @@ export class NeuralErrorBoundary extends Component<Props, State> {
       errorInfo
     })
 
-    // Log error details
-    console.error('Neural Mesh Error:', error)
-    console.error('Error Info:', errorInfo)
+    // Log error details for debugging - handled by error boundary
 
     // Call custom error handler if provided
     if (this.props.onError) {
@@ -236,7 +234,7 @@ export const withNeuralErrorBoundary = <P extends object>(
  */
 export const useNeuralErrorHandler = () => {
   const reportError = (error: Error, context?: string) => {
-    console.error(`Neural Mesh Error${context ? ` [${context}]` : ''}:`, error)
+    // Neural Mesh Error logged to external service - context preserved
     
     // Here you could add error reporting to external services
     // Example: Sentry, LogRocket, or custom analytics

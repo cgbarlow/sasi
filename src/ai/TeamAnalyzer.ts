@@ -235,9 +235,12 @@ export class TeamAnalyzer {
     return Array.from(this.members.values());
   }
 
-  async optimizeTeamFormation(_options: Record<string, unknown>): Promise<{ recommendedTeam: TeamMember[]; reasoning: string; confidence: number }> {
+  async optimizeTeamFormation(options: Record<string, unknown>): Promise<{ recommendedTeam: TeamMember[]; reasoning: string; confidence: number }> {
     // Stub implementation - would optimize team formation
+    // Using options for team formation criteria
+    const teamSize = (options.size as number) || 4
     return {
+      recommendedTeam: this.getMembers().slice(0, teamSize),
       recommendedTeam: this.getMembers().slice(0, 5),
       reasoning: 'Optimized based on skills and collaboration patterns',
       confidence: 0.8

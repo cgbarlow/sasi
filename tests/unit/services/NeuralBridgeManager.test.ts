@@ -56,7 +56,6 @@ const mockAgentManager = {
   spawnAgent: jest.fn().mockImplementation(async (config) => {
     await new Promise(resolve => setTimeout(resolve, 5)) // Simulate spawn time
     const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
-    console.log(`DEBUG: Spawning agent with ID: ${agentId}`) // Debug log
     // Store the agent in a mock registry for getAgentState to find
     const agentData = {
       id: agentId,
@@ -72,13 +71,10 @@ const mockAgentManager = {
       connectionStrength: 1.0
     }
     mockAgentRegistry.set(agentId, agentData)
-    console.log(`DEBUG: Stored agent data for ID: ${agentId}, registry size: ${mockAgentRegistry.size}`) // Debug log
     return agentId
   }),
   getAgentState: jest.fn().mockImplementation((id) => {
-    console.log(`DEBUG: Getting agent state for ID: ${id}, registry size: ${mockAgentRegistry.size}`) // Debug log
     const agent = mockAgentRegistry.get(id) || null
-    console.log(`DEBUG: Found agent:`, agent ? agent.id : 'null') // Debug log
     return agent
   }),
   runInference: jest.fn().mockImplementation(async () => {
@@ -162,15 +158,7 @@ describe('NeuralBridgeManager', () => {
     
     // Inject mocks into the instance with CI-optimized behavior
     ;(neuralBridge as any).wasmBridge = mockWasmBridge
-    ;(neuralBridge as any).agentManager = {
-      ...mockAgentManager,
-      spawnAgent: jest.fn().mockImplementation(async (config) => {
-        // Ultra-fast spawn in CI
-        await new Promise(resolve => setTimeout(resolve, isCI ? 1 : 5))
-        const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
-        return agentId
-      })
-    }
+    ;(neuralBridge as any).agentManager = mockAgentManager // Use the shared mock instance
     ;(neuralBridge as any).meshService = mockMeshService
   })
   

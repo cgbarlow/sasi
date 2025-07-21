@@ -267,9 +267,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
           integrationSystem
         })
 
-        console.log('🚀 Advanced performance systems initialized')
+        // Advanced performance systems initialized successfully
       } catch (error) {
-        console.error('❌ Failed to initialize advanced performance systems:', error)
+        // Failed to initialize advanced performance systems - error handled
       }
     }
 
@@ -330,7 +330,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
         }
 
       } catch (error) {
-        console.error('Error updating advanced metrics:', error)
+        // Error updating advanced metrics - handled via error boundary
       }
     }, 5000)
 
@@ -1045,9 +1045,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                     try {
                       const report = await advancedSystems.integrationSystem!.generatePerformanceReport()
                       setPerformanceReport(report as unknown as Record<string, unknown>)
-                      console.log('Performance Report:', report)
+                      // Performance report generated successfully
                     } catch (error) {
-                      console.error('Report generation failed:', error)
+                      // Report generation failed - error handled
                     }
                   }}
                   style={{

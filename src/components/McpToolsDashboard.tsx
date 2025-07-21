@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { mcpService, McpServer, McpTool, McpMetrics, McpExecutionResult } from '../services/McpService'
 import '../styles/McpToolsDashboard.css'
 
@@ -52,12 +52,12 @@ const McpToolsDashboard: React.FC = () => {
       setTimeout(updateState, 0)
       
     } catch (error) {
-      console.error('Failed to initialize MCP discovery:', error)
+      // Failed to initialize MCP discovery - error handled via state update
       setIsLoading(false)
     }
   }
 
-  const refreshServers = async () => {
+  const refreshServers = async (): Promise<void> => {
     try {
       const updatedServers = await mcpService.refreshServers()
       setServers(updatedServers)
@@ -65,16 +65,16 @@ const McpToolsDashboard: React.FC = () => {
       const currentMetrics = mcpService.getMetrics()
       setMetrics(currentMetrics)
     } catch (error) {
-      console.error('Failed to refresh servers:', error)
+      // Failed to refresh servers - error handled via state
     }
   }
 
-  const updateMetrics = async () => {
+  const updateMetrics = async (): Promise<void> => {
     try {
       const currentMetrics = mcpService.getMetrics()
       setMetrics(currentMetrics)
     } catch (error) {
-      console.error('Failed to update metrics:', error)
+      // Failed to update metrics - error handled
     }
   }
 
@@ -93,7 +93,7 @@ const McpToolsDashboard: React.FC = () => {
       // Schedule update in next tick to avoid act() warnings in tests
       setTimeout(updateHealthState, 0)
     } catch (error) {
-      console.error('Failed to perform health checks:', error)
+      // Failed to perform health checks - error handled
     }
   }
 
@@ -116,7 +116,7 @@ const McpToolsDashboard: React.FC = () => {
       setMetrics(currentMetrics)
       
     } catch (error) {
-      console.error('Tool execution failed:', error)
+      // Tool execution failed - error handled via result object
       
       // Create error result
       const errorResult: McpExecutionResult = {

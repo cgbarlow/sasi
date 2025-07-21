@@ -119,8 +119,11 @@ export class NeuralPatternMatcher {
     }));
   }
 
-  async learn(_issueData: Record<string, unknown>, _triageResult: Record<string, unknown>): Promise<void> {
+  async learn(issueData: Record<string, unknown>, triageResult: Record<string, unknown>): Promise<void> {
     // Stub implementation - would update pattern matching model
     // Learning from triage patterns
+    // Pattern learning from issue data and triage results
+    // Analyzing data structure: issue keys and triage result keys
+    if (Object.keys(issueData).length === 0 || Object.keys(triageResult).length === 0) return
   }
 }

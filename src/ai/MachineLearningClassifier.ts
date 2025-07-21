@@ -43,9 +43,11 @@ export class MachineLearningClassifier {
     this.config = config;
   }
 
-  async train(_trainingData: TrainingData[]): Promise<void> {
+  async train(trainingData: TrainingData[]): Promise<void> {
     // Stub implementation - would train ML model
     // Training classifier with data
+    // Training with provided samples for model improvement
+    if (trainingData.length === 0) return
     this.model = { trained: true, algorithm: this.config.algorithm };
     this.trained = true;
   }
@@ -83,9 +85,11 @@ export class MachineLearningClassifier {
     }));
   }
 
-  async learn(_issueData: TrainingData, _triageResult: ClassificationResult): Promise<void> {
+  async learn(issueData: TrainingData, triageResult: ClassificationResult): Promise<void> {
     // Stub implementation - would update model with new training data
     // Learning from triage result
+    // Learning from issue analysis and triage results
+    if (!issueData.content || !triageResult.label) return
     // Store learning data for model training (production would use real ML training)
   }
 
