@@ -197,7 +197,6 @@ export class WASMPerformanceOptimizer {
       console.log(`⚡ Loading WASM module: ${name} using ${loadStrategy.name}`)
 
       let wasmModule: WebAssembly.Module
-      let instance: WebAssembly.Instance
 
       // Load module based on strategy
       if (loadStrategy.streaming && 'compileStreaming' in WebAssembly) {
@@ -221,7 +220,7 @@ export class WASMPerformanceOptimizer {
       moduleInfo.compiled = true
 
       // Instantiate module
-      instance = await WebAssembly.instantiate(wasmModule, importObject || {})
+      const instance = await WebAssembly.instantiate(wasmModule, importObject || {})
       this.instances.set(name, instance)
       moduleInfo.instantiated = true
 

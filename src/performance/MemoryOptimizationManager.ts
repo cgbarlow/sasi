@@ -4,7 +4,7 @@
  */
 
 // WeakRef polyfill for environments that don't support it
-declare var WeakRef: any;
+declare const WeakRef: any;
 interface WeakRefConstructor {
   new <T extends object>(target: T): WeakRef<T>;
 }

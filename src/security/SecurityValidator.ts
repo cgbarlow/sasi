@@ -75,9 +75,9 @@ export class SecurityValidator {
     const sqlInjectionPatterns = [
       /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/i,
       /('|(--|\/\*|\*\/|;))/,
-      /((\%27)|(\')|(--)|(\%23)|(#))/i,
-      /((\%3D)|(=))[^\n]*((\%27)|(\')|(--)|(\%3B)|(;))/i,
-      /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/i
+      /((%27)|(')|(--)|(%23)|(#))/i,
+      /((%3D)|(=))[^\n]*((%27)|(')|(--)|(%3B)|(;))/i,
+      /\w*((%27)|('))((%6F)|o|(%4F))((%72)|r|(%52))/i
     ];
 
     for (const param of params) {

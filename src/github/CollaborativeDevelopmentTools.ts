@@ -1800,7 +1800,7 @@ export class CollaborativeDevelopmentTools {
         if (filename.endsWith('.js') || filename.endsWith('.ts') || filename.endsWith('.py')) {
           const additions = file.additions || 0;
           const patch = file.patch || '';
-          const commentLines = (patch.match(/\/\*|\*\/|\/\/|#|"""|\'\'\'|\\\"/g) || []).length;
+          const commentLines = (patch.match(/\/\*|\*\/|\/\/|#|"""|'''|"/g) || []).length;
           
           if (commentLines > additions * 0.1) { // More than 10% comment lines
             isDocCommit = true;

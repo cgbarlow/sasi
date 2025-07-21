@@ -253,10 +253,13 @@ export class PerformanceBenchmarkSuite {
         await this.optimizer.optimizedAgentSpawning({ architecture: 'standard' })
         break
         
-      case 'inference_pipeline':
-        const inputs = Array.from({ length: 32 }, () => new Float32Array(784).map(() => Math.random()))
-        await this.optimizer.optimizedNeuralInference(inputs, { type: 'feedforward' })
+      case 'inference_pipeline': {
+        {
+          const inputs = Array.from({ length: 32 }, () => new Float32Array(784).map(() => Math.random()))
+          await this.optimizer.optimizedNeuralInference(inputs, { type: 'feedforward' })
+        }
         break
+      }
         
       case 'memory_usage_per_agent':
         return await this.measureMemoryUsage()
@@ -271,10 +274,13 @@ export class PerformanceBenchmarkSuite {
       case 'concurrent_agent_throughput':
         return await this.measureConcurrentThroughput()
         
-      case 'real_time_inference':
-        const singleInput = [new Float32Array(784).map(() => Math.random())]
-        await this.optimizer.optimizedNeuralInference(singleInput, { type: 'realtime' })
+      case 'real_time_inference': {
+        {
+          const singleInput = [new Float32Array(784).map(() => Math.random())]
+          await this.optimizer.optimizedNeuralInference(singleInput, { type: 'realtime' })
+        }
         break
+      }
         
       case 'batch_processing_efficiency':
         return await this.measureBatchEfficiency()

@@ -77,9 +77,9 @@ export class PerformanceIntegration {
       console.log('📊 Initializing Performance Integration...')
       
       // Import and initialize performance monitoring suite
-      const PerformanceMonitoringSuite = require('../../../synaptic-mesh/src/neural/performance-monitoring-suite.js')
+      const PerformanceMonitoringSuite = await import('../../../synaptic-mesh/src/neural/performance-monitoring-suite.js')
       
-      this.performanceMonitor = new PerformanceMonitoringSuite({
+      this.performanceMonitor = new PerformanceMonitoringSuite.default({
         // Neural-specific targets
         targetSpawnTime: 100, // ms
         targetMemoryPerAgent: this.config.alertThresholds.memoryUsage * 1024 * 1024, // Convert MB to bytes

@@ -12,7 +12,7 @@
 
 // Mock WASM module for testing - will be injected during tests
 declare global {
-  var mockWasmModule: any;
+  const mockWasmModule: any;
 }
 
 // Browser-compatible EventEmitter implementation
