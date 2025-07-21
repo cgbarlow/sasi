@@ -165,22 +165,32 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
     setupNeuralIntegration()
   }, [])
 
-  // Define updateStats before using it in useEffect
+  // Define updateStats before using it in useEffect - with defensive checks
   const updateStats = React.useCallback(() => {
     const activeAgents = agents.filter(agent => agent.status === 'active' || agent.status === 'processing').length
     const totalTasks = agents.reduce((sum, agent) => sum + agent.completedTasks, 0)
     const avgEfficiency = agents.length > 0 ? agents.reduce((sum, agent) => sum + agent.efficiency, 0) / agents.length : 0
     
+    // Defensive neural mesh metrics access
+    const safeMetrics = neuralMeshHook?.metrics || {
+      totalNeurons: 0,
+      totalSynapses: 0,
+      networkEfficiency: 0,
+      averageActivity: 0,
+      wasmAcceleration: false
+    }
+    const safeAgents = neuralMeshHook?.agents || []
+    
     // Include neural mesh metrics
-    const neuralMeshStats = enableNeuralMesh ? {
-      totalNeurons: neuralMeshHook.metrics.totalNeurons,
-      totalSynapses: neuralMeshHook.metrics.totalSynapses,
-      meshConnectivity: neuralMeshHook.metrics.networkEfficiency,
-      neuralActivity: neuralMeshHook.metrics.averageActivity,
-      wasmAcceleration: neuralMeshHook.metrics.wasmAcceleration,
-      averageLatency: neuralMeshHook.agents.length > 0 ? 
-        neuralMeshHook.agents.reduce((sum: number, agent: unknown) => 
-          sum + ((agent as { realtime?: { networkLatency?: number } }).realtime?.networkLatency || 0), 0) / neuralMeshHook.agents.length : 0
+    const neuralMeshStats = enableNeuralMesh && neuralMeshHook ? {
+      totalNeurons: safeMetrics.totalNeurons,
+      totalSynapses: safeMetrics.totalSynapses,
+      meshConnectivity: safeMetrics.networkEfficiency,
+      neuralActivity: safeMetrics.averageActivity,
+      wasmAcceleration: safeMetrics.wasmAcceleration,
+      averageLatency: safeAgents.length > 0 ? 
+        safeAgents.reduce((sum: number, agent: unknown) => 
+          sum + ((agent as { realtime?: { networkLatency?: number } }).realtime?.networkLatency || 0), 0) / safeAgents.length : 0
     } : undefined
 
     // Get enhanced stats from neural integration if available
@@ -190,7 +200,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
       totalRepositories: repositories.length,
       tasksCompleted: totalTasks,
       asiProgress: Math.min(95, (totalTasks / 1000) * 100),
-      networkEfficiency: enableNeuralMesh ? neuralMeshHook.metrics.networkEfficiency : avgEfficiency,
+      networkEfficiency: enableNeuralMesh && neuralMeshHook ? safeMetrics.networkEfficiency : avgEfficiency,
       globalContributors: Math.floor(Math.random() * 5000) + 15000,
       processingUnits: Math.floor(agents.length * 42.5) + Math.floor(Math.random() * 200) + 1200,
       ...(neuralMeshStats && { neuralMeshStats })
@@ -201,20 +211,20 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
       baseStats
     
     setStats(enhancedStats)
-  }, [agents, repositories, neuralMeshHook.metrics.totalNeurons, neuralMeshHook.metrics.totalSynapses, neuralMeshHook.metrics.networkEfficiency, neuralMeshHook.agents.length, enableNeuralMesh, neuralIntegrationReady])
+  }, [agents, repositories, neuralMeshHook?.metrics?.totalNeurons, neuralMeshHook?.metrics?.totalSynapses, neuralMeshHook?.metrics?.networkEfficiency, neuralMeshHook?.agents?.length, enableNeuralMesh, neuralIntegrationReady])
 
   // Update stats when agents/repositories change
   useEffect(() => {
     updateStats()
   }, [updateStats])
   
-  // Sync neural mesh agents with regular agents
+  // Sync neural mesh agents with regular agents - with defensive checks
   useEffect(() => {
-    if (enableNeuralMesh && neuralMeshHook.agents.length > 0) {
+    if (enableNeuralMesh && neuralMeshHook?.agents?.length > 0) {
       const combinedAgents = [...agents.filter(a => !a.neuralId), ...neuralMeshHook.agents]
       setAgents(combinedAgents)
     }
-  }, [neuralMeshHook.agents, enableNeuralMesh])
+  }, [neuralMeshHook?.agents, enableNeuralMesh, agents])
   
   // Sync neural integration agents
   useEffect(() => {
@@ -460,7 +470,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
     }
     
     // Try neural mesh service
-    if (enableNeuralMesh && neuralMeshHook.isConnected) {
+    if (enableNeuralMesh && neuralMeshHook?.isConnected) {
       try {
         const neuralAgent = await neuralMeshHook.createAgent(type, {
           layer: Math.floor(Math.random() * 6) + 1,
@@ -510,7 +520,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
     }
     
     // Remove from neural mesh if it's a neural agent
-    if (enableNeuralMesh) {
+    if (enableNeuralMesh && neuralMeshHook?.removeAgent) {
       neuralMeshHook.removeAgent(id)
     }
     
@@ -608,15 +618,26 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
     shareKnowledge,
     getPerformanceMetrics: () => getPerformanceMetrics,
     refreshSwarm,
-    // Neural mesh specific methods
+    // Neural mesh specific methods - with defensive checks
     neuralMesh: {
-      isConnected: neuralMeshHook.isConnected,
-      isInitializing: neuralMeshHook.isInitializing,
-      error: neuralMeshHook.error,
-      metrics: neuralMeshHook.metrics,
-      connection: neuralMeshHook.connection,
+      isConnected: neuralMeshHook?.isConnected || false,
+      isInitializing: neuralMeshHook?.isInitializing || false,
+      error: neuralMeshHook?.error || null,
+      metrics: neuralMeshHook?.metrics || {
+        totalNeurons: 0,
+        totalSynapses: 0,
+        averageActivity: 0,
+        networkEfficiency: 0,
+        wasmAcceleration: false
+      },
+      connection: neuralMeshHook?.connection || null,
       trainMesh: async (patterns: unknown[], epochs: number = 10) => {
         try {
+          if (!neuralMeshHook?.trainMesh) {
+            console.warn('Neural mesh training not available')
+            return false
+          }
+          
           // Safe type guard for pattern objects
           const isValidPattern = (obj: unknown): obj is { inputs?: unknown; outputs?: unknown } => {
             return typeof obj === 'object' && obj !== null
@@ -653,14 +674,14 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
           return false
         }
       },
-      getMeshStatus: neuralMeshHook.getMeshStatus,
-      clearError: neuralMeshHook.clearError,
-      reconnect: neuralMeshHook.reconnect,
+      getMeshStatus: neuralMeshHook?.getMeshStatus || (() => Promise.resolve({})),
+      clearError: neuralMeshHook?.clearError || (() => {}),
+      reconnect: neuralMeshHook?.reconnect || (() => Promise.resolve()),
       toggleNeuralMesh: (enabled: boolean) => setEnableNeuralMesh(enabled)
     }
   }
 
-  // Cleanup neural resources on unmount
+  // Cleanup neural resources on unmount - with defensive checks
   useEffect(() => {
     return () => {
       // Cleanup neural integration
@@ -671,7 +692,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
       }
       
       // Cleanup neural mesh
-      if (neuralMeshHook.isConnected) {
+      if (neuralMeshHook?.isConnected) {
         try {
           neuralMeshHook.clearError()
         } catch (error) {
@@ -679,7 +700,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
         }
       }
     }
-  }, [neuralIntegrationReady, neuralMeshHook.isConnected])
+  }, [neuralIntegrationReady, neuralMeshHook?.isConnected])
 
   return (
     <SwarmContext.Provider value={value}>

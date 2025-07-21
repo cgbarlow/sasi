@@ -7,8 +7,11 @@ process.env.NODE_ENV = 'test';
 // Import Jest DOM matchers for React component testing
 require('@testing-library/jest-dom');
 
-// Set global timeout for all tests
-jest.setTimeout(60000);
+// Configure React Testing Library for better async handling
+process.env.RTL_SKIP_AUTO_CLEANUP = 'true'; // We'll handle cleanup manually for better control
+
+// Set global timeout for all tests - aligned with jest.config.js
+jest.setTimeout(30000);
 
 // Global test configuration
 global.expect = expect;
@@ -70,6 +73,21 @@ jest.mock('@react-three/fiber', () => ({
     gl: {}
   }))
 }));
+
+// Enhanced React Context support for SwarmContext tests
+global.React = require('react');
+global.ReactDOM = require('react-dom');
+
+// Fix React context issues in testing environment
+const originalCreateContext = global.React.createContext;
+global.React.createContext = function(defaultValue) {
+  const context = originalCreateContext(defaultValue);
+  // Ensure _context property is available for testing
+  if (context && !context._context) {
+    context._context = context;
+  }
+  return context;
+};
 
 // Mock WebSocket for real-time tests
 global.WebSocket = class MockWebSocket {
@@ -136,6 +154,114 @@ try {
 } catch (e) {
   // ruv-swarm not available in this environment
 }
+
+// Mock useNeuralMesh hook BEFORE importing SwarmContext - Complete structure
+jest.mock('../src/hooks/useNeuralMesh', () => ({
+  useNeuralMesh: jest.fn().mockReturnValue({
+    isConnected: false,
+    isInitializing: false,
+    error: null,
+    metrics: {
+      totalNeurons: 0,
+      totalSynapses: 0,
+      averageActivity: 0,
+      networkEfficiency: 85,
+      wasmAcceleration: false
+    },
+    connection: null,
+    agents: [],
+    createAgent: jest.fn().mockResolvedValue(null),
+    removeAgent: jest.fn(),
+    trainMesh: jest.fn().mockResolvedValue({ convergence: true }),
+    getMeshStatus: jest.fn().mockResolvedValue({}),
+    clearError: jest.fn(),
+    reconnect: jest.fn().mockResolvedValue(undefined)
+  })
+}), { virtual: true });
+
+// Load SwarmContext specific mocks to prevent infinite re-render loops
+require('./mocks/SwarmContextMocks.js');
+
+// Enhanced mock for SwarmContext neural services (fallback if not loaded above)
+jest.mock('../../src/services/NeuralAgentManager', () => ({
+  NeuralAgentManager: jest.fn().mockImplementation(() => ({
+    initialize: jest.fn().mockResolvedValue(true),
+    spawnAgent: jest.fn().mockImplementation(async (config) => {
+      // Simulate realistic spawn time
+      await new Promise(resolve => setTimeout(resolve, 50));
+      return `agent-${Date.now()}`;
+    }),
+    getActiveAgents: jest.fn().mockReturnValue([]),
+    getPerformanceMetrics: jest.fn().mockReturnValue({
+      totalAgentsSpawned: 0,
+      averageSpawnTime: 45,
+      averageInferenceTime: 25,
+      memoryUsage: 1024,
+      activeLearningTasks: 0,
+      systemHealthScore: 100
+    }),
+    terminateAgent: jest.fn().mockResolvedValue(undefined),
+    runInference: jest.fn().mockImplementation(async (agentId, input) => {
+      // Simulate inference time
+      await new Promise(resolve => setTimeout(resolve, 25));
+      return input.map(() => Math.random());
+    }),
+    trainAgent: jest.fn().mockImplementation(async (agentId, data, epochs) => {
+      // Simulate training time
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return {
+        sessionId: `session-${Date.now()}`,
+        agentId,
+        finalAccuracy: 0.85 + Math.random() * 0.1,
+        epochs
+      };
+    }),
+    shareKnowledge: jest.fn().mockResolvedValue(undefined),
+    cleanup: jest.fn().mockResolvedValue(undefined),
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn()
+  }))
+}), { virtual: true });
+
+jest.mock('../../src/services/NeuralMeshService', () => ({
+  NeuralMeshService: jest.fn().mockImplementation(() => ({
+    initialize: jest.fn().mockResolvedValue(true),
+    addNode: jest.fn().mockImplementation(async (config) => {
+      await new Promise(resolve => setTimeout(resolve, 30));
+      return `node-${Date.now()}`;
+    }),
+    createConnection: jest.fn().mockResolvedValue(undefined),
+    propagateSignal: jest.fn().mockImplementation(async (signal) => {
+      await new Promise(resolve => setTimeout(resolve, 15));
+      return { output: Math.random() };
+    }),
+    getPerformanceMetrics: jest.fn().mockReturnValue({
+      propagationTime: 15,
+      learningRate: 0.001,
+      networkEfficiency: 0.85,
+      memoryUsage: 1024,
+      nodeUtilization: 0.75
+    }),
+    shutdown: jest.fn().mockResolvedValue(undefined),
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn()
+  }))
+}), { virtual: true });
+
+jest.mock('../../src/services/SwarmContextIntegration', () => ({
+  SwarmContextIntegration: jest.fn().mockImplementation(() => ({
+    initializeNeuralData: jest.fn().mockResolvedValue({
+      agents: [],
+      metrics: {
+        systemHealthScore: 100,
+        totalAgentsSpawned: 0
+      }
+    }),
+    cleanup: jest.fn().mockResolvedValue(undefined)
+  }))
+}), { virtual: true });
 
 // Mock WASM modules (conditional mock)
 try {
