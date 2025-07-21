@@ -4,8 +4,8 @@
  */
 
 import { GitHubIntegrationLayer } from './GitHubIntegrationLayer';
-import { MachineLearningClassifier } from '../ai/MachineLearningClassifier';
-import { NeuralPatternMatcher } from '../ai/NeuralPatternMatcher';
+import { MachineLearningClassifier, ClassifierConfig } from '../ai/MachineLearningClassifier';
+import { NeuralPatternMatcher, PatternConfig } from '../ai/NeuralPatternMatcher';
 
 interface TriageAction {
   type: 'label' | 'assign' | 'comment' | 'close';
@@ -21,8 +21,19 @@ export class AutomatedIssueTriage {
 
   constructor(options: TriageOptions) {
     this.githubIntegration = new GitHubIntegrationLayer(options.githubToken);
-    this.classifier = new MachineLearningClassifier(options.mlConfig as any || {});
-    this.patternMatcher = new NeuralPatternMatcher(options.patternConfig as any || {});
+    const defaultClassifierConfig = {
+      algorithm: 'naive_bayes' as const,
+      features: ['title', 'body', 'labels'],
+      classes: ['bug', 'feature', 'documentation', 'security']
+    };
+    this.classifier = new MachineLearningClassifier((options.mlConfig as ClassifierConfig) || defaultClassifierConfig);
+    const defaultPatternConfig = {
+      patterns: ['error', 'bug', 'feature', 'security'],
+      threshold: 0.7,
+      algorithm: 'neural' as const,
+      contextWindow: 100
+    };
+    this.patternMatcher = new NeuralPatternMatcher((options.patternConfig as PatternConfig) || defaultPatternConfig);
     this.triageRules = options.triageRules || this.getDefaultTriageRules();
     this.learningEnabled = options.learningEnabled ?? true;
   }
@@ -186,8 +197,8 @@ export class AutomatedIssueTriage {
     
     // Safe confidence access
     const getConfidence = (item: unknown): number => {
-      return (typeof item === 'object' && item !== null && 'confidence' in item && typeof (item as any).confidence === 'number') 
-        ? (item as any).confidence 
+      return (typeof item === 'object' && item !== null && 'confidence' in item && typeof (item as Record<string, unknown>).confidence === 'number') 
+        ? Number((item as Record<string, unknown>).confidence) 
         : 0;
     };
     
@@ -211,11 +222,17 @@ export class AutomatedIssueTriage {
       triageResult
     );
     
+    // Safe property access with type guards
+    const safeResponse = response as { message?: string; actions?: string[]; confidence?: number };
+    const message = safeResponse.message || 'Automated response generated';
+    const actions = safeResponse.actions || ['label'];
+    const confidence = safeResponse.confidence || 0.7;
+    
     return {
-      message: response.message,
-      actions: response.actions,
-      confidence: response.confidence,
-      requiresHumanReview: response.confidence < 0.8
+      message,
+      actions,
+      confidence,
+      requiresHumanReview: confidence < 0.8
     };
   }
 
@@ -503,14 +520,14 @@ export class AutomatedIssueTriage {
   private extractContent(issue: unknown, comments: unknown[]): string {
     // Safe property access with type guards
     const getTitle = (obj: unknown): string => {
-      return (typeof obj === 'object' && obj !== null && 'title' in obj && typeof (obj as any).title === 'string') 
-        ? (obj as any).title 
+      return (typeof obj === 'object' && obj !== null && 'title' in obj && typeof (obj as Record<string, unknown>).title === 'string') 
+        ? String((obj as Record<string, unknown>).title) 
         : '';
     };
     
     const getBody = (obj: unknown): string => {
-      return (typeof obj === 'object' && obj !== null && 'body' in obj && typeof (obj as any).body === 'string') 
-        ? (obj as any).body 
+      return (typeof obj === 'object' && obj !== null && 'body' in obj && typeof (obj as Record<string, unknown>).body === 'string') 
+        ? String((obj as Record<string, unknown>).body) 
         : '';
     };
 
@@ -541,7 +558,7 @@ export class AutomatedIssueTriage {
     // Safe property access with type guards
     const safeGet = (obj: unknown, prop: string): unknown => {
       return (typeof obj === 'object' && obj !== null && prop in obj) 
-        ? (obj as any)[prop] 
+        ? (obj as Record<string, unknown>)[prop] 
         : null;
     };
 
@@ -670,7 +687,7 @@ export class AutomatedIssueTriage {
   private calculateWeightedPriority(assessments: unknown[]): number {
     // Implementation for weighted priority calculation with type guards
     const validAssessments = assessments.filter((a: unknown): a is { score: number } => 
-      typeof a === 'object' && a !== null && 'score' in a && typeof (a as any).score === 'number'
+      typeof a === 'object' && a !== null && 'score' in a && typeof (a as Record<string, unknown>).score === 'number'
     );
     return validAssessments.length > 0 
       ? validAssessments.reduce((sum, assessment) => sum + assessment.score, 0) / validAssessments.length 
@@ -680,7 +697,7 @@ export class AutomatedIssueTriage {
   private calculateConfidence(assessments: unknown[]): number {
     // Implementation for confidence calculation with type guards
     const validAssessments = assessments.filter((a: unknown): a is { confidence: number } => 
-      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number'
+      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as Record<string, unknown>).confidence === 'number'
     );
     return validAssessments.length > 0 
       ? validAssessments.reduce((sum, assessment) => sum + assessment.confidence, 0) / validAssessments.length 
@@ -696,7 +713,7 @@ export class AutomatedIssueTriage {
 
   private generatePriorityReasoning(assessments: unknown[]): string {
     const validAssessments = assessments.filter((a: unknown): a is { reasoning: string } => 
-      typeof a === 'object' && a !== null && 'reasoning' in a && typeof (a as any).reasoning === 'string'
+      typeof a === 'object' && a !== null && 'reasoning' in a && typeof (a as Record<string, unknown>).reasoning === 'string'
     );
     return validAssessments.map(a => a.reasoning).join('; ');
   }
@@ -709,21 +726,21 @@ export class AutomatedIssueTriage {
   }
 
   // Additional missing methods
-  private async findSemanticDuplicates(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findSemanticDuplicates(owner: string, repo: string, issueData: IssueData): Promise<unknown[]> {
     // Stub implementation - would find semantically similar issues
     return [
       { issueNumber: 123, confidence: 0.8, similarity: 'semantic', reason: 'Similar content and context' }
     ];
   }
 
-  private async findPatternDuplicates(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findPatternDuplicates(owner: string, repo: string, issueData: IssueData): Promise<unknown[]> {
     // Stub implementation - would find pattern-based duplicates
     return [
       { issueNumber: 124, confidence: 0.7, similarity: 'pattern', reason: 'Similar error patterns' }
     ];
   }
 
-  private async findKeywordDuplicates(owner: string, repo: string, issueData: IssueData): Promise<any[]> {
+  private async findKeywordDuplicates(owner: string, repo: string, issueData: IssueData): Promise<unknown[]> {
     // Stub implementation - would find keyword-based duplicates
     return [
       { issueNumber: 125, confidence: 0.6, similarity: 'keyword', reason: 'Shared keywords and terms' }
@@ -733,14 +750,14 @@ export class AutomatedIssueTriage {
   private rankDuplicates(duplicates: unknown[]): unknown[] {
     return duplicates
       .sort((a, b) => {
-        const aConfidence = (typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number') ? (a as any).confidence : 0;
-        const bConfidence = (typeof b === 'object' && b !== null && 'confidence' in b && typeof (b as any).confidence === 'number') ? (b as any).confidence : 0;
+        const aConfidence = (typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as Record<string, unknown>).confidence === 'number') ? Number((a as Record<string, unknown>).confidence) : 0;
+        const bConfidence = (typeof b === 'object' && b !== null && 'confidence' in b && typeof (b as Record<string, unknown>).confidence === 'number') ? Number((b as Record<string, unknown>).confidence) : 0;
         return bConfidence - aConfidence;
       })
       .slice(0, 5); // Top 5 potential duplicates
   }
 
-  private async getResponseTemplates(category: string): Promise<any> {
+  private async getResponseTemplates(category: string): Promise<unknown> {
     // Stub implementation - would get response templates
     return {
       bug: 'Thank you for reporting this bug. We will investigate and provide updates.',
@@ -749,9 +766,9 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private async personalizeResponse(templates: unknown, issueData: IssueData, triageResult: TriageResult): Promise<any> {
+  private async personalizeResponse(templates: unknown, issueData: IssueData, triageResult: TriageResult): Promise<unknown> {
     // Stub implementation - would personalize response
-    const safeTemplates = templates as any;
+    const safeTemplates = templates as Record<string, unknown>;
     const template = safeTemplates[triageResult.category] || safeTemplates.bug || 'Default response template';
     return {
       message: template,
@@ -767,7 +784,7 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private async analyzeRepositoryContext(issueData: IssueData): Promise<any> {
+  private async analyzeRepositoryContext(issueData: IssueData): Promise<unknown> {
     // Stub implementation - would analyze repository context
     return {
       recentIssues: 10,
@@ -776,7 +793,7 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private async analyzeTemporalContext(issueData: IssueData): Promise<any> {
+  private async analyzeTemporalContext(issueData: IssueData): Promise<unknown> {
     // Stub implementation - would analyze temporal patterns
     return {
       timeOfDay: 'business_hours',
@@ -785,7 +802,7 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private async analyzeUserContext(issueData: IssueData): Promise<any> {
+  private async analyzeUserContext(issueData: IssueData): Promise<unknown> {
     // Stub implementation - would analyze user context
     return {
       userType: 'contributor',
@@ -796,7 +813,7 @@ export class AutomatedIssueTriage {
 
   private calculateCombinedConfidence(analyses: unknown[]): number {
     const validAnalyses = analyses.filter((a: unknown): a is { confidence: number } => 
-      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as any).confidence === 'number'
+      typeof a === 'object' && a !== null && 'confidence' in a && typeof (a as Record<string, unknown>).confidence === 'number'
     );
     return validAnalyses.length > 0 
       ? validAnalyses.reduce((sum, analysis) => sum + analysis.confidence, 0) / validAnalyses.length 
