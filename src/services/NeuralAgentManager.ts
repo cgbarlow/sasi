@@ -668,8 +668,8 @@ export class NeuralAgentManager extends EventEmitter {
   
   private async createMockNeuralNetwork(config: NeuralConfiguration): Promise<any> {
     // In test environment, use the injected mock WASM module
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && global.mockWasmModule) {
-      return await global.mockWasmModule.createNeuralNetwork(config);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && (global as any).mockWasmModule) {
+      return await (global as any).mockWasmModule.createNeuralNetwork(config);
     }
     
     // Simulate network creation time with realistic performance for tests
@@ -687,8 +687,8 @@ export class NeuralAgentManager extends EventEmitter {
   
   private async runMockInference(network: any, inputs: number[]): Promise<number[]> {
     // In test environment, use the injected mock WASM module
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && global.mockWasmModule) {
-      return await global.mockWasmModule.runInference(network, inputs);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && (global as any).mockWasmModule) {
+      return await (global as any).mockWasmModule.runInference(network, inputs);
     }
     
     // IMPLEMENTATION FIRST: Simulate realistic inference time for tests
@@ -709,8 +709,8 @@ export class NeuralAgentManager extends EventEmitter {
   
   private async trainMockNetwork(network: any, data: any[], epochs: number): Promise<any> {
     // In test environment, use the injected mock WASM module
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && global.mockWasmModule) {
-      return await global.mockWasmModule.trainNetwork(network, data, epochs);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && (global as any).mockWasmModule) {
+      return await (global as any).mockWasmModule.trainNetwork(network, data, epochs);
     }
     
     // Simulate training time
@@ -725,8 +725,8 @@ export class NeuralAgentManager extends EventEmitter {
   
   private async serializeMockWeights(network: any): Promise<ArrayBuffer> {
     // In test environment, use the injected mock WASM module
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && global.mockWasmModule) {
-      return await global.mockWasmModule.serializeWeights(network);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && (global as any).mockWasmModule) {
+      return await (global as any).mockWasmModule.serializeWeights(network);
     }
     
     return network.weights.buffer.slice();
@@ -734,8 +734,8 @@ export class NeuralAgentManager extends EventEmitter {
   
   private async deserializeMockWeights(network: any, weights: ArrayBuffer, influence: number): Promise<void> {
     // In test environment, use the injected mock WASM module
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && global.mockWasmModule) {
-      return await global.mockWasmModule.deserializeWeights(network, weights, influence);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test' && (global as any).mockWasmModule) {
+      return await (global as any).mockWasmModule.deserializeWeights(network, weights, influence);
     }
     
     // Mock weight blending
