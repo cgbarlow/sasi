@@ -13,8 +13,8 @@ module.exports = {
     pretendToBeVisual: true
   },
 
-  // Timeout Configuration - CI-optimized with environment detection
-  testTimeout: process.env.CI === 'true' ? 30000 : 15000, // 30s for CI, 15s for local
+  // Timeout Configuration - Aggressive CI optimization for test consistency
+  testTimeout: process.env.CI === 'true' ? 8000 : 10000, // Reduced to 8s for CI, 10s for local
   
   // Test Pattern Matching - Focused on unit tests
   testMatch: [
@@ -33,9 +33,10 @@ module.exports = {
     '/tests/integration/'
   ],
 
-  // Setup Files - CI-enhanced
+  // Setup Files - CI-enhanced with WASM setup
   setupFilesAfterEnv: [
     '<rootDir>/tests/setup.js',
+    '<rootDir>/tests/wasm-setup.ts', // Always include WASM setup for consistency
     ...(process.env.CI === 'true' ? ['<rootDir>/tests/ci-setup.js'] : [])
   ],
 
@@ -75,17 +76,25 @@ module.exports = {
     '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/tests/mocks/fileMock.js'
   },
 
-  // Performance Configuration - CI-optimized
-  maxWorkers: 1,
-  cache: process.env.CI === 'true' ? false : true, // Disable cache in CI for consistency
+  // Performance Configuration - Ultra CI-optimized for consistent execution
+  maxWorkers: process.env.CI === 'true' ? 1 : 2, // Single worker in CI for stability
+  cache: false, // Always disable cache for maximum consistency
   cacheDirectory: '<rootDir>/.jest-cache',
   
-  // Memory Management - Critical for preventing infinite loops
-  workerIdleMemoryLimit: process.env.CI === 'true' ? '1GB' : '512MB',
+  // Memory Management - Critical for preventing timeouts and infinite loops
+  workerIdleMemoryLimit: process.env.CI === 'true' ? '256MB' : '512MB', // Reduced from 1GB to 256MB for CI
   
-  // Output Configuration
-  verbose: true,
-  detectOpenHandles: true,
+  // Enhanced CI stability settings
+  ...(process.env.CI === 'true' && {
+    bail: true, // Stop on first test failure in CI for faster feedback
+    detectOpenHandles: false, // Disable in CI to prevent hanging
+    forceExit: true, // Always force exit in CI
+    runInBand: true, // Run all tests in single process for CI stability
+  }),
+  
+  // Output Configuration - CI-optimized
+  verbose: process.env.CI === 'true' ? false : true, // Reduce verbosity in CI for performance
+  detectOpenHandles: process.env.CI === 'true' ? false : true, // Disable in CI to prevent hanging
   forceExit: true,
   
   // Mock Configuration
