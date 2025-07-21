@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:unit": "jest --testPathPatterns=tests/unit",
+    "test:ci": "jest --config=jest.config.ci.js --maxWorkers=50% --bail=1 --forceExit --silent",
+    "test:ci-fast": "jest --config jest.config.ci.js",
     "test:integration": "jest --testPathPatterns=tests/integration",
     "test:performance": "jest --testPathPatterns=tests/performance --detectLeaks",
     "test:persistence": "jest --testPathPatterns=tests/persistence",
