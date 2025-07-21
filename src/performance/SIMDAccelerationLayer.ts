@@ -490,10 +490,18 @@ export class SIMDAccelerationLayer {
     
     this.operations.set(name, operation)
     
-    // Update metrics
-    this.metrics.operationsPerSecond = dataSize / (executionTime / 1000)
+    // Update metrics - CI-safe calculations
+    const executionTimeSeconds = executionTime / 1000
     this.metrics.averageLatency = (this.metrics.averageLatency + executionTime) / 2
-    this.metrics.memoryThroughput = (dataSize * 4) / (executionTime / 1000) // bytes/sec
+    
+    if (executionTimeSeconds > 0) {
+      this.metrics.operationsPerSecond = dataSize / executionTimeSeconds
+      this.metrics.memoryThroughput = (dataSize * 4) / executionTimeSeconds // bytes/sec
+    } else {
+      // In CI/test environments with ultra-fast execution (0ms), use reasonable fallback
+      this.metrics.operationsPerSecond = dataSize * 1000 // Assume 1000 ops/ms baseline
+      this.metrics.memoryThroughput = (dataSize * 4) * 1000 // bytes/sec
+    }
   }
 
   /**

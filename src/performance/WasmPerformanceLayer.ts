@@ -514,8 +514,16 @@ export class WasmPerformanceLayer {
     // Update average latency
     this.metrics.averageLatency = (this.metrics.averageLatency + executionTime) / 2
     
-    // Update operations per second
-    this.metrics.operationsPerSecond = dataSize / (executionTime / 1000)
+    // Update operations per second - CI-safe calculation
+    const executionTimeSeconds = executionTime / 1000
+    if (executionTimeSeconds > 0) {
+      this.metrics.operationsPerSecond = dataSize / executionTimeSeconds
+      this.metrics.throughput = dataSize / executionTimeSeconds
+    } else {
+      // In CI/test environments with ultra-fast execution (0ms), use reasonable fallback
+      this.metrics.operationsPerSecond = dataSize * 1000 // Assume 1000 ops/ms baseline
+      this.metrics.throughput = dataSize * 1000
+    }
     
     // Update error rate
     if (!success) {
@@ -523,9 +531,6 @@ export class WasmPerformanceLayer {
     } else {
       this.metrics.errorRate = this.metrics.errorRate * 0.95
     }
-    
-    // Update throughput
-    this.metrics.throughput = dataSize / (executionTime / 1000)
     
     // Update memory usage
     this.metrics.memoryUsage = this.getMemoryUsage()
