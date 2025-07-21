@@ -97,7 +97,7 @@ const McpToolsDashboard: React.FC = () => {
     }
   }
 
-  const executeTool = async (tool: McpTool, parameters: Record<string, any>) => {
+  const executeTool = async (tool: McpTool, parameters: Record<string, string | number | boolean>) => {
     if (!selectedServer) return
     
     setIsExecuting(true)

@@ -902,7 +902,7 @@ Claude Flow extends the base coordination with:
 - Examples: https://github.com/ruvnet/claude-flow/tree/main/examples
 
 ## Protocols (a.k.a. YOLO Protocols)
-Standard protocols to be executed when asked: 
+Standard protocols to be executed when asked, e.g. "Initialize CI protocol": 
 
 ### Continuous Integration (CI) protocol
 Enhanced protocol with research capabilities and proven implementation-first strategy. For systematic CI fixing, testing, committing regularly, push, PR, review, monitor build, repeat. The whole thing should run and repeat unattended with zero intervention; the monitoring of the active action and automated merge where possible is critical:
@@ -914,7 +914,7 @@ Enhanced protocol with research capabilities and proven implementation-first str
    - Store findings: `mcp__claude-flow__memory_usage` for coordination
 
 2. **MULTI-SOURCE RESEARCH**: Gather intelligence using all available resources:
-   - **Context7 MCP**: Search for latest best practices, error patterns, and solutions
+   - **Context7 MCP**: Search for intel on specific products, platforms, technologies (add Context7 MCP if not available)
    - **WebSearch**: Search for latest best practices, error patterns, and solutions
    - **Codebase Analysis**: Use Grep, Glob, Read tools to understand current state
    - **GitHub Integration**: Check issues, PRs, workflow history using `gh` commands
@@ -922,11 +922,11 @@ Enhanced protocol with research capabilities and proven implementation-first str
 3. **SYSTEMATIC ANALYSIS**: Apply proven analysis patterns:
    - Identify root causes vs symptoms
    - Categorize issues by severity and component
-   - Document findings in GitHub issues with proper labels
+   - Document findings in GitHub issues with proper labels (check what labels are available, add new labels if required before creating/modifying issues)
    - Store research results in swarm memory for coordination
 
 ## 🎯 PHASE 2: Implementation-First Strategy
-4. **IMPLEMENTATION-FIRST FIXES**: Apply proven methodology that achieved 4x 100% test success:
+4. **IMPLEMENTATION-FIRST FIXES**: Apply proven methodology that achieves 100% test success:
    - Fix actual implementation logic rather than relaxing test expectations
    - Handle both edge cases and main use cases simultaneously  
    - Use realistic thresholds for test environment while maintaining production standards
@@ -942,8 +942,10 @@ Enhanced protocol with research capabilities and proven implementation-first str
 6. **ACTIVE MONITORING**: Monitor GitHub Actions workflows continuously:
    - Use `gh run list --repo owner/repo --limit N` to track workflow status
    - Monitor specific runs: `gh run view RUN_ID --repo owner/repo`
-   - Set up automated polling during CI execution
-   - Analyze results immediately when CI finishes
+   - **CRITICAL**: Always check CI status after pushing changes - never assume success
+   - Set up automated polling during CI execution using intelligent CI monitoring hooks
+   - Analyze results immediately when CI finishes - target specific failure items first
+   - **LESSON LEARNED**: Use targeted fixes for specific CI failure items rather than broad codebase cleanup
 
 7. **SYSTEMATIC INTEGRATION**: Follow proven integration workflow:
    - Commit regularly with descriptive messages including methodology
@@ -968,6 +970,32 @@ Enhanced protocol with research capabilities and proven implementation-first str
 - Monitor: Memory usage, performance thresholds, code coverage
 - Document: Methodologies that achieve breakthrough results
 - Coordinate: All agents use swarm memory and hooks for alignment
+
+## 🔧 RECENT ENHANCEMENTS (Based on Successful Implementations):
+
+### ✅ **Intelligent CI Monitoring System**
+- **Implementation**: Created adaptive polling algorithms with machine learning (ruvnet/claude-flow#419)
+- **Features**: Smart backoff (2s-5min intervals), auto-merge capabilities, swarm coordination
+- **Usage**: Deploy hooks for automated CI monitoring instead of manual polling
+- **Command**: `npx claude-flow@alpha hooks ci-monitor-init --adaptive true`
+
+### ✅ **Targeted CI Failure Resolution**  
+- **Strategy**: Focus on specific CI failure items mentioned in GitHub Actions output
+- **Approach**: Address TypeScript strict mode violations, console.log removal, unused variables
+- **Efficiency**: Target original failure items rather than comprehensive codebase cleanup
+- **Example**: Fix specific linting errors in identified files vs. fixing all 1000+ codebase issues
+
+### ✅ **Implementation-First Strategy Proven**
+- **Success Rate**: Multiple components achieved 100% test success (NeuralAgentManager: 24/24)
+- **Method**: Fix actual implementation logic rather than relaxing test expectations
+- **Evidence**: OAuth authentication system fully functional with PKCE security
+- **Result**: Real working features over perfect test coverage
+
+### ⚡ **CI Protocol Violation Detection**
+- **Issue**: Continuing without monitoring CI results breaks the protocol
+- **Rule**: ALWAYS check `gh run list` and `gh run view` after pushing changes
+- **Automation**: Use intelligent CI monitoring hooks to prevent protocol violations
+- **Recovery**: When CI fails, immediately analyze with `gh run view --log-failed`
 
 ---
 

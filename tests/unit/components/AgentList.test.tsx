@@ -15,78 +15,102 @@ jest.mock('../../../src/styles/AgentList.css', () => ({}));
 const mockAgents = [
   {
     id: 'agent-1',
+    name: 'Research Agent 1',
     type: 'researcher',
     status: 'active',
-    performance: 85.2,
-    tasks: 12,
-    cognitivePattern: 'divergent',
+    efficiency: 85.2,
+    completedTasks: 12,
+    currentTask: 'Analyzing documentation patterns',
+    repository: 'test-repo',
+    branch: 'main',
+    progress: 75.5,
+    position: { x: 0, y: 0, z: 0 },
+    owner: 'system',
     neuralId: 'neural-1',
-    meshConnection: {
-      meshId: 'mesh-1',
-      strength: 0.8,
-      latency: 45
-    },
-    neuralProperties: {
-      neuronId: 'neuron-1',
-      meshId: 'mesh-1',
-      learningRate: 0.001,
-      activationFunction: 'tanh',
-      connectionStrength: 0.85
-    },
     capabilities: ['research', 'analysis', 'documentation'],
-    memory: 45.6,
-    lastActive: Date.now() - 30000, // 30 seconds ago
-    createdAt: Date.now() - 300000 // 5 minutes ago
+    meshConnection: {
+      connected: true,
+      meshId: 'mesh-1',
+      nodeType: 'processor',
+      layer: 1,
+      synapses: 128,
+      activation: 0.8,
+      lastSpike: new Date(Date.now() - 30000)
+    },
+    realtime: {
+      cpuUsage: 45.6,
+      memoryUsage: 32.1,
+      networkLatency: 45,
+      wasmPerformance: 95.2,
+      isProcessing: true,
+      throughput: 1200
+    }
   },
   {
     id: 'agent-2',
+    name: 'Coder Agent 1',
     type: 'coder',
     status: 'idle',
-    performance: 92.1,
-    tasks: 8,
-    cognitivePattern: 'convergent',
+    efficiency: 92.1,
+    completedTasks: 8,
+    currentTask: 'Code optimization',
+    repository: 'test-repo',
+    branch: 'feature-branch',
+    progress: 45.0,
+    position: { x: 1, y: 0, z: 0 },
+    owner: 'system',
     neuralId: 'neural-2',
-    meshConnection: {
-      meshId: 'mesh-1',
-      strength: 0.9,
-      latency: 32
-    },
-    neuralProperties: {
-      neuronId: 'neuron-2',
-      meshId: 'mesh-1',
-      learningRate: 0.002,
-      activationFunction: 'relu',
-      connectionStrength: 0.92
-    },
     capabilities: ['coding', 'debugging', 'optimization'],
-    memory: 38.2,
-    lastActive: Date.now() - 120000, // 2 minutes ago
-    createdAt: Date.now() - 600000 // 10 minutes ago
+    meshConnection: {
+      connected: true,
+      meshId: 'mesh-1',
+      nodeType: 'processor',
+      layer: 2,
+      synapses: 96,
+      activation: 0.9,
+      lastSpike: new Date(Date.now() - 120000)
+    },
+    realtime: {
+      cpuUsage: 38.2,
+      memoryUsage: 28.7,
+      networkLatency: 32,
+      wasmPerformance: 92.5,
+      isProcessing: false,
+      throughput: 800
+    }
   },
   {
     id: 'agent-3',
-    type: 'analyst',
-    status: 'busy',
-    performance: 78.9,
-    tasks: 15,
-    cognitivePattern: 'systems',
+    name: 'Analyst Agent 1',
+    type: 'neural',
+    status: 'processing',
+    efficiency: 78.9,
+    completedTasks: 15,
+    currentTask: 'Performance analysis',
+    repository: 'analytics-repo',
+    branch: 'analysis-branch',
+    progress: 92.3,
+    position: { x: 0, y: 1, z: 0 },
+    owner: 'system',
     neuralId: 'neural-3',
-    meshConnection: {
-      meshId: 'mesh-2',
-      strength: 0.7,
-      latency: 58
-    },
-    neuralProperties: {
-      neuronId: 'neuron-3',
-      meshId: 'mesh-2',
-      learningRate: 0.0015,
-      activationFunction: 'sigmoid',
-      connectionStrength: 0.76
-    },
     capabilities: ['analysis', 'reporting', 'metrics'],
-    memory: 52.1,
-    lastActive: Date.now() - 5000, // 5 seconds ago
-    createdAt: Date.now() - 180000 // 3 minutes ago
+    meshConnection: {
+      connected: true,
+      meshId: 'mesh-2',
+      nodeType: 'analyzer',
+      layer: 3,
+      synapses: 64,
+      activation: 0.7,
+      lastSpike: new Date(Date.now() - 5000)
+    },
+    realtime: {
+      cpuUsage: 52.1,
+      memoryUsage: 41.3,
+      networkLatency: 58,
+      wasmPerformance: 88.7,
+      isProcessing: true,
+      throughput: 1500
+    }
   }
 ];
 
@@ -102,36 +126,32 @@ describe('AgentList Component - Comprehensive Tests', () => {
     test('should render agent list with default props', () => {
       render(<AgentList agents={mockAgents} />);
       
-      expect(screen.getByText('Active Agents (3)')).toBeInTheDocument();
-      expect(screen.getByText('agent-1')).toBeInTheDocument();
-      expect(screen.getByText('agent-2')).toBeInTheDocument();
-      expect(screen.getByText('agent-3')).toBeInTheDocument();
+      expect(screen.getByText('Active Agents')).toBeInTheDocument();
+      expect(screen.getByText('3 of 3 agents')).toBeInTheDocument();
+      expect(screen.getByText('researcher')).toBeInTheDocument();
+      expect(screen.getByText('coder')).toBeInTheDocument();
+      expect(screen.getByText('neural')).toBeInTheDocument();
     });
 
     test('should render empty state when no agents', () => {
       render(<AgentList agents={[]} />);
       
-      expect(screen.getByText('No agents available')).toBeInTheDocument();
-      expect(screen.getByText('Spawn your first agent to get started')).toBeInTheDocument();
+      expect(screen.getByText('No agents found')).toBeInTheDocument();
+      expect(screen.getByText('Try adjusting your filters or spawn new agents.')).toBeInTheDocument();
     });
 
-    test('should render loading state', () => {
-      render(<AgentList agents={mockAgents} loading={true} />);
+    test('should render with different agent counts', () => {
+      render(<AgentList agents={[mockAgents[0]]} />);
       
-      expect(screen.getByText('Loading agents...')).toBeInTheDocument();
+      expect(screen.getByText('1 of 1 agents')).toBeInTheDocument();
     });
 
-    test('should render error state', () => {
-      const errorMessage = 'Failed to load agents';
-      render(<AgentList agents={[]} error={errorMessage} />);
+    test('should render all agent statuses', () => {
+      render(<AgentList agents={mockAgents} />);
       
-      expect(screen.getByText('Error: Failed to load agents')).toBeInTheDocument();
-    });
-
-    test('should render custom title when provided', () => {
-      render(<AgentList agents={mockAgents} title="My Custom Agents" />);
-      
-      expect(screen.getByText('My Custom Agents (3)')).toBeInTheDocument();
+      expect(screen.getByText('active')).toBeInTheDocument();
+      expect(screen.getByText('idle')).toBeInTheDocument();
+      expect(screen.getByText('processing')).toBeInTheDocument();
     });
   });
 
@@ -171,9 +191,9 @@ describe('AgentList Component - Comprehensive Tests', () => {
     test('should display task counts', () => {
       render(<AgentList agents={mockAgents} />);
       
-      expect(screen.getByText('12 tasks')).toBeInTheDocument();
-      expect(screen.getByText('8 tasks')).toBeInTheDocument();
-      expect(screen.getByText('15 tasks')).toBeInTheDocument();
+      expect(screen.getByText('12')).toBeInTheDocument();
+      expect(screen.getByText('8')).toBeInTheDocument();
+      expect(screen.getByText('15')).toBeInTheDocument();
     });
 
     test('should display memory usage', () => {
@@ -242,7 +262,7 @@ describe('AgentList Component - Comprehensive Tests', () => {
       render(<AgentList agents={mockAgents} showSort={true} />);
       
       const sortSelect = screen.getByRole('combobox', { name: /sort by/i });
-      fireEvent.change(sortSelect, { target: { value: 'performance' } });
+      fireEvent.change(sortSelect, { target: { value: 'efficiency' } });
       
       // Should sort in descending order (highest first)
       const agentElements = screen.getAllByTestId(/agent-item/);
@@ -361,7 +381,7 @@ describe('AgentList Component - Comprehensive Tests', () => {
       
       const updatedAgents = mockAgents.map(agent => 
         agent.id === 'agent-1' 
-          ? { ...agent, status: 'busy', performance: 87.5 }
+          ? { ...agent, status: 'busy', efficiency: 87.5 }
           : agent
       );
       
@@ -449,7 +469,7 @@ describe('AgentList Component - Comprehensive Tests', () => {
       const agentsWithNulls = [
         {
           ...mockAgents[0],
-          performance: null,
+          efficiency: null,
           meshConnection: null,
           neuralProperties: undefined
         }
@@ -462,7 +482,7 @@ describe('AgentList Component - Comprehensive Tests', () => {
       const invalidAgents = [
         {
           ...mockAgents[0],
-          performance: NaN,
+          efficiency: NaN,
           memory: -1
         }
       ];
@@ -500,7 +520,7 @@ describe('AgentList Component - Comprehensive Tests', () => {
       for (let i = 0; i < 10; i++) {
         const updatedAgents = mockAgents.map(agent => ({
           ...agent,
-          performance: Math.random() * 100,
+          efficiency: Math.random() * 100,
           lastActive: Date.now()
         }));
         

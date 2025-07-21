@@ -13,6 +13,23 @@ import WASMPerformanceOptimizer from '../performance/WASMPerformanceOptimizer'
 import AutomatedBenchmarkSuite from '../performance/AutomatedBenchmarkSuite'
 import PerformanceIntegrationSystem from '../performance/PerformanceIntegrationSystem'
 
+// Type definitions for performance data - using flexible types to match actual return values
+type IntegratedPerformanceMetrics = Record<string, unknown> & {
+  overall?: number;
+  components?: Record<string, unknown>;
+  trends?: Array<unknown>;
+  recommendations?: string[];
+}
+
+type PerformanceReport = Record<string, unknown> & {
+  summary?: {
+    overall?: number;
+    score?: number;
+  };
+  details?: Record<string, unknown>;
+  timestamp?: string;
+}
+
 interface PerformanceDashboardProps {
   className?: string
 }
@@ -136,13 +153,50 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     benchmarkSuite: null,
     integrationSystem: null
   })
-  const [systemHealth, setSystemHealth] = useState<any>(null)
-  const [memoryStats, setMemoryStats] = useState<any>(null)
-  const [cacheStats, setCacheStats] = useState<any>(null)
-  const [wasmStats, setWasmStats] = useState<any>(null)
-  const [regressionStats, setRegressionStats] = useState<any>(null)
-  const [comprehensiveMetrics, setComprehensiveMetrics] = useState<any>(null)
-  const [performanceReport, setPerformanceReport] = useState<any>(null)
+  const [systemHealth, setSystemHealth] = useState<{
+    overall: string;
+    score: number;
+    components: Record<string, string>;
+  } | null>(null)
+  const [memoryStats, setMemoryStats] = useState<{
+    current?: { heapUsed: string; heapTotal: string };
+    pools?: Array<{ name: string; size: number }>;
+    gc?: { requestCount: number };
+    leaks?: Array<{ source: string; size: number }>;
+    growth?: string;
+  } | null>(null)
+  const [cacheStats, setCacheStats] = useState<{
+    metrics?: {
+      hitRatio: number;
+      totalSize: number;
+      entryCount: number;
+      averageAccessTime: number;
+    };
+    recommendations?: string[];
+  } | null>(null)
+  const [wasmStats, setWasmStats] = useState<{
+    loadedModules: number;
+    totalModules: number;
+    cacheSize?: number;
+    capabilities?: {
+      simdSupported: boolean;
+      streamingSupported: boolean;
+    };
+    modules?: Array<{ loadTime?: number }>;
+  } | null>(null)
+  const [regressionStats, setRegressionStats] = useState<{
+    summary?: {
+      passRate: number;
+      enabledTests: number;
+      regressions: number;
+    };
+    severity?: {
+      critical: number;
+    };
+    baselines?: Array<{ test: string; baseline: number; current: number }>;
+  } | null>(null)
+  const [comprehensiveMetrics, setComprehensiveMetrics] = useState<Record<string, unknown> | null>(null)
+  const [performanceReport, setPerformanceReport] = useState<Record<string, unknown> | null>(null)
 
   // Initialize advanced performance systems
   useEffect(() => {
@@ -233,7 +287,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
       try {
         // Get comprehensive metrics from integration system
         const metrics = await advancedSystems.integrationSystem!.getComprehensiveMetrics()
-        setComprehensiveMetrics(metrics)
+        setComprehensiveMetrics(metrics as unknown as Record<string, unknown>)
 
         // Get individual component metrics
         if (advancedSystems.monitoringSystem) {
@@ -287,7 +341,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
   }
 
   // Handle config update
-  const handleConfigUpdate = (key: string, value: any) => {
+  const handleConfigUpdate = (key: string, value: unknown) => {
     updateConfig({ [key]: value })
   }
 
@@ -822,7 +876,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                 </div>
                 <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f3f4f6' }}>
                   {wasmStats.modules ? 
-                    (wasmStats.modules.reduce((sum: number, m: any) => sum + (m.loadTime || 0), 0) / wasmStats.modules.length).toFixed(2) 
+                    (wasmStats.modules.reduce((sum: number, m: { loadTime?: number }) => sum + (m.loadTime || 0), 0) / wasmStats.modules.length).toFixed(2) 
                     : '0'}ms
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -964,7 +1018,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                   onClick={async () => {
                     try {
                       const report = await advancedSystems.integrationSystem!.generatePerformanceReport()
-                      setPerformanceReport(report)
+                      setPerformanceReport(report as unknown as Record<string, unknown>)
                       console.log('Performance Report:', report)
                     } catch (error) {
                       console.error('Report generation failed:', error)

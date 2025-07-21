@@ -505,7 +505,7 @@ export class SecurityAnalyzer {
   /**
    * Check OWASP Top 10 compliance
    */
-  private checkOWASPCompliance(_files: PRFile[]): ComplianceCheck[] {
+  private checkOWASPCompliance(files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Example checks
@@ -529,7 +529,7 @@ export class SecurityAnalyzer {
   /**
    * Check CWE Top 25 compliance
    */
-  private checkCWECompliance(_files: PRFile[]): ComplianceCheck[] {
+  private checkCWECompliance(files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     checks.push({
