@@ -138,6 +138,9 @@ export class PerformanceAnalyzer {
       }
       // Starting performance analysis
 
+      // IMPLEMENTATION FIRST: Safe guard against undefined files array
+      const files = prData.files || [];
+      
       const [
         complexityIssues,
         memoryIssues,
@@ -145,11 +148,11 @@ export class PerformanceAnalyzer {
         renderingIssues,
         bundleIssues
       ] = await Promise.all([
-        this.analyzeComplexity(prData.files),
-        this.analyzeMemoryUsage(prData.files),
-        this.analyzeNetworkImpact(prData.files),
-        this.analyzeRenderingPerformance(prData.files),
-        this.analyzeBundleImpact(prData.files)
+        this.analyzeComplexity(files),
+        this.analyzeMemoryUsage(files),
+        this.analyzeNetworkImpact(files),
+        this.analyzeRenderingPerformance(files),
+        this.analyzeBundleImpact(files)
       ]);
 
       const allIssues = [
@@ -160,7 +163,7 @@ export class PerformanceAnalyzer {
         ...bundleIssues
       ];
 
-      const metrics = this.calculatePerformanceMetrics(prData.files, allIssues);
+      const metrics = this.calculatePerformanceMetrics(files, allIssues);
       const overallScore = this.calculateOverallPerformanceScore(metrics, allIssues);
       const recommendations = this.generatePerformanceRecommendations(allIssues, metrics);
 

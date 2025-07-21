@@ -151,7 +151,7 @@ const RepositoryList: React.FC<RepositoryListProps> = ({ repositories }) => {
           <label>Sort by:</label>
           <select 
             value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'name' | 'agents' | 'progress' | 'activity' | 'votes')}
             className="filter-select"
           >
             <option value="votes">Vote Count</option>

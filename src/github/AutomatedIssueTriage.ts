@@ -405,11 +405,11 @@ export class AutomatedIssueTriage {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private extractContent(issue: any, comments: any[]): string {
+  private extractContent(issue: unknown, comments: unknown[]): string {
     return [issue.title, issue.body, ...comments.map(c => c.body)].join(' ');
   }
 
-  private extractPatterns(issue: any, comments: any[]): string[] {
+  private extractPatterns(issue: unknown, comments: unknown[]): string[] {
     // Extract patterns from issue content
     const content = this.extractContent(issue, comments);
     const patterns = [];
@@ -425,7 +425,7 @@ export class AutomatedIssueTriage {
     return patterns;
   }
 
-  private extractMetadata(issue: any, comments: any[], events: any[]): any {
+  private extractMetadata(issue: unknown, comments: unknown[], events: unknown[]): unknown {
     return {
       createdAt: issue.created_at,
       updatedAt: issue.updated_at,
@@ -438,7 +438,7 @@ export class AutomatedIssueTriage {
   }
 
   // Missing method implementations
-  private applyLabelRules(issueData: IssueData): any[] {
+  private applyLabelRules(issueData: IssueData): unknown[] {
     // Apply rule-based label suggestions
     const suggestions: any[] = [];
     

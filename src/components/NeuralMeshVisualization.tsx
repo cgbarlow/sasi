@@ -131,7 +131,7 @@ export const NeuralMeshVisualization: React.FC<NeuralMeshVisualizationProps> = (
       }
     } catch (error) {
       console.error('Neural mesh visualization initialization failed:', error)
-      setWebglError(error.message)
+      setWebglError(error instanceof Error ? error.message : 'Unknown error occurred')
     }
   }, [])
 
@@ -354,8 +354,8 @@ export const NeuralMeshVisualization: React.FC<NeuralMeshVisualizationProps> = (
     }
     
     // Create activity wave visualization
-    const particles = []
-    const colors = []
+    const particles: number[] = []
+    const colors: number[] = []
     
     neuralAgents.forEach(agent => {
       const pos = agent.position
@@ -461,7 +461,7 @@ export const NeuralMeshVisualization: React.FC<NeuralMeshVisualizationProps> = (
 
   // Utility functions
   const getNodeSize = (type: string): number => {
-    const sizes = {
+    const sizes: Record<string, number> = {
       'sensory': 1.5,
       'motor': 1.8,
       'inter': 1.0,
@@ -487,7 +487,7 @@ export const NeuralMeshVisualization: React.FC<NeuralMeshVisualizationProps> = (
   }
 
   const getNodeColor = (type: string, activity: number): THREE.Color => {
-    const baseColors = {
+    const baseColors: Record<string, number> = {
       'sensory': 0x00ff00,
       'motor': 0xff0000,
       'inter': 0x0000ff,

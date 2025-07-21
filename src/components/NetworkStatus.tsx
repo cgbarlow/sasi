@@ -16,7 +16,7 @@ import {
 } from '../types/network';
 import { getP2PNetworkManager } from '../services/P2PNetworkManager';
 import { getMeshTopology } from '../services/MeshTopology';
-import { getConsensusEngine } from '../services/ConsensusEngine';
+import { getConsensusEngine, ConsensusAlgorithm } from '../services/ConsensusEngine';
 
 // Chart.js imports for visualizations
 import {
@@ -150,7 +150,7 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({
   const networkManager = getP2PNetworkManager();
   const meshTopology = getMeshTopology('current-node');
   const consensusEngine = getConsensusEngine({
-    algorithm: 'raft' as unknown, // Type assertion needed due to enum constraints
+    algorithm: 'raft' as ConsensusAlgorithm,
     nodeId: 'current-node',
     byzantineFaultTolerance: 0.33,
     consensusTimeout: 30000,

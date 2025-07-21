@@ -517,10 +517,35 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       connection: neuralMeshHook.connection,
       trainMesh: async (patterns: unknown[], epochs: number = 10) => {
         try {
-          const trainingData = patterns.map(pattern => ({
-            inputs: (pattern as { inputs?: unknown }).inputs || pattern,
-            outputs: (pattern as { outputs?: unknown }).outputs || { result: 1 }
-          }))
+          // Safe type guard for pattern objects
+          const isValidPattern = (obj: unknown): obj is { inputs?: unknown; outputs?: unknown } => {
+            return typeof obj === 'object' && obj !== null
+          }
+          
+          // Convert unknown data to TrainingData format
+          const convertToTrainingData = (data: unknown): { inputs: unknown; outputs: unknown } => {
+            const defaultResult = { inputs: { value: 0 } as unknown, outputs: { result: 1 } as unknown }
+            
+            if (isValidPattern(data)) {
+              // Try to convert inputs and outputs to proper format
+              const inputs = typeof data.inputs === 'object' && data.inputs !== null 
+                ? data.inputs as Record<string, number>
+                : { value: 0 }
+              const outputs = typeof data.outputs === 'object' && data.outputs !== null
+                ? data.outputs as Record<string, number>
+                : { result: 1 }
+              return { inputs, outputs }
+            }
+            
+            // Handle primitive values
+            if (typeof data === 'number') {
+              return { inputs: { value: data }, outputs: { result: 1 } }
+            }
+            
+            return defaultResult
+          }
+          
+          const trainingData = patterns.map(convertToTrainingData)
           const session = await neuralMeshHook.trainMesh(trainingData, epochs)
           return session.convergence
         } catch (error) {

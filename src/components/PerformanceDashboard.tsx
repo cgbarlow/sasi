@@ -30,6 +30,20 @@ type PerformanceReport = Record<string, unknown> & {
   timestamp?: string;
 }
 
+// Safe type interface for benchmark results
+interface SafeBenchmarkResult {
+  testName?: string;
+  beforeMs?: number;
+  afterMs?: number;
+  improvement?: number;
+  status?: 'pass' | 'fail' | 'warning';
+}
+
+// Type guard for benchmark results
+const isSafeBenchmarkResult = (obj: unknown): obj is SafeBenchmarkResult => {
+  return typeof obj === 'object' && obj !== null
+}
+
 interface PerformanceDashboardProps {
   className?: string
 }
@@ -128,7 +142,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     getPerformanceReport
   } = usePerformanceMonitoring()
 
-  const [benchmarkResults, setBenchmarkResults] = useState<unknown[]>([])
+  const [benchmarkResults, setBenchmarkResults] = useState<SafeBenchmarkResult[]>([])
   const [showBenchmarks, setShowBenchmarks] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
   const [showMemoryDetails, setShowMemoryDetails] = useState(false)
@@ -335,7 +349,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
   const handleRunBenchmarks = async () => {
     const results = await runBenchmarks()
     if (results) {
-      setBenchmarkResults(results)
+      // Safely convert unknown results to SafeBenchmarkResult
+      const safeResults = results.filter(isSafeBenchmarkResult)
+      setBenchmarkResults(safeResults)
       setShowBenchmarks(true)
     }
   }
@@ -750,7 +766,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                 <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
                   Memory Leaks
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: memoryStats.leaks?.length > 0 ? '#f87171' : '#4ade80' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: (memoryStats.leaks?.length || 0) > 0 ? '#f87171' : '#4ade80' }}>
                   {memoryStats.leaks?.length || 0} Detected
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -920,7 +936,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                 <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '4px' }}>
                   Regressions
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: regressionStats.summary?.regressions > 0 ? '#f87171' : '#4ade80' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: (regressionStats.summary?.regressions || 0) > 0 ? '#f87171' : '#4ade80' }}>
                   {regressionStats.summary?.regressions || 0}
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -989,7 +1005,17 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                     if (advancedSystems.benchmarkSuite) {
                       try {
                         const results = await advancedSystems.benchmarkSuite.runAllBenchmarks()
-                        setBenchmarkResults(results)
+                        // Convert BenchmarkReport[] to SafeBenchmarkResult[]
+                        const safeResults: SafeBenchmarkResult[] = (results || []).flatMap(report => 
+                          (report.results || []).map(result => ({
+                            testName: result.testId || report.suiteId,
+                            beforeMs: result.maxTime || 0,
+                            afterMs: result.averageTime || 0,
+                            improvement: result.operationsPerSecond ? ((result.operationsPerSecond - 100) / 100) * 100 : 0,
+                            status: result.success ? 'pass' as const : 'fail' as const
+                          }))
+                        )
+                        setBenchmarkResults(safeResults)
                         setShowBenchmarks(true)
                       } catch (error) {
                         console.error('Benchmark failed:', error)
@@ -1188,27 +1214,36 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
                 </tr>
               </thead>
               <tbody>
-                {benchmarkResults.map((result, index) => (
-                  <tr key={index} style={{ borderBottom: '1px solid #374151' }}>
-                    <td style={{ padding: '8px', color: '#e5e7eb' }}>{result.testName}</td>
-                    <td style={{ padding: '8px', textAlign: 'right', color: '#e5e7eb' }}>
-                      {result.beforeMs.toFixed(2)}ms
-                    </td>
-                    <td style={{ padding: '8px', textAlign: 'right', color: '#e5e7eb' }}>
-                      {result.afterMs.toFixed(2)}ms
-                    </td>
-                    <td style={{ 
-                      padding: '8px',
-                      textAlign: 'right',
-                      color: result.improvement > 0 ? '#4ade80' : '#f87171'
-                    }}>
-                      {result.improvement > 0 ? '+' : ''}{result.improvement.toFixed(1)}%
-                    </td>
-                    <td style={{ padding: '8px', textAlign: 'center' }}>
-                      {result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⚠️'}
-                    </td>
-                  </tr>
-                ))}
+                {benchmarkResults.map((result, index) => {
+                  // Safe property access with fallbacks
+                  const testName = result.testName || 'Unknown Test'
+                  const beforeMs = typeof result.beforeMs === 'number' ? result.beforeMs : 0
+                  const afterMs = typeof result.afterMs === 'number' ? result.afterMs : 0
+                  const improvement = typeof result.improvement === 'number' ? result.improvement : 0
+                  const status = result.status || 'warning'
+                  
+                  return (
+                    <tr key={index} style={{ borderBottom: '1px solid #374151' }}>
+                      <td style={{ padding: '8px', color: '#e5e7eb' }}>{testName}</td>
+                      <td style={{ padding: '8px', textAlign: 'right', color: '#e5e7eb' }}>
+                        {beforeMs.toFixed(2)}ms
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'right', color: '#e5e7eb' }}>
+                        {afterMs.toFixed(2)}ms
+                      </td>
+                      <td style={{ 
+                        padding: '8px',
+                        textAlign: 'right',
+                        color: improvement > 0 ? '#4ade80' : '#f87171'
+                      }}>
+                        {improvement > 0 ? '+' : ''}{improvement.toFixed(1)}%
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        {status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⚠️'}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
