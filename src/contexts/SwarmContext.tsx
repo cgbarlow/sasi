@@ -58,9 +58,9 @@ interface SwarmContextType {
   spawnAgent: (config: { type: string; cognitivePattern?: string }) => Promise<string>
   terminateAgent: (agentId: string) => Promise<void>
   runInference: (agentId: string, inputs: number[]) => Promise<number[]>
-  trainAgent: (agentId: string, trainingData: any[], epochs: number) => Promise<any>
+  trainAgent: (agentId: string, trainingData: unknown[], epochs: number) => Promise<unknown>
   shareKnowledge: (sourceAgentId: string, targetAgentIds: string[]) => Promise<void>
-  getPerformanceMetrics: () => any
+  getPerformanceMetrics: () => unknown
   refreshSwarm: () => Promise<void>
   // Neural mesh integration
   neuralMesh: {
@@ -572,7 +572,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children, config }
     return inputs.map(input => Math.round((input * 0.8 + 0.1) * 100) / 100)
   }
 
-  const trainAgent = async (agentId: string, trainingData: any[], epochs: number): Promise<any> => {
+  const trainAgent = async (agentId: string, trainingData: unknown[], epochs: number): Promise<unknown> => {
     // Mock training result
     return {
       sessionId: `session_${Date.now()}`,
