@@ -241,7 +241,6 @@ export class TeamAnalyzer {
     const teamSize = (options.size as number) || 4
     return {
       recommendedTeam: this.getMembers().slice(0, teamSize),
-      recommendedTeam: this.getMembers().slice(0, 5),
       reasoning: 'Optimized based on skills and collaboration patterns',
       confidence: 0.8
     };

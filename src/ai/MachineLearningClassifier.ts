@@ -89,7 +89,7 @@ export class MachineLearningClassifier {
     // Stub implementation - would update model with new training data
     // Learning from triage result
     // Learning from issue analysis and triage results
-    if (!issueData.content || !triageResult.label) return
+    if (!issueData.features || !triageResult.category) return
     // Store learning data for model training (production would use real ML training)
   }
 

@@ -328,7 +328,7 @@ export class NeuralBridgeManager extends EventEmitter {
             id: agentId,
             config: config,
             network: { memoryUsage: 1024 * 1024 },
-            state: 'active',
+            state: 'active' as any, // AgentState.ACTIVE compatible
             createdAt: Date.now(),
             lastActive: Date.now(),
             memoryUsage: 1024 * 1024,

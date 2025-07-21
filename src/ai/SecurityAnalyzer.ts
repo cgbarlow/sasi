@@ -621,9 +621,8 @@ export class SecurityAnalyzer {
                      counts.medium * weights.medium +
                      counts.low * weights.low;
     
-    // Consider vulnerability types for additional risk calculation if provided
-    const typeRiskModifier = vulnerabilities ? vulnerabilities.filter(v => v.type === 'injection').length * 0.1 : 0;
-    const adjustedRisk = totalRisk + typeRiskModifier;
+    // Base risk calculation without additional modifiers
+    const adjustedRisk = totalRisk;
     
     return Math.min(100, adjustedRisk);
   }
