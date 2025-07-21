@@ -518,8 +518,8 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       trainMesh: async (patterns: unknown[], epochs: number = 10) => {
         try {
           const trainingData = patterns.map(pattern => ({
-            inputs: pattern.inputs || pattern,
-            outputs: pattern.outputs || { result: 1 }
+            inputs: (pattern as { inputs?: unknown }).inputs || pattern,
+            outputs: (pattern as { outputs?: unknown }).outputs || { result: 1 }
           }))
           const session = await neuralMeshHook.trainMesh(trainingData, epochs)
           return session.convergence
