@@ -128,7 +128,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
     getPerformanceReport
   } = usePerformanceMonitoring()
 
-  const [benchmarkResults, setBenchmarkResults] = useState<any[]>([])
+  const [benchmarkResults, setBenchmarkResults] = useState<unknown[]>([])
   const [showBenchmarks, setShowBenchmarks] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
   const [showMemoryDetails, setShowMemoryDetails] = useState(false)

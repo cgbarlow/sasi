@@ -268,7 +268,7 @@ export class AutomatedIssueTriage {
     };
   }
 
-  private combineAnalyses(analyses: any[]): CombinedAnalysis {
+  private combineAnalyses(analyses: unknown[]): CombinedAnalysis {
     // Intelligent combination of different analysis results
     return {
       classification: analyses[0],

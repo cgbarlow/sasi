@@ -181,7 +181,6 @@ export class PerformanceAnalyzer {
 
     } catch (error) {
       // Log error internally without console for production
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
       // Return fallback analysis
       return {

@@ -64,9 +64,9 @@ interface SwarmContextType {
       networkEfficiency: number
       wasmAcceleration: boolean
     }
-    connection: any
-    trainMesh: (patterns: any[], epochs?: number) => Promise<boolean>
-    getMeshStatus: () => Promise<any>
+    connection: unknown
+    trainMesh: (patterns: unknown[], epochs?: number) => Promise<boolean>
+    getMeshStatus: () => Promise<unknown>
     clearError: () => void
     reconnect: () => Promise<void>
     toggleNeuralMesh: (enabled: boolean) => void
@@ -345,8 +345,8 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       meshConnectivity: neuralMeshHook.metrics.networkEfficiency,
       neuralActivity: neuralMeshHook.metrics.averageActivity,
       wasmAcceleration: neuralMeshHook.metrics.wasmAcceleration,
-      averageLatency: neuralMeshHook.agents.reduce((sum: number, agent: any) => 
-        sum + (agent.realtime?.networkLatency || 0), 0) / (neuralMeshHook.agents.length || 1)
+      averageLatency: neuralMeshHook.agents.reduce((sum: number, agent: unknown) => 
+        sum + ((agent as { realtime?: { networkLatency?: number } }).realtime?.networkLatency || 0), 0) / (neuralMeshHook.agents.length || 1)
     } : undefined
 
     // Get enhanced stats from neural integration if available
@@ -515,7 +515,7 @@ export const SwarmProvider: React.FC<SwarmProviderProps> = ({ children }) => {
       error: neuralMeshHook.error,
       metrics: neuralMeshHook.metrics,
       connection: neuralMeshHook.connection,
-      trainMesh: async (patterns: any[], epochs: number = 10) => {
+      trainMesh: async (patterns: unknown[], epochs: number = 10) => {
         try {
           const trainingData = patterns.map(pattern => ({
             inputs: pattern.inputs || pattern,

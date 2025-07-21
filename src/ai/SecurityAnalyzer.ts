@@ -505,7 +505,7 @@ export class SecurityAnalyzer {
   /**
    * Check OWASP Top 10 compliance
    */
-  private checkOWASPCompliance(files: PRFile[]): ComplianceCheck[] {
+  private checkOWASPCompliance(_files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Example checks
@@ -529,7 +529,7 @@ export class SecurityAnalyzer {
   /**
    * Check CWE Top 25 compliance
    */
-  private checkCWECompliance(files: PRFile[]): ComplianceCheck[] {
+  private checkCWECompliance(_files: PRFile[]): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     checks.push({
@@ -610,7 +610,7 @@ export class SecurityAnalyzer {
     return Math.min(100, totalRisk);
   }
 
-  private calculateOverallSecurityScore(metrics: SecurityMetrics, _vulnerabilities: SecurityVulnerability[]): number {
+  private calculateOverallSecurityScore(metrics: SecurityMetrics, vulnerabilities: SecurityVulnerability[]): number {
     const baseScore = 1.0;
     
     // Penalize based on vulnerability severity

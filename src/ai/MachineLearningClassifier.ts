@@ -83,7 +83,7 @@ export class MachineLearningClassifier {
     }));
   }
 
-  async learn(issueData: TrainingData, triageResult: ClassificationResult): Promise<void> {
+  async learn(_issueData: TrainingData, _triageResult: ClassificationResult): Promise<void> {
     // Stub implementation - would update model with new training data
     // Learning from triage result
     // Store learning data for model training (production would use real ML training)

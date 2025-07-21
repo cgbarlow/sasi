@@ -5,7 +5,7 @@ import '../styles/SwarmVisualization.css'
 
 interface SwarmVisualizationProps {
   agents: Agent[]
-  repositories: any[]
+  repositories: unknown[]
   isActive: boolean
 }
 
