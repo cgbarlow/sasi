@@ -123,7 +123,11 @@ describe('PerformanceOptimizer - Comprehensive Unit Tests', () => {
     const hasWebAssembly = typeof WebAssembly !== 'undefined'
     const shouldSkipWASM = isCI || !hasWebAssembly
 
-    test.skipIf(shouldSkipWASM)('should load WASM modules successfully', async () => {
+    test(shouldSkipWASM ? 'SKIP: should load WASM modules successfully (WASM unavailable)' : 'should load WASM modules successfully', async () => {
+      if (shouldSkipWASM) {
+        console.log('⚠️ Skipping WASM test - WebAssembly not available in CI')
+        return
+      }
       await optimizer.initialize();
       
       expect(global.fetch).toHaveBeenCalledWith(
@@ -134,7 +138,11 @@ describe('PerformanceOptimizer - Comprehensive Unit Tests', () => {
       );
     });
 
-    test.skipIf(shouldSkipWASM)('should use cached WASM modules when available', async () => {
+    test(shouldSkipWASM ? 'SKIP: should use cached WASM modules when available (WASM unavailable)' : 'should use cached WASM modules when available', async () => {
+      if (shouldSkipWASM) {
+        console.log('⚠️ Skipping WASM test - WebAssembly not available in CI')
+        return
+      }
       // Initialize once to cache modules
       await optimizer.initialize();
       
