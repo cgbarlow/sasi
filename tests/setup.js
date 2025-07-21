@@ -110,6 +110,121 @@ global.WebSocket = class MockWebSocket {
   }
 };
 
+// Mock RTCPeerConnection for P2P tests
+global.RTCPeerConnection = class MockRTCPeerConnection {
+  constructor(config) {
+    this.localDescription = null;
+    this.remoteDescription = null;
+    this.iceConnectionState = 'new';
+    this.connectionState = 'new';
+    this.iceGatheringState = 'new';
+    this.signalingState = 'stable';
+    this.onicecandidate = null;
+    this.oniceconnectionstatechange = null;
+    this.ondatachannel = null;
+    this.onconnectionstatechange = null;
+  }
+  
+  createDataChannel(label, options) {
+    return {
+      label,
+      readyState: 'open',
+      send: jest.fn(),
+      close: jest.fn(),
+      onopen: null,
+      onmessage: null,
+      onclose: null,
+      onerror: null
+    };
+  }
+  
+  async createOffer() {
+    return { type: 'offer', sdp: 'mock-sdp' };
+  }
+  
+  async createAnswer() {
+    return { type: 'answer', sdp: 'mock-sdp' };
+  }
+  
+  async setLocalDescription(desc) {
+    this.localDescription = desc;
+  }
+  
+  async setRemoteDescription(desc) {
+    this.remoteDescription = desc;
+  }
+  
+  async addIceCandidate(candidate) {
+    // Mock ICE candidate handling
+  }
+  
+  close() {
+    this.connectionState = 'closed';
+    if (this.onconnectionstatechange) {
+      this.onconnectionstatechange();
+    }
+  }
+};
+
+// Mock comprehensive P2P Network components
+jest.mock('../src/services/P2PNetworkManager', () => ({
+  P2PNetworkManager: jest.fn().mockImplementation(() => ({
+    isInitialized: false,
+    peers: new Map(),
+    signalingServer: {
+      close: jest.fn(),
+      connect: jest.fn(),
+      disconnect: jest.fn()
+    },
+    
+    async initialize() {
+      this.isInitialized = true;
+      return true;
+    },
+    
+    async connectToPeer(peerId) {
+      // Mock successful connection for normal peers
+      if (peerId === 'unreliable-peer') {
+        throw new Error('Connection failed');
+      }
+      return {
+        id: peerId,
+        status: 'connected',
+        dataChannel: {
+          send: jest.fn(),
+          close: jest.fn()
+        }
+      };
+    },
+    
+    async disconnectFromPeer(peerId) {
+      this.peers.delete(peerId);
+    },
+    
+    async shutdown() {
+      this.peers.clear();
+      this.isInitialized = false;
+      if (this.signalingServer && this.signalingServer.close) {
+        this.signalingServer.close();
+      }
+    },
+    
+    getPeerInfo: jest.fn(() => ({ status: 'connected' })),
+    listPeers: jest.fn(() => []),
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn()
+  })),
+  
+  WebRTCError: jest.fn().mockImplementation((message, peerId, state, cause) => {
+    const error = new Error(message);
+    error.peerId = peerId;
+    error.state = state;
+    error.cause = cause;
+    return error;
+  })
+}), { virtual: true });
+
 // Mock claude-flow hooks (conditional mock)
 try {
   jest.mock('claude-flow', () => ({

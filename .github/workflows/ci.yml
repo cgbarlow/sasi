@@ -8,6 +8,10 @@ on:
 
 env:
   NODE_VERSION: '20'
+  # WASM-specific environment variables for CI
+  WASM_ENABLED: 'false'
+  TEST_ENVIRONMENT: 'ci'
+  DISABLE_WASM_ACCELERATION: 'true'
 
 jobs:
   build-and-test:

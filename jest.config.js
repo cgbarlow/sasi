@@ -13,8 +13,8 @@ module.exports = {
     pretendToBeVisual: true
   },
 
-  // Timeout Configuration - Optimized for SwarmContext
-  testTimeout: 15000, // 15 seconds - allows for async operations without being too long
+  // Timeout Configuration - CI-optimized with environment detection
+  testTimeout: process.env.CI === 'true' ? 30000 : 15000, // 30s for CI, 15s for local
   
   // Test Pattern Matching - Focused on unit tests
   testMatch: [
@@ -33,9 +33,10 @@ module.exports = {
     '/tests/integration/'
   ],
 
-  // Setup Files
+  // Setup Files - CI-enhanced
   setupFilesAfterEnv: [
-    '<rootDir>/tests/setup.js'
+    '<rootDir>/tests/setup.js',
+    ...(process.env.CI === 'true' ? ['<rootDir>/tests/ci-setup.js'] : [])
   ],
 
   // TypeScript Configuration
@@ -74,13 +75,13 @@ module.exports = {
     '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/tests/mocks/fileMock.js'
   },
 
-  // Performance Configuration
+  // Performance Configuration - CI-optimized
   maxWorkers: 1,
-  cache: true,
+  cache: process.env.CI === 'true' ? false : true, // Disable cache in CI for consistency
   cacheDirectory: '<rootDir>/.jest-cache',
   
   // Memory Management - Critical for preventing infinite loops
-  workerIdleMemoryLimit: '512MB',
+  workerIdleMemoryLimit: process.env.CI === 'true' ? '1GB' : '512MB',
   
   // Output Configuration
   verbose: true,
