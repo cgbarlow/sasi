@@ -110,6 +110,15 @@ export class PerformanceOptimizer {
    * Initialize WASM modules with caching
    */
   private async initializeWASMModules(): Promise<void> {
+    // Skip WASM initialization in CI/test environments where WebAssembly may not be available
+    const isCI = process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.TEST_ENVIRONMENT === 'ci'
+    const hasWebAssembly = typeof WebAssembly !== 'undefined'
+    
+    if (isCI || !hasWebAssembly) {
+      console.log(`⚠️ Skipping WASM initialization in ${isCI ? 'CI' : 'non-WebAssembly'} environment`)
+      return
+    }
+
     const wasmModules = [
       'ruv_swarm_wasm_bg.wasm',
       'ruv_swarm_simd.wasm',
