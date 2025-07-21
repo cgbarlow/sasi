@@ -37,8 +37,8 @@ jobs:
         run: npm run typecheck
         continue-on-error: true  # Allow type issues for now
         
-      - name: Run unit tests
-        run: npm run test:unit
+      - name: Run unit tests (Ultra-Fast CI)
+        run: npm run test:ci-fast
         
       - name: Build application
         run: npm run build
