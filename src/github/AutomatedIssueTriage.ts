@@ -226,15 +226,51 @@ export class AutomatedIssueTriage {
     const comments = await this.githubIntegration.getIssueComments(owner, repo, issueNumber);
     const events = await this.githubIntegration.getIssueEvents(owner, repo, issueNumber);
     
+    // Safe property extraction helper
+    const safeGet = (obj: unknown, prop: string): unknown => {
+      return (typeof obj === 'object' && obj !== null && prop in obj) 
+        ? (obj as Record<string, unknown>)[prop] 
+        : null;
+    };
+    
+    const safeGetString = (obj: unknown, prop: string): string => {
+      const value = safeGet(obj, prop);
+      return typeof value === 'string' ? value : '';
+    };
+    
+    const safeGetNumber = (obj: unknown, prop: string): number => {
+      const value = safeGet(obj, prop);
+      return typeof value === 'number' ? value : 0;
+    };
+    
+    const safeGetArray = (obj: unknown, prop: string): unknown[] => {
+      const value = safeGet(obj, prop);
+      return Array.isArray(value) ? value : [];
+    };
+    
+    const safeGetStringArray = (obj: unknown, prop: string): string[] => {
+      const value = safeGet(obj, prop);
+      if (Array.isArray(value)) {
+        return value.filter((item): item is string => typeof item === 'string');
+      }
+      return [];
+    };
+    
+    // Extract author from nested user object
+    const getAuthor = (issueObj: unknown): string => {
+      const user = safeGet(issueObj, 'user');
+      return safeGetString(user, 'login');
+    };
+    
     return {
-      number: typeof issue === 'object' && issue !== null && 'number' in issue ? (issue as any).number : 0,
-      title: typeof issue === 'object' && issue !== null && 'title' in issue ? (issue as any).title : '',
-      body: typeof issue === 'object' && issue !== null && 'body' in issue ? (issue as any).body : '',
-      labels: typeof issue === 'object' && issue !== null && 'labels' in issue ? (issue as any).labels : [],
-      assignees: typeof issue === 'object' && issue !== null && 'assignees' in issue ? (issue as any).assignees : [],
-      author: typeof issue === 'object' && issue !== null && 'user' in issue && (issue as any).user && 'login' in (issue as any).user ? (issue as any).user.login : '',
-      createdAt: typeof issue === 'object' && issue !== null && 'created_at' in issue ? (issue as any).created_at : '',
-      updatedAt: typeof issue === 'object' && issue !== null && 'updated_at' in issue ? (issue as any).updated_at : '',
+      number: safeGetNumber(issue, 'number'),
+      title: safeGetString(issue, 'title'),
+      body: safeGetString(issue, 'body'),
+      labels: safeGetStringArray(issue, 'labels'),
+      assignees: safeGetStringArray(issue, 'assignees'),
+      author: getAuthor(issue),
+      createdAt: safeGetString(issue, 'created_at'),
+      updatedAt: safeGetString(issue, 'updated_at'),
       content: this.extractContent(issue, comments),
       patterns: this.extractPatterns(issue, comments),
       metadata: this.extractMetadata(issue, comments, events),
