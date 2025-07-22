@@ -892,7 +892,14 @@ export class P2PNetworkManager {
 
     // Close signaling server connection
     if (this.signalingServer) {
-      this.signalingServer.close();
+      try {
+        // CI compatibility: Check if close method exists before calling
+        if (typeof this.signalingServer.close === 'function') {
+          this.signalingServer.close();
+        }
+      } catch (error) {
+        console.warn('⚠️ Warning: Failed to close signaling server:', error);
+      }
       this.signalingServer = null;
     }
 

@@ -904,31 +904,44 @@ Claude Flow extends the base coordination with:
 ## Protocols (a.k.a. YOLO Protocols)
 Standard protocols executed on request, e.g. "Initialize CI protocol": 
 
+### Model Protocol
+Always use Claude Sonnet. Start every Claude session with `model /sonnet`.
+
 ### Agile Delivery Protocols
-Deliver work in manageable chunks through fully automated pipelines.
+Deliver work in manageable chunks through fully automated pipelines. The goal is to deliver features and keep going unattended (don't stop!) until the feature is fully deployed.
 
 #### Work Chunking Protocol (WCP)
-Feature-based agile development with CI integration using EPICs, Features, and Issues with coordinated swarm approach:
+Feature-based agile with CI integration using EPICs, Features, and Issues:
 
-##### 🎯 PHASE 1: EPIC Creation & Planning
-1. **CREATE EPIC ISSUE**: Comprehensive GitHub issue tracking initiative
-   - Title: Clear business-focused name
-   - Content: Objectives, requirements, success criteria, dependencies
-   - Labels: `epic`, `enhancement`, domain labels
+##### 🎯 PHASE 1: Planning
+1. **EPIC ISSUE**: Business-focused GitHub issue with objectives, requirements, criteria, dependencies. Labels: `epic`, `enhancement`
 
-2. **FEATURE BREAKDOWN**: 3-7 logical Features
-   - Sequence by dependencies/value
-   - 1-3 days completion each
-   - Independently testable/deployable
-   - Incremental business value
+2. **FEATURE BREAKDOWN**: 3-7 Features (1-3 days each, independently testable/deployable, incremental value)
 
-3. **ISSUE DECOMPOSITION**: 1-3 Issues per Feature
-   - Specific testable acceptance criteria
-   - Linked to parent feature
-   - Priority labeled (high/medium/low)
+3. **ISSUE DECOMPOSITION**: 1-3 Issues per Feature with testable criteria, linked to parent, priority labeled
 
 ##### 🔗 PHASE 2: GitHub Structure
-4. **EPIC TEMPLATE**:
+4. **CREATE SUB-ISSUES** (GitHub CLI + GraphQL):
+   ```bash
+   # Create issues
+   gh issue create --title "Parent Feature" --body "Description"
+   gh issue create --title "Sub-Issue Task" --body "Description"
+   
+   # Get GraphQL IDs  
+   gh api graphql --header 'X-Github-Next-Global-ID:1' -f query='
+   { repository(owner: "OWNER", name: "REPO") { 
+       issue(number: PARENT_NUM) { id }
+   }}'
+   
+   # Add sub-issue relationship
+   gh api graphql --header 'X-Github-Next-Global-ID:1' -f query='
+   mutation { addSubIssue(input: {
+     issueId: "PARENT_GraphQL_ID"
+     subIssueId: "CHILD_GraphQL_ID"
+   }) { issue { id } subIssue { id } }}'
+   ```
+
+5. **EPIC TEMPLATE**:
    ```markdown
    # EPIC: [Name]
    
@@ -952,7 +965,7 @@ Feature-based agile development with CI integration using EPICs, Features, and I
    [List external dependencies]
    ```
 
-5. **FEATURE TEMPLATE**:
+6. **FEATURE TEMPLATE**:
    ```markdown
    # Feature: [Name]
    **Parent**: #[EPIC]
@@ -960,8 +973,8 @@ Feature-based agile development with CI integration using EPICs, Features, and I
    ## Description
    [What feature accomplishes]
    
-   ## Issues
-   - [ ] Issue 1: #[num] - [Status]
+   ## Sub-Issues (Proper GitHub hierarchy)
+   - [ ] Sub-Issue 1: #[num] - [Status]
    
    ## Acceptance Criteria
    - [ ] Functional requirements
@@ -976,38 +989,22 @@ Feature-based agile development with CI integration using EPICs, Features, and I
    ```
 
 ##### 🚀 PHASE 3: Execution
-6. **ONE FEATURE AT A TIME**:
-   - Complete current feature (100% CI) before next
-   - No parallel features
-   - One PR per feature
-   - CI gate enforcement
+7. **ONE FEATURE AT A TIME**: Complete current feature (100% CI) before next. No parallel features. One PR per feature.
 
-7. **SWARM DEPLOYMENT**: For complex features (2+ issues)
-   - Hierarchical topology
-   - Agent specialization
-   - Memory coordination
+8. **SWARM DEPLOYMENT**: For complex features (2+ issues) - hierarchical topology, agent specialization, memory coordination
 
 ##### 🔄 PHASE 4: CI Integration
-8. **MANDATORY CI COMPLIANCE**:
-   - Phase 1: Research via swarm
-   - Phase 2: Implementation-first
-   - Phase 3: Continuous monitoring
-   - Gate: 100% success required
+9. **MANDATORY CI**: Research→Implementation→Monitoring. 100% success required.
 
-9. **CI MONITORING**:
-   ```bash
-   # Monitor feature branch
-   gh run list --repo owner/repo --branch feature/[name] --limit 10
-   
-   # View run details
-   gh run view [RUN_ID] --repo owner/repo --log-failed
-   
-   # Automated hooks
-   npx claude-flow@alpha hooks ci-monitor-init --branch feature/[name]
-   ```
+10. **CI MONITORING**:
+    ```bash
+    gh run list --repo owner/repo --branch feature/[name] --limit 10
+    gh run view [RUN_ID] --repo owner/repo --log-failed
+    npx claude-flow@alpha hooks ci-monitor-init --branch feature/[name]
+    ```
 
-##### 📊 PHASE 5: Progress Tracking
-10. **VISUAL TRACKING**:
+##### 📊 PHASE 5: Tracking
+11. **VISUAL TRACKING**:
     ```
     📊 EPIC: [Name]
        ├── Features: X total
@@ -1017,203 +1014,87 @@ Feature-based agile development with CI integration using EPICs, Features, and I
        └── 🎯 CI: [PASS/FAIL]
     ```
 
-11. **ISSUE UPDATES**:
-    ```bash
-    gh issue edit [NUM] --add-label "in-progress"
-    gh issue edit [NUM] --body "Parent: #[FEATURE]"
-    gh issue close [NUM] --comment "Completed in #[FEATURE]"
-    ```
+12. **ISSUE UPDATES**: Add labels, link parents, close with comments
 
-##### 🎯 WORKFLOW
-1. Create EPIC with features/issues
-2. Select next feature → Deploy swarm if complex → Apply CI Protocol
-3. Achieve 100% CI → Full CD to production
-4. Close issues → Update EPIC → Next feature
-
-##### 🚨 SUCCESS FACTORS
-- ONE feature at a time until production
-- 100% CI + production deployment before next
+##### 🎯 KEY RULES
+- ONE feature at a time to production
+- 100% CI before progression
 - Swarm for complex features
 - Implementation-first focus
-- Continuous CI/CD monitoring
-- Proper issue linking
 - Max 3 issues/feature, 7 features/EPIC
 
-##### 🏆 METRICS
-- Feature velocity: 1-3 days to production
-- CI/CD success rate: % achieving 100%
-- Deployment lead time
-- Issue completion rate
-- EPIC progress vs timeline
-
 #### Continuous Integration (CI) Protocol
-Fix → Test → Commit → Push → Monitor → Repeat until 100% success. Automated cycles with intelligent monitoring:
+Fix→Test→Commit→Push→Monitor→Repeat until 100%:
 
-##### 🔬 PHASE 1: Research & Analysis
-1. **RESEARCH SWARM**: Deploy coordinated swarm
-   - Init: `mcp__claude-flow__swarm_init`
-   - Spawn agents: researcher, analyst, detective
-   - Store findings in memory
+##### 🔬 PHASE 1: Research
+1. **SWARM**: Deploy researcher/analyst/detective via `mcp__claude-flow__swarm_init`
 
-2. **MULTI-SOURCE RESEARCH**:
-   - Context7 MCP: Product/platform intel
-   - WebSearch: Best practices, solutions
-   - Codebase: Grep/Glob/Read analysis
-   - GitHub: Issues, PRs, workflows
+2. **SOURCES**: Context7 MCP, WebSearch, Codebase analysis, GitHub
 
-3. **ANALYSIS**:
-   - Root causes vs symptoms
-   - Categorize by severity/component
-   - Document in GitHub with labels
-   - Store in swarm memory
+3. **ANALYSIS**: Root causes vs symptoms, severity categorization, GitHub documentation
 
-4. **TARGETED FIXES**: Focus on specific CI failures
-   - TypeScript violations, console.log, unused vars
-   - Fix identified files only
-   - Target original failure items
+4. **TARGETED FIXES**: Focus on specific CI failures (TypeScript violations, console.log, unused vars)
 
 ##### 🎯 PHASE 2: Implementation
-5. **IMPLEMENTATION-FIRST**:
-   - Fix logic, not test expectations
-   - Handle edge + main cases
-   - Realistic test thresholds
-   - Working functionality focus
+5. **IMPLEMENTATION-FIRST**: Fix logic not test expectations, handle edge cases, realistic thresholds
 
-6. **SWARM EXECUTION**:
-   - Systematic TDD approach
-   - Coordinate via hooks/memory
-   - Target 100% per component
-   - Branch and update issues
+6. **SWARM EXECUTION**: Systematic TDD, coordinate via hooks/memory, target 100% per component
 
-##### 🚀 PHASE 3: Monitoring & Integration
-7. **ACTIVE MONITORING**:
+##### 🚀 PHASE 3: Monitoring
+7. **ACTIVE MONITORING**: ALWAYS check after pushing
    ```bash
    gh run list --repo owner/repo --limit N
    gh run view RUN_ID --repo owner/repo
    ```
-   - ALWAYS check after pushing
-   - Automated polling during CI
-   - Analyze failures immediately
-   - Target specific failure items
 
 8. **INTELLIGENT MONITORING**:
    ```bash
    npx claude-flow@alpha hooks ci-monitor-init --adaptive true
    ```
-   - Smart backoff (2s-5min)
-   - Auto-merge capabilities
-   - Swarm coordination
+   Smart backoff (2s-5min), auto-merge, swarm coordination
 
-9. **PROTOCOL COMPLIANCE**:
-   - Always check `gh run list/view` after push
-   - Use monitoring hooks
-   - Analyze failures with `--log-failed`
+9. **INTEGRATION**: Regular commits, interval pushes, PR on milestones
 
-10. **INTEGRATION**:
-    - Regular descriptive commits
-    - Push at intervals for CI
-    - PR on milestones
-    - Review/merge on success
+10. **ISSUE MANAGEMENT**: Close with summaries, update tracking, document methods, label appropriately
 
-11. **ISSUE MANAGEMENT**:
-    - Close with resolution summaries
-    - Update tracking issues
-    - Document methodologies
-    - Label appropriately
+11. **ITERATE**: Continue until deployment success, apply lessons, scale swarm by complexity
 
-12. **ITERATE TO DEPLOYMENT**:
-    - Continue phases 1-11 until deploy success
-    - Apply lessons learned
-    - Scale swarm by complexity
-    - Maintain coordination
-
-##### 🏆 METRICS:
-- 100% test success target
-- Monitor: memory, performance, coverage
-- Document breakthrough methods
-- Coordinate via swarm memory/hooks
+##### 🏆 TARGET: 100% test success
 
 #### Continuous Deployment (CD) Protocol
-Deploy → E2E Test → Monitor → Validate → Auto-promote to production. Automated with rollback and zero-downtime:
+Deploy→E2E→Monitor→Validate→Auto-promote:
 
 ##### 🚀 PHASE 1: Staging
-1. **AUTO-DEPLOY**: After CI passes
+1. **AUTO-DEPLOY**: Blue-green after CI passes
    ```bash
    gh workflow run deploy-staging.yml --ref feature/[name]
    ```
-   - Blue-green deployment
-   - Infrastructure as code
-   - Store deployment metadata
 
-2. **VALIDATE**: Environment health
-   - Smoke tests
-   - Service/DB connectivity
-   - Configuration/secrets
-   - Resource baselines
+2. **VALIDATE**: Smoke tests, connectivity, configuration/secrets, resource baselines
 
 ##### 🧪 PHASE 2: E2E Testing
-3. **E2E EXECUTION**:
-   - User journey tests
-   - Cross-service integration
-   - Security/access validation
-   - Performance/load tests
+3. **EXECUTION**: User journeys, cross-service integration, security/access, performance/load
 
-4. **RESULT ANALYSIS**:
-   - Deploy analysis swarm on failures
-   - Categorize: flaky/environment/code
-   - Auto-retry with backoff
-   - Block on critical failures
+4. **ANALYSIS**: Deploy swarm on failures, categorize flaky/environment/code, auto-retry, block critical
 
 ##### 🔍 PHASE 3: Production Readiness
-5. **SECURITY**: SAST/DAST scans
-   - Container vulnerabilities
-   - Compliance validation
-   - SSL/encryption checks
+5. **SECURITY**: SAST/DAST, container vulnerabilities, compliance, SSL/encryption
 
-6. **PERFORMANCE**: SLA validation
-   - Load tests
-   - Response/throughput metrics
-   - Compare baselines
-   - Generate reports
+6. **PERFORMANCE**: SLA validation, load tests, response/throughput metrics, baseline comparison
 
 ##### 🎯 PHASE 4: Production
-7. **DEPLOY**: Safety controls
-   - Canary: 5%→25%→50%→100%
-   - Monitor each phase
-   - Auto-rollback on spikes
-   - Feature flags
+7. **DEPLOY**: Canary 5%→25%→50%→100%, monitor phases, auto-rollback on spikes, feature flags
 
-8. **MONITOR**: Health tracking
-   - App metrics: errors, response, throughput
-   - Infrastructure: CPU, memory, disk, network
-   - Automated alerts
-   - Deployment notifications
+8. **MONITOR**: App metrics (errors/response/throughput), infrastructure (CPU/memory/disk/network), automated alerts
 
-##### 🔄 PHASE 5: Validation & Cleanup
-9. **VALIDATE**: Production success
-   - Smoke tests
-   - Synthetic monitoring
-   - Business metrics
-   - Service health
+##### 🔄 PHASE 5: Validation
+9. **VALIDATE**: Smoke tests, synthetic monitoring, business metrics, service health
 
-10. **CLEANUP**:
-    - Archive logs/metrics
-    - Clean temp resources
-    - Update docs/runbooks
-    - Tag in VCS
+10. **CLEANUP**: Archive logs/metrics, clean temp resources, update docs/runbooks, tag VCS
 
-11. **COMPLETE**: Feature closure
-    - Update GitHub issues/boards
-    - Close deployment items
-    - Generate summary
-    - Update swarm memory
+11. **COMPLETE**: Update GitHub issues/boards, generate summary, update swarm memory
 
-##### 🏆 METRICS:
-- Zero-downtime, <1% error rate
-- Monitor: frequency, lead time, MTTR, failure rate
-- Document patterns/rollback procedures
-- Track via swarm memory
-
+##### 🏆 TARGETS: Zero-downtime, <1% error rate
 
 ---
 

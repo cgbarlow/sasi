@@ -7,7 +7,7 @@
 
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   
   // CRITICAL: Performance optimizations for CI speed
   maxWorkers: '50%',                    // Use 50% of CPU cores for parallel execution
