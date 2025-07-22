@@ -29,11 +29,13 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Disable P2P to avoid singleton conflicts between tests
     service = new NeuralMeshService({
       serverUrl: 'ws://localhost:3000',
       transport: 'websocket',
       enableWasm: true,
       enableRealtime: true,
+      enableP2P: false, // CI compatibility: Disable P2P to avoid initialization conflicts
       debugMode: true
     });
   });
@@ -58,9 +60,9 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     });
 
     test('should handle partial configuration with all transports', () => {
-      const httpService = new NeuralMeshService({ transport: 'http' });
-      const stdioService = new NeuralMeshService({ transport: 'stdio' });
-      const wsService = new NeuralMeshService({ transport: 'websocket' });
+      const httpService = new NeuralMeshService({ transport: 'http', enableP2P: false });
+      const stdioService = new NeuralMeshService({ transport: 'stdio', enableP2P: false });
+      const wsService = new NeuralMeshService({ transport: 'websocket', enableP2P: false });
       
       expect(httpService).toBeDefined();
       expect(stdioService).toBeDefined();
@@ -74,6 +76,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
         serverUrl: 'http://localhost:3000',
         transport: 'http',
         enableWasm: false,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
@@ -88,6 +91,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const stdioService = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: false
       });
 
@@ -101,6 +105,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     test('should handle unsupported transport type', async () => {
       const badService = new NeuralMeshService({
         transport: 'invalid' as any,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
@@ -208,10 +213,16 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const jsService = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: false,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
-      await jsService.initialize();
+      const connected = await jsService.initialize();
+      expect(connected).toBe(true);
+      
+      // CI compatibility: Verify connection status before proceeding
+      const connectionStatus = jsService.getConnectionStatus();
+      expect(connectionStatus?.status).toBe('connected');
 
       const input = new Float32Array([0.1, 0.2, 0.3, 0.4, 0.5]);
       const result = await jsService.processInference(input);
@@ -228,10 +239,16 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const wasmService = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: false
       });
 
-      await wasmService.initialize();
+      const connected = await wasmService.initialize();
+      expect(connected).toBe(true);
+      
+      // CI compatibility: Verify connection status before proceeding
+      const connectionStatus = wasmService.getConnectionStatus();
+      expect(connectionStatus?.status).toBe('connected');
 
       // Test various input sizes
       const testSizes = [1, 10, 100, 1000];
@@ -251,7 +268,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
 
   describe('Agent Lifecycle Coverage', () => {
     test('should handle agent creation with minimal config', async () => {
-      const service = new NeuralMeshService({ transport: 'stdio' });
+      const service = new NeuralMeshService({ transport: 'stdio', enableP2P: false });
       await service.initialize();
 
       const agent = await service.spawnAgent({});
@@ -266,7 +283,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     });
 
     test('should handle agent creation with full config', async () => {
-      const service = new NeuralMeshService({ transport: 'stdio' });
+      const service = new NeuralMeshService({ transport: 'stdio', enableP2P: false });
       await service.initialize();
 
       const fullConfig = {
@@ -305,7 +322,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     });
 
     test('should update connection stats when spawning agents', async () => {
-      const service = new NeuralMeshService({ transport: 'stdio', debugMode: true });
+      const service = new NeuralMeshService({ transport: 'stdio', enableP2P: false, debugMode: true });
       await service.initialize();
 
       const initialStatus = service.getConnectionStatus();
@@ -323,14 +340,14 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
 
   describe('Error Handling Coverage', () => {
     test('should throw error when spawning agent without connection', async () => {
-      const disconnectedService = new NeuralMeshService();
+      const disconnectedService = new NeuralMeshService({ enableP2P: false });
       
       await expect(disconnectedService.spawnAgent({ id: 'test' }))
         .rejects.toThrow('Neural mesh not connected');
     });
 
     test('should throw error when processing inference without connection', async () => {
-      const disconnectedService = new NeuralMeshService();
+      const disconnectedService = new NeuralMeshService({ enableP2P: false });
       
       await expect(disconnectedService.processInference(new Float32Array([1, 2, 3])))
         .rejects.toThrow('Neural mesh not connected');
@@ -340,6 +357,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const service = new NeuralMeshService({
         transport: 'invalid' as any,
         enableWasm: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
@@ -355,6 +373,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
         transport: 'stdio',
         enableWasm: true,
         enableRealtime: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
@@ -367,14 +386,14 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     });
 
     test('should handle shutdown when not initialized', async () => {
-      const service = new NeuralMeshService();
+      const service = new NeuralMeshService({ enableP2P: false });
       
       // Should not throw error
       await expect(service.shutdown()).resolves.not.toThrow();
     });
 
     test('should handle multiple shutdown calls', async () => {
-      const service = new NeuralMeshService({ transport: 'stdio' });
+      const service = new NeuralMeshService({ transport: 'stdio', enableP2P: false });
       await service.initialize();
 
       await service.shutdown();
@@ -388,6 +407,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const service = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: false
       });
 
@@ -406,6 +426,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
     test('should handle rapid agent spawning', async () => {
       const service = new NeuralMeshService({
         transport: 'stdio',
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: false
       });
 
@@ -433,6 +454,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const debugService = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: true,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: true
       });
 
@@ -451,6 +473,7 @@ describe('NeuralMeshService - Comprehensive Coverage Tests', () => {
       const silentService = new NeuralMeshService({
         transport: 'stdio',
         enableWasm: false,
+        enableP2P: false, // CI compatibility: Disable P2P to avoid conflicts
         debugMode: false
       });
 
